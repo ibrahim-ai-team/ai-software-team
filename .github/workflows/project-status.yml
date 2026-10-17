@@ -1,0 +1,147 @@
+name: Update GitHub Project issue status
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number in this repository"
+        required: true
+        type: number
+      status:
+        description: "Exact Status option on organization Project #1"
+        required: true
+        type: choice
+        options:
+          - Backlog
+          - Ready
+          - In Progress
+          - Done
+          - Blocked
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-status-${{ github.workflow }}-${{ inputs.issue_number }}
+  cancel-in-progress: false
+
+jobs:
+  update-project-status:
+    name: Update Project #1 Status
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate inputs and token
+        shell: bash
+        env:
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          TARGET_STATUS: ${{ inputs.status }}
+          PROJECTS_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$ISSUE_NUMBER" =~ ^[1-9][0-9]*$ ]]; then
+            echo "::error::Issue number must be a positive integer."
+            exit 1
+          fi
+          case "$TARGET_STATUS" in
+            Backlog|Ready|"In Progress"|Done|Blocked) ;;
+            *) echo "::error::Unsupported status."; exit 1 ;;
+          esac
+          if [[ -z "${PROJECTS_TOKEN:-}" ]]; then
+            echo "::error::Repository secret PROJECTS_TOKEN is missing."
+            exit 1
+          fi
+
+      - name: Find issue, project item, and Status option
+        id: lookup
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          TARGET_STATUS: ${{ inputs.status }}
+          OWNER: ${{ github.repository_owner }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          QUERY='query($org:String!, $number:Int!) {
+            organization(login:$org) {
+              projectV2(number:$number) {
+                id
+                fields(first:50) {
+                  nodes {
+                    ... on ProjectV2SingleSelectField {
+                      id
+                      name
+                      options { id name }
+                    }
+                  }
+                }
+                items(first:100) {
+                  nodes {
+                    id
+                    content {
+                      ... on Issue {
+                        number
+                        title
+                        repository { nameWithOwner }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }'
+          DATA="$(gh api graphql -f query="$QUERY" -F org="$OWNER" -F number=1)"
+          PROJECT_ID="$(jq -r '.data.organization.projectV2.id // empty' <<<"$DATA")"
+          if [[ -z "$PROJECT_ID" ]]; then
+            echo "::error::Organization Project #1 was not found or the token cannot access it. Check Projects: Read and write and organization authorization."
+            exit 1
+          fi
+          ITEM_ID="$(jq -r --arg repo "$REPOSITORY" --argjson issue "$ISSUE_NUMBER" '[.data.organization.projectV2.items.nodes[] | select(.content != null and .content.number == $issue and .content.repository.nameWithOwner == $repo) | .id] | first // empty' <<<"$DATA")"
+          if [[ -z "$ITEM_ID" ]]; then
+            echo "::error::Issue #$ISSUE_NUMBER was not found among the first 100 items in Project #1. Confirm the issue is added to that project."
+            exit 1
+          fi
+          FIELD_ID="$(jq -r '[.data.organization.projectV2.fields.nodes[] | select(.name == "Status") | .id] | first // empty' <<<"$DATA")"
+          OPTION_ID="$(jq -r --arg status "$TARGET_STATUS" '[.data.organization.projectV2.fields.nodes[] | select(.name == "Status") | .options[]? | select(.name == $status) | .id] | first // empty' <<<"$DATA")"
+          if [[ -z "$FIELD_ID" || -z "$OPTION_ID" ]]; then
+            echo "::error::The project does not have a Status field with the exact option '$TARGET_STATUS'. Check the board's field and options."
+            exit 1
+          fi
+          {
+            echo "project_id=$PROJECT_ID"
+            echo "item_id=$ITEM_ID"
+            echo "field_id=$FIELD_ID"
+            echo "option_id=$OPTION_ID"
+          } >> "$GITHUB_OUTPUT"
+          echo "Found issue #$ISSUE_NUMBER in Project #1 and matched Status option '$TARGET_STATUS'."
+
+      - name: Set Project V2 Status
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          PROJECT_ID: ${{ steps.lookup.outputs.project_id }}
+          ITEM_ID: ${{ steps.lookup.outputs.item_id }}
+          FIELD_ID: ${{ steps.lookup.outputs.field_id }}
+          OPTION_ID: ${{ steps.lookup.outputs.option_id }}
+          TARGET_STATUS: ${{ inputs.status }}
+        run: |
+          set -euo pipefail
+          MUTATION='mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $optionId:String!) {
+            updateProjectV2ItemFieldValue(input:{
+              projectId:$projectId,
+              itemId:$itemId,
+              fieldId:$fieldId,
+              value:{singleSelectOptionId:$optionId}
+            }) {
+              projectV2Item { id }
+            }
+          }'
+          RESULT="$(gh api graphql -f query="$MUTATION" -F projectId="$PROJECT_ID" -F itemId="$ITEM_ID" -F fieldId="$FIELD_ID" -F optionId="$OPTION_ID")"
+          UPDATED="$(jq -r '.data.updateProjectV2ItemFieldValue.projectV2Item.id // empty' <<<"$RESULT")"
+          if [[ -z "$UPDATED" ]]; then
+            echo "::error::GitHub did not confirm the Project V2 status update."
+            jq -r '.errors[]?.message // empty' <<<"$RESULT"
+            exit 1
+          fi
+          echo "Successfully set issue #${{ inputs.issue_number }} to '$TARGET_STATUS' on organization Project #1."
