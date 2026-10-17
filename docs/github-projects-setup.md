@@ -16,6 +16,10 @@ Create a GitHub Project linked to this repository and add:
 
 GitHub Projects features and field availability can vary by project type and account permissions; configure equivalent fields if names differ.
 
+## Canonical status and transition rules
+
+The Project V2 single-select `Status` field is the source of truth for board status; issue titles must not carry status prefixes as a second source of truth. Use `workflows/project-status-transitions.md` for permitted transitions, event triggers, and required evidence. Use `workflows/backlog-quality-gates.md` for Definition of Ready and QA decomposition. A manual setup guide is not automation: verify the actual project fields, options, and item status after configuration.
+
 ## Recommended views
 
 1. **Product Backlog:** Status is Backlog, sorted by priority.
