@@ -38,6 +38,8 @@ jobs:
         env:
           MANIFEST_BASE_REF: origin/${{ github.event.repository.default_branch || 'main' }}
         run: python scripts/validate_team.py
+      - name: Check repository-relative Markdown links
+        run: python scripts/check_markdown_links.py
       - name: Run offline inventory check (not Claude Code runtime discovery)
         run: python scripts/smoke_discovery.py
       - name: Run regression tests
