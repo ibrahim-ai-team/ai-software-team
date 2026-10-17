@@ -1,0 +1,86 @@
+name: QA task
+description: Plan or deliver distinct test strategy, test automation, test data, environment, or verification work.
+title: "[QA] "
+labels: ["qa"]
+body:
+  - type: input
+    id: qa_id
+    attributes:
+      label: QA task ID
+      placeholder: "QA-XXX"
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Parent story, bug, or technical issue
+      description: "Enter issue number/link or explain why this is a cross-cutting QA task."
+      placeholder: "#123 or URL"
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Test objective and risk
+      description: "What behaviour/risk will this task verify?"
+    validations:
+      required: true
+  - type: textarea
+    id: coverage
+    attributes:
+      label: Scenarios and coverage
+      description: "List positive, negative, boundary, permission, error, regression and non-functional scenarios as applicable."
+    validations:
+      required: true
+  - type: dropdown
+    id: test_level
+    attributes:
+      label: Test level
+      multiple: true
+      options: ["Unit", "Integration / contract", "API", "UI / component", "End-to-end", "Regression", "Performance / reliability", "Security / accessibility"]
+    validations:
+      required: true
+  - type: textarea
+    id: data_env
+    attributes:
+      label: Test data and environment
+      description: "Describe safe test data, isolation/cleanup, environment, dependencies and access needs. Never include credentials."
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: ["P0 - Critical", "P1 - High", "P2 - Medium", "P3 - Low"]
+    validations:
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Estimate
+      description: "Use agreed scale or TBD pending refinement."
+      placeholder: "3 or TBD"
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and related issues
+      description: "List issue numbers/PRs/environment prerequisites, or write None."
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and exit criteria
+      description: "State exact test commands/suites, expected results, pass/fail criteria, reports/artifacts, and how gaps are recorded."
+    validations:
+      required: true
+  - type: textarea
+    id: followups
+    attributes:
+      label: Defect and follow-up handling
+      description: "Explain how failures become linked bug issues and how untested scope is reported."
+      value: "Any confirmed defect must be recorded as a separate linked Bug issue. Never mark tests passed if they were not run."
+    validations:
+      required: true
