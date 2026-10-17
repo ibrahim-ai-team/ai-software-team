@@ -1,0 +1,80 @@
+name: Bug report
+description: Report reproducible incorrect behaviour.
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Short summary
+      placeholder: "Observed behaviour"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. ...\n2. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment and version
+      description: "Include browser/device/build/commit/environment as applicable; do not include secrets or personal data."
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: "Add sanitized logs, screenshots, trace, request/response examples, or links. Write Not available and why if absent."
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options: ["S0 - Critical outage/security", "S1 - High", "S2 - Medium", "S3 - Low"]
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: ["P0 - Critical", "P1 - High", "P2 - Medium", "P3 - Low"]
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact and workaround
+      description: "Who is affected? Is there a workaround?"
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Related issues and dependencies
+      description: "Link affected story/PR/related issue, or write None."
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Fix verification and regression evidence expected
+      description: "State reproduction test, regression scope, and evidence required to close this bug."
+    validations:
+      required: true

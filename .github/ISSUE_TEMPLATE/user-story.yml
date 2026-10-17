@@ -1,0 +1,81 @@
+name: User Story
+description: Propose a user-facing capability with testable acceptance criteria.
+title: "[STORY] "
+labels: ["story"]
+body:
+  - type: markdown
+    attributes:
+      value: "Use this form for a user-visible outcome. Create separate QA tasks when verification is a distinct deliverable."
+  - type: input
+    id: story_id
+    attributes:
+      label: Story ID
+      description: "Stable identifier, e.g. US-012. Use TBD if not yet assigned."
+      placeholder: "US-XXX"
+    validations:
+      required: true
+  - type: textarea
+    id: story
+    attributes:
+      label: User story
+      description: "As a [persona], I want [capability], so that [outcome]."
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context, assumptions, and scope
+      description: "Include known constraints, assumptions, and what is out of scope."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: "Use Given / When / Then. Each criterion must be observable and testable."
+      placeholder: "- Given ... When ... Then ..."
+    validations:
+      required: true
+  - type: textarea
+    id: edge_cases
+    attributes:
+      label: Edge cases and failure states
+      description: "List important invalid inputs, errors, permissions, and boundary conditions; write None with rationale if none."
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: ["P0 - Critical", "P1 - High", "P2 - Medium", "P3 - Low"]
+    validations:
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Estimate
+      description: "Use the team's agreed scale (e.g. 1, 2, 3, 5, 8) or TBD pending refinement."
+      placeholder: "3 or TBD"
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and related issues
+      description: "List issue numbers/links, or write None."
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification and evidence expected
+      description: "State how each acceptance criterion will be verified, relevant test levels, and expected evidence. If tests are tracked separately, link planned QA issues or write QA decomposition required."
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of Done
+      value: "- [ ] Acceptance criteria met\n- [ ] Appropriate tests added/updated and executed\n- [ ] Results/evidence recorded; unrun checks explained\n- [ ] Documentation updated where needed\n- [ ] PR reviewed; human owner performs final merge"
+    validations:
+      required: true

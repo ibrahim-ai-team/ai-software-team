@@ -68,6 +68,10 @@ Transitions must be recorded with timestamp, previous phase, new phase, reason, 
 - If requirements or architecture conflict, stop dependent work, record the conflict and impact, and resolve via the role owner or sponsor decision gate.
 - On context/token pressure, stop starting new work, persist the checkpoint and handover, and report what remains. Never claim the overall project is complete because the budget or session ended.
 
+## Backlog and project status integrity
+
+Follow `workflows/backlog-quality-gates.md` before a task is considered Ready. QA must map acceptance criteria to verification methods and identify distinct linked QA issues before sprint commitment. Follow `workflows/project-status-transitions.md` for the canonical GitHub Projects Status field and allowed transitions. A title prefix, issue body text, label, or agent assertion does not prove a board status changed. The coordinator must verify the actual Project V2 field after a status update. Report status-update failures without claiming success; keep the last verified state. Never set Done without a verified human-merged PR and completion evidence.
+
 ## Quality and merge gate
 A task can enter review only when its acceptance checks and relevant tests have evidence. Review must inspect the actual diff, test results, security/privacy impact, docs/config changes, and compatibility. QA reports tested and not-tested scope. The `code-review-security` agent produces a read-only review report with findings and evidence. The coordinator records the review disposition in the delegation/PR record; the reviewer never approves its own implementation. The Architect may advise on architecture, but no separate Tech Lead agent is assumed. A PR may be labelled ready only when required CI checks pass and the evidence is linked; if checks are unavailable, state that explicitly and do not imply they passed.
 

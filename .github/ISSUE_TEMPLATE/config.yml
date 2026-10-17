@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Team workflow and contribution guidance
+    url: https://github.com/ibrahim-ai-team/ai-software-team/blob/main/workflows/agile-agent-delivery.md
+    about: Read the task lifecycle, QA planning requirements, and human merge policy before creating work.

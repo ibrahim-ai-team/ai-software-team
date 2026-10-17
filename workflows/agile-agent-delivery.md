@@ -33,6 +33,10 @@ The team should run routine planning and execution without requiring the user to
 
 The user receives visibility and retains final PR merge authority. A request to build an application authorizes planning and routine implementation within available project/repository scope; it does not authorize paid services, production deployment, or other protected actions.
 
+## Backlog quality and QA planning (mandatory)
+
+Before any issue enters `Ready`, follow `workflows/backlog-quality-gates.md`. Create issues with the matching form under `.github/ISSUE_TEMPLATE/`; do not rely on title prefixes for metadata. The PM owns the Definition of Ready gate, while QA maps each acceptance criterion to verification and creates a separate linked `[QA]` issue when the work is a distinct deliverable. A confirmed product defect requiring separate remediation becomes a linked `[BUG]` issue. If tests reasonably fit the implementation task, keep them there and record the rationale instead of creating unnecessary tickets. Missing acceptance criteria, priority, dependencies, estimates/refinement plan, QA mapping, or evidence expectations keep the item in Backlog.
+
 ## Issue lifecycle
 
 1. **Backlog** — captured, not committed to a sprint.
