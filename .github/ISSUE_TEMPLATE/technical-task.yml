@@ -1,0 +1,69 @@
+name: Technical task
+description: Propose bounded engineering, DevOps, security, refactoring, or documentation work.
+title: "[TECH] "
+labels: ["technical-task"]
+body:
+  - type: input
+    id: task_id
+    attributes:
+      label: Task ID
+      placeholder: "TECH-XXX"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and rationale
+      description: "Describe current state, evidence, and why the work is needed."
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected outcome and scope
+      description: "Define deliverables and explicitly list out-of-scope work."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: "Use observable, verifiable checks; do not use vague wording such as works correctly."
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: ["P0 - Critical", "P1 - High", "P2 - Medium", "P3 - Low"]
+    validations:
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Estimate
+      description: "Use agreed scale or TBD pending refinement."
+      placeholder: "2 or TBD"
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and related issues
+      description: "Link issue/PR/ADR or write None."
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Validation evidence
+      description: "List commands, tests, CI jobs, security checks, docs, and the evidence expected. Explain checks that cannot run."
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks and rollback
+      description: "Include security/privacy, compatibility, migration, operational impact, and rollback where relevant; write N/A with rationale if not applicable."
+    validations:
+      required: true
