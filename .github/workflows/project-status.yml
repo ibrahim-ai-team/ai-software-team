@@ -1,0 +1,228 @@
+name: Update GitHub Project issue status
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number in this repository"
+        required: true
+        type: number
+      status:
+        description: "Target status on organization Project #1"
+        required: true
+        type: choice
+        options:
+          - Backlog
+          - Ready
+          - In Progress
+          - In Review
+          - Changes Requested
+          - Approved — Awaiting Human Merge
+          - Blocked
+          - Done
+      reason:
+        description: "Why this transition is justified"
+        required: true
+        type: string
+      evidence_url:
+        description: "URL to the PR, CI run, test report, or blocker evidence"
+        required: true
+        type: string
+      pull_request_number:
+        description: "Required only when setting Done; merged PR number"
+        required: false
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: project-status-${{ github.workflow }}-${{ inputs.issue_number }}
+  cancel-in-progress: false
+
+jobs:
+  update-project-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Validate inputs and secret
+        shell: bash
+        env:
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          TARGET_STATUS: ${{ inputs.status }}
+          REASON: ${{ inputs.reason }}
+          EVIDENCE_URL: ${{ inputs.evidence_url }}
+          PROJECTS_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+        run: |
+          set -euo pipefail
+          [[ "$ISSUE_NUMBER" =~ ^[1-9][0-9]*$ ]] || { echo "::error::Issue number must be a positive integer."; exit 1; }
+          [[ -n "${REASON//[[:space:]]/}" ]] || { echo "::error::Transition reason is required."; exit 1; }
+          [[ "$EVIDENCE_URL" =~ ^https:// ]] || { echo "::error::Evidence must be an HTTPS URL."; exit 1; }
+          [[ -n "${PROJECTS_TOKEN:-}" ]] || { echo "::error::Repository secret PROJECTS_TOKEN is missing."; exit 1; }
+          if [[ "$TARGET_STATUS" == "Done" && -z "${{ inputs.pull_request_number }}" ]]; then
+            echo "::error::Done requires a merged pull request number for verification."
+            exit 1
+          fi
+
+      - name: Verify completion evidence when setting Done
+        if: inputs.status == 'Done'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          PR_NUMBER: ${{ inputs.pull_request_number }}
+        run: |
+          set -euo pipefail
+          PR_JSON="$(gh pr view "$PR_NUMBER" --repo "$REPOSITORY" --json state,mergedAt,body,url)"
+          [[ "$(jq -r '.state' <<<"$PR_JSON")" == "MERGED" && "$(jq -r '.mergedAt // empty' <<<"$PR_JSON")" != "" ]] || {
+            echo "::error::The supplied PR is not merged. Done is not allowed."
+            exit 1
+          }
+          PR_BODY="$(jq -r '.body // ""' <<<"$PR_JSON")"
+          if ! grep -Eq "(Closes|Fixes|Resolves)[[:space:]]+#${ISSUE_NUMBER}([^0-9]|$)" <<<"$PR_BODY"; then
+            echo "::error::The PR body must link this issue using Closes #$ISSUE_NUMBER, Fixes #$ISSUE_NUMBER, or Resolves #$ISSUE_NUMBER."
+            exit 1
+          fi
+          echo "Verified merged PR #$PR_NUMBER is linked to issue #$ISSUE_NUMBER."
+
+      - name: Find issue, project item, current status, and target option
+        id: lookup
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          TARGET_STATUS: ${{ inputs.status }}
+          OWNER: ${{ github.repository_owner }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          QUERY='query($org:String!, $number:Int!) {
+            organization(login:$org) {
+              projectV2(number:$number) {
+                id
+                fields(first:50) {
+                  nodes {
+                    ... on ProjectV2SingleSelectField {
+                      id
+                      name
+                      options { id name }
+                    }
+                  }
+                }
+                items(first:100) {
+                  nodes {
+                    id
+                    content {
+                      ... on Issue {
+                        number
+                        title
+                        repository { nameWithOwner }
+                      }
+                    }
+                    fieldValues(first:20) {
+                      nodes {
+                        ... on ProjectV2ItemFieldSingleSelectValue {
+                          name
+                          field { ... on ProjectV2SingleSelectField { name } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }'
+          DATA="$(gh api graphql -f query="$QUERY" -F org="$OWNER" -F number=1)"
+          PROJECT_ID="$(jq -r '.data.organization.projectV2.id // empty' <<<"$DATA")"
+          [[ -n "$PROJECT_ID" ]] || { echo "::error::Project #1 unavailable. Check org access and Projects: Read and write."; exit 1; }
+          ITEM_JSON="$(jq -c --arg repo "$REPOSITORY" --argjson issue "$ISSUE_NUMBER" '[.data.organization.projectV2.items.nodes[] | select(.content != null and .content.number == $issue and .content.repository.nameWithOwner == $repo)] | first // empty' <<<"$DATA")"
+          [[ -n "$ITEM_JSON" && "$ITEM_JSON" != "null" ]] || { echo "::error::Issue #$ISSUE_NUMBER was not found in the first 100 items of Project #1. Confirm project membership."; exit 1; }
+          ITEM_ID="$(jq -r '.id' <<<"$ITEM_JSON")"
+          CURRENT_STATUS="$(jq -r '[.fieldValues.nodes[] | select(.field.name == "Status") | .name] | first // empty' <<<"$ITEM_JSON")"
+          FIELD_ID="$(jq -r '[.data.organization.projectV2.fields.nodes[] | select(.name == "Status") | .id] | first // empty' <<<"$DATA")"
+          OPTION_ID="$(jq -r --arg status "$TARGET_STATUS" '[.data.organization.projectV2.fields.nodes[] | select(.name == "Status") | .options[]? | select(.name == $status) | .id] | first // empty' <<<"$DATA")"
+          [[ -n "$FIELD_ID" && -n "$OPTION_ID" ]] || { echo "::error::Status field/option '$TARGET_STATUS' not found. Match the exact Project field options."; exit 1; }
+          {
+            echo "project_id=$PROJECT_ID"
+            echo "item_id=$ITEM_ID"
+            echo "field_id=$FIELD_ID"
+            echo "option_id=$OPTION_ID"
+            echo "current_status=$CURRENT_STATUS"
+          } >> "$GITHUB_OUTPUT"
+          echo "Current board status: ${CURRENT_STATUS:-unset}; requested status: $TARGET_STATUS"
+
+      - name: Validate transition
+        shell: bash
+        env:
+          CURRENT_STATUS: ${{ steps.lookup.outputs.current_status }}
+          TARGET_STATUS: ${{ inputs.status }}
+        run: |
+          set -euo pipefail
+          if [[ "$CURRENT_STATUS" == "$TARGET_STATUS" ]]; then
+            echo "Status already matches requested value; no update needed."
+            exit 0
+          fi
+          ALLOWED=false
+          case "$CURRENT_STATUS->$TARGET_STATUS" in
+            "Backlog->Ready"|"Backlog->Blocked"|"Ready->In Progress"|"Ready->Blocked"|"In Progress->In Review"|"In Progress->Blocked"|"In Review->Changes Requested"|"In Review->Approved — Awaiting Human Merge"|"In Review->Blocked"|"Changes Requested->In Progress"|"Changes Requested->In Review"|"Changes Requested->Blocked"|"Approved — Awaiting Human Merge->Done"|"Approved — Awaiting Human Merge->Blocked"|"Blocked->Backlog"|"Blocked->Ready"|"Done->In Progress") ALLOWED=true ;;
+          esac
+          if [[ "$TARGET_STATUS" == "Blocked" && -n "$CURRENT_STATUS" && "$CURRENT_STATUS" != "Done" ]]; then ALLOWED=true; fi
+          [[ "$ALLOWED" == true ]] || {
+            echo "::error::Transition '$CURRENT_STATUS' -> '$TARGET_STATUS' is not allowed by workflows/project-status-transitions.md."
+            exit 1
+          }
+
+      - name: Update the Project V2 Status field
+        if: steps.lookup.outputs.current_status != inputs.status
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          PROJECT_ID: ${{ steps.lookup.outputs.project_id }}
+          ITEM_ID: ${{ steps.lookup.outputs.item_id }}
+          FIELD_ID: ${{ steps.lookup.outputs.field_id }}
+          OPTION_ID: ${{ steps.lookup.outputs.option_id }}
+          TARGET_STATUS: ${{ inputs.status }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          REASON: ${{ inputs.reason }}
+          EVIDENCE_URL: ${{ inputs.evidence_url }}
+        run: |
+          set -euo pipefail
+          MUTATION='mutation($projectId:ID!, $itemId:ID!, $fieldId:ID!, $optionId:String!) {
+            updateProjectV2ItemFieldValue(input:{
+              projectId:$projectId,
+              itemId:$itemId,
+              fieldId:$fieldId,
+              value:{singleSelectOptionId:$optionId}
+            }) { projectV2Item { id } }
+          }'
+          RESULT="$(gh api graphql -f query="$MUTATION" -F projectId="$PROJECT_ID" -F itemId="$ITEM_ID" -F fieldId="$FIELD_ID" -F optionId="$OPTION_ID")"
+          UPDATED="$(jq -r '.data.updateProjectV2ItemFieldValue.projectV2Item.id // empty' <<<"$RESULT")"
+          [[ -n "$UPDATED" ]] || { echo "::error::GitHub did not confirm the Project V2 status update."; jq -r '.errors[]?.message // empty' <<<"$RESULT"; exit 1; }
+          echo "Updated issue #$ISSUE_NUMBER to '$TARGET_STATUS'. Reason: $REASON. Evidence: $EVIDENCE_URL"
+
+      - name: Read back and verify the board status
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
+          ITEM_ID: ${{ steps.lookup.outputs.item_id }}
+          TARGET_STATUS: ${{ inputs.status }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+        run: |
+          set -euo pipefail
+          QUERY='query($itemId:ID!) {
+            node(id:$itemId) {
+              ... on ProjectV2Item {
+                fieldValueByName(name:"Status") {
+                  ... on ProjectV2ItemFieldSingleSelectValue { name }
+                }
+              }
+            }
+          }'
+          RESULT="$(gh api graphql -f query="$QUERY" -F itemId="$ITEM_ID")"
+          ACTUAL="$(jq -r '.data.node.fieldValueByName.name // empty' <<<"$RESULT")"
+          [[ "$ACTUAL" == "$TARGET_STATUS" ]] || {
+            echo "::error::Read-back mismatch. Expected '$TARGET_STATUS', observed '${ACTUAL:-unset}'."
+            exit 1
+          }
+          echo "Verified: issue #$ISSUE_NUMBER has actual Project Status '$ACTUAL'."
