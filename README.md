@@ -6,11 +6,11 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 
 | Area | Contents |
 |---|---|
-| Agents | 16 focused roles under .claude/agents/, including UI/UX Designer, SRE / Observability Engineer, Performance Engineer, and Release Manager |
-| Skills | 22 reusable procedures under .claude/skills/<skill-name>/SKILL.md |
-| Shared instructions | .claude/CLAUDE.md and local permission guardrails in .claude/settings.json |
+| Agents | 16 focused roles under `.claude/agents/` |
+| Skills | 23 reusable procedures under `.claude/skills/` (the manifest minimum is 22) |
+| Shared instructions | `.claude/CLAUDE.md` and local permission guardrails in `.claude/settings.json` |
 | Standards | Engineering, security, Git workflow, and definition of done |
-| Templates | Requirements, stories, sprint plans, architecture decisions, test plans, code reviews, handovers, sprint reviews, retrospectives, release readiness, and daily reports |
+| Templates | 17 template files; 10 are currently required by the manifest, while the rest are optional support artifacts |
 | Workflow and docs | Project bootstrap, Agile delivery, orchestration contract, agent traceability, GitHub Projects setup, capabilities, and verification notes |
 | Validation | Manifest-driven Python static checks, offline inventory check, and regression tests |
 | Security automation | Gitleaks secret scanning and weekly GitHub Actions dependency update PRs |
@@ -24,9 +24,11 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 ## Quick start
 
 1. Clone or download this repository.
-2. From the repository root, run `python scripts/validate_team.py`, `python scripts/smoke_discovery.py (offline inventory check only)`, and `python -m unittest discover -s tests -v`.
+2. From the repository root, run `python scripts/validate_team.py`, `python scripts/smoke_discovery.py` (offline inventory check only), and `python -m unittest discover -s tests -v`.
 3. Start Claude Code from this directory.
 4. Ask Claude Code to inspect the team configuration only, report which agents and skills it discovers, and identify version-specific issues. Do not authorize application creation unless you are ready to start a separate project.
+
+For a fictional end-to-end illustration, see [Example Walkthrough](docs/example-walkthrough.md). The example is documentation, not runtime evidence.
 
 ## Agile commands
 
@@ -53,7 +55,7 @@ For the exact phases, recovery rules, evidence requirements and safety boundarie
 - This repository does not itself run a background agent team when Claude Code is closed.
 - Markdown task records and GitHub labels are not atomic distributed locks. The documented protocol is single-coordinator/single-writer unless separate isolated worktrees and a real coordination mechanism are configured.
 - The validator reads `.claude/manifest.json` for minimum agent/skill inventories and required command/template files. The offline `scripts/smoke_discovery.py` checks whether inventory files and agent/skill metadata can be discovered without launching Claude Code. Neither check proves real Claude Code discovery, delegation, application correctness, deployment, or branch protection.
-- Choose a project license before presenting the repository as licensed open-source software.
+- No repository license has been selected yet. Do not present the project as licensed open-source software until the owner selects and adds a license.
 
 ## Verification
 
