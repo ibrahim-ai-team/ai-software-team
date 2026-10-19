@@ -49,8 +49,10 @@ Workflow `.github/workflows/project-status.yml` from branch `claude/ai-team-proj
 | PS-01 | Issue not on the Project (#45) | Failed with "Issue #45 is not on Project ibrahim-ai-team/#1" ([run](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39297846952)) | PASS (clear error) |
 | PS-02 | Real update #24 → Blocked | Updated, then read back "actual Project Status 'Blocked'" ([run](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39297917731)) | PASS |
 | PS-03 | `dry_run` on 18 issues | Reported each Status without changing it; `Done → Blocked` refused as an invalid transition | PASS |
+| PS-04 | `add_if_missing` (#35, #45) | Added both issues to the board, then set Ready / Blocked with read-back | PASS |
+| PS-05 | Full chain Ready → In Progress → In Review → Approved → Done for #32, #34, #35, #39, #40, #42, #43 | Every step read back; Done gate verified merged PR #48 with `Closes #n` | PASS |
 
-Board Status read back on 2026-10-19 (Project #1):
+Board Status read back on 2026-10-19 before corrections (Project #1):
 
 | Status | Issues |
 |---|---|
@@ -59,6 +61,16 @@ Board Status read back on 2026-10-19 (Project #1):
 | Backlog | #32, #34, #36, #39, #40, #42, #43 |
 | Done | #23, #28, #33, #37, #41 |
 | Not on board | #35, #38, #45 (no auto-add workflow on the Project) |
+
+Board Status after corrections (each value confirmed by the workflow's read-back):
+
+| Status | Issues |
+|---|---|
+| Blocked | #24 (owner branch rule), #45 (pilot) |
+| Backlog | #26, #36 |
+| In Progress | #25 — closed issue; owner action (see above) |
+| Done | #23, #28, #32, #33, #34, #35, #37, #39, #40, #41, #42, #43 |
+| Not on board | #38 (closed; cosmetic) |
 
 ## Template for future runs
 
