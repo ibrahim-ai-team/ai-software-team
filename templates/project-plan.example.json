@@ -4,7 +4,7 @@
   "visibility": "private",
   "project": {
     "id": "idea-01",
-    "name": "Shop Platform"
+    "name": "Shopinow"
   },
   "summary": "Online store where customers browse products, buy them and track orders.",
   "requirements": [
@@ -60,7 +60,9 @@
         "GET /products returns a paginated list with name, price and stock",
         "GET /products/{id} returns 404 for an unknown product"
       ],
-      "depends_on": ["EP-1"]
+      "depends_on": [
+        "EP-1"
+      ]
     },
     {
       "key": "US-2",
@@ -74,7 +76,9 @@
         "The home page shows products from the catalogue API",
         "An empty catalogue shows a friendly message"
       ],
-      "depends_on": ["US-1"]
+      "depends_on": [
+        "US-1"
+      ]
     },
     {
       "key": "QA-1",
@@ -86,7 +90,9 @@
       "acceptance_criteria": [
         "Playwright test opens the home page and sees at least one product from a seeded API"
       ],
-      "depends_on": ["US-2"]
+      "depends_on": [
+        "US-2"
+      ]
     }
   ],
   "options": {

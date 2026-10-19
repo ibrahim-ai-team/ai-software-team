@@ -42,9 +42,9 @@ class FakeGitHub:
         self.writes.append((op, target))
 
     # reads
-    def list_org_repo_names(self, org):
-        self._check("list_org_repo_names")
-        return list(self.repos)
+    def list_org_repos(self, org):
+        self._check("list_org_repos")
+        return [{"name": n, "description": r["description"], "topics": r["topics"]} for n, r in self.repos.items()]
 
     def get_repo(self, org, name):
         self._check("get_repo", name)
@@ -172,15 +172,39 @@ def statuses(state, prefix):
 class NamingAndPlanTests(unittest.TestCase):
     def test_next_project_id(self):
         self.assertEqual(pp.next_project_id([]), "idea-01")
-        self.assertEqual(pp.next_project_id(["ai-software-team", "idea-01-front", "idea-07-management"]), "idea-08")
+        self.assertEqual(pp.next_project_id(["ai-software-team", "shopinow-front", "idea-07-management"]), "idea-08")
         self.assertEqual(pp.next_project_id(["idea-99-back"]), "idea-100")
+        tagged = [{"name": "shopinow-back", "description": "API [ai-team:idea-04]", "topics": []},
+                  {"name": "booky-app", "description": "", "topics": ["ai-team-app", "idea-06"]}]
+        self.assertEqual(pp.next_project_id(tagged), "idea-07")
+
+    def test_repository_names_come_from_the_app_name(self):
+        normalized = pp.validate_plan(plan(project={"id": "idea-01", "name": "Shopinow"}))
+        self.assertEqual(normalized["project"]["slug"], "shopinow")
+        self.assertEqual(pp.slugify("My Shop  2.0!"), "my-shop-2-0")
+        custom = pp.validate_plan(plan(project={"id": "idea-01", "name": "Shop Now", "slug": "shopnow"}))
+        self.assertEqual([r["name"] for r in custom["repos"]], ["shopnow-management", "shopnow-front", "shopnow-back"])
+
+    def test_app_name_rules(self):
+        for bad in ("ai-software-team", "idea-05", "Shop_Now", "-x"):
+            with self.subTest(slug=bad), self.assertRaises(pp.PlanError) as ctx:
+                pp.validate_plan(plan(project={"id": "idea-01", "name": "X", "slug": bad}))
+            self.assertTrue(any("project.slug" in e for e in ctx.exception.errors))
+
+    def test_app_name_used_by_another_idea_is_rejected(self):
+        existing = [{"name": "shopinow-front", "description": "Store [ai-team:idea-03]", "topics": []}]
+        with self.assertRaises(pp.PlanError) as ctx:
+            pp.validate_plan(plan(project={"name": "Shopinow"}), existing_repos=existing)
+        self.assertTrue(any("already used by idea-03" in e for e in ctx.exception.errors))
+        same = pp.validate_plan(plan(project={"id": "idea-03", "name": "Shopinow"}), existing_repos=existing)
+        self.assertEqual(same["project"]["id"], "idea-03")   # rerun of the same idea is fine
 
     def test_id_assigned_from_existing_repos_when_missing(self):
-        raw = plan(project={"name": "Shop Platform"})
-        normalized = pp.validate_plan(raw, existing_repo_names=["idea-01-management", "idea-02-app"])
+        raw = plan(project={"name": "Shopinow"})
+        normalized = pp.validate_plan(raw, existing_repos=["ai-software-team", "idea-02-app"])
         self.assertEqual(normalized["project"]["id"], "idea-03")
         self.assertEqual([r["name"] for r in normalized["repos"]],
-                         ["idea-03-management", "idea-03-front", "idea-03-back"])
+                         ["shopinow-management", "shopinow-front", "shopinow-back"])
 
     def test_frontend_backend_gets_management_front_back(self):
         roles = [r["role"] for r in pp.validate_plan(plan())["repos"]]
@@ -192,7 +216,7 @@ class NamingAndPlanTests(unittest.TestCase):
         for item in raw["backlog"]:
             item["repo"] = "app"
         normalized = pp.validate_plan(raw)
-        self.assertEqual([r["name"] for r in normalized["repos"]], ["idea-01-app"])
+        self.assertEqual([r["name"] for r in normalized["repos"]], ["shopinow-app"])
         self.assertEqual(normalized["home_role"], "app")
         self.assertIn("docs/adr/0001-architecture.md", pp.scaffold_files(normalized, normalized["repos"][0]))
 
@@ -250,8 +274,8 @@ class NamingAndPlanTests(unittest.TestCase):
 
     def test_tree_explains_grouping_and_lists_repositories(self):
         tree = pp.render_tree(pp.validate_plan(plan()))
-        for text in ("cannot be nested", "ai-team-app", "idea-01-management", "idea-01-front", "idea-01-back",
-                     "GitHub Project: \"idea-01 · Shop Platform\""):
+        for text in ("cannot be nested", "ai-team-app", "shopinow-management", "shopinow-front", "shopinow-back",
+                     "GitHub Project: \"Shopinow (idea-01)\""):
             self.assertIn(text, tree)
 
 
@@ -260,13 +284,13 @@ class ProvisioningTests(unittest.TestCase):
         fake = FakeGitHub()
         state, path = run(fake, plan())
         self.assertEqual(state["phase"], "COMPLETE_WITH_MANUAL_STEPS")
-        self.assertEqual(set(fake.repos), {"idea-01-management", "idea-01-front", "idea-01-back"})
+        self.assertEqual(set(fake.repos), {"shopinow-management", "shopinow-front", "shopinow-back"})
         for repo in fake.repos.values():
             self.assertIn("[ai-team:idea-01]", repo["description"])
             self.assertEqual(repo["visibility"], "private")
             self.assertTrue({"ai-team-app", "idea-01"} <= set(repo["topics"]))
             self.assertEqual(len(repo["prs"]), 1)
-            self.assertIn("idea-01 Sprint 1", repo["milestones"])
+            self.assertIn("Sprint 1", repo["milestones"])
             self.assertNotIn(("main", "README.md"), repo["files"])   # nothing is written to main
         issues = {i["title"]: i for r in fake.repos.values() for i in r["issues"]}
         self.assertEqual(len(issues), 4)
@@ -274,11 +298,11 @@ class ProvisioningTests(unittest.TestCase):
         self.assertIn(us1["html_url"], issues["[US-2] Product list page"]["body"])   # cross-repo link
         self.assertIn("project:idea-01", us1["labels"])
         self.assertEqual(us1["milestone"], 1)
-        project = fake.projects["idea-01 · Shop Platform"]
+        project = fake.projects["Shopinow (idea-01)"]
         self.assertEqual(project["repos"], set(fake.repos))
         self.assertEqual(len(project["items"]), 4)
         self.assertIn("Sprint", project["fields"])
-        report = fake.repos["idea-01-management"]["files"][(pp.BOOTSTRAP_BRANCH, "docs/provisioning-report.md")][0]
+        report = fake.repos["shopinow-management"]["files"][(pp.BOOTSTRAP_BRANCH, "docs/provisioning-report.md")][0]
         self.assertIn("COMPLETE_WITH_MANUAL_STEPS", report)
         self.assertEqual(json.loads(path.read_text())["phase"], "COMPLETE_WITH_MANUAL_STEPS")
         self.assertFalse(any(op == "protect_branch" for op, _ in fake.writes))
@@ -299,7 +323,7 @@ class ProvisioningTests(unittest.TestCase):
 
     def test_foreign_repository_blocks_without_changes(self):
         fake = FakeGitHub()
-        fake.create_repo("ibrahim-ai-team", "idea-01-front", "someone else's repo", "public")
+        fake.create_repo("ibrahim-ai-team", "shopinow-front", "someone else's repo", "public")
         fake.writes.clear()
         state, _ = run(fake, plan())
         self.assertEqual(state["phase"], "BLOCKED")
@@ -308,12 +332,12 @@ class ProvisioningTests(unittest.TestCase):
 
     def test_foreign_project_board_is_not_adopted(self):
         fake = FakeGitHub()
-        fake.projects["idea-01 · Shop Platform"] = {"id": "P_x", "url": "u", "description": "someone else's board",
+        fake.projects["Shopinow (idea-01)"] = {"id": "P_x", "url": "u", "description": "someone else's board",
                                                     "repos": set(), "fields": set(), "items": set()}
         state, _ = run(fake, plan())
         self.assertEqual(state["steps"]["project"]["status"], "FAILED")
         self.assertIn("not adopting it", state["steps"]["project"]["detail"])
-        self.assertEqual(fake.projects["idea-01 · Shop Platform"]["repos"], set())
+        self.assertEqual(fake.projects["Shopinow (idea-01)"]["repos"], set())
         self.assertEqual(state["phase"], "PARTIAL")
 
     def test_tokens_are_redacted_from_recorded_errors(self):
@@ -321,7 +345,7 @@ class ProvisioningTests(unittest.TestCase):
         fake.fail("create_label", pp.classify(500, "boom ghp_" + "a" * 36), times=5)
         state, path = run(fake, plan())
         self.assertNotIn("ghp_" + "a" * 36, path.read_text())
-        self.assertIn("[redacted]", state["steps"]["labels:idea-01-management"]["detail"])
+        self.assertIn("[redacted]", state["steps"]["labels:shopinow-management"]["detail"])
 
     def test_missing_project_permission_is_reported_not_faked(self):
         fake = FakeGitHub()
@@ -336,40 +360,41 @@ class ProvisioningTests(unittest.TestCase):
 
     def test_partial_failure_skips_dependents_and_resumes(self):
         fake = FakeGitHub()
-        fake.fail("create_repo", pp.TransientError(502, "Bad gateway"), match="idea-01-back", times=3)
+        fake.fail("create_repo", pp.TransientError(502, "Bad gateway"), match="shopinow-back", times=3)
         state, _ = run(fake, plan())
         self.assertEqual(state["phase"], "PARTIAL")
-        self.assertEqual(state["steps"]["repo:idea-01-back"]["status"], "FAILED")
-        self.assertIn("after 2 retries", state["steps"]["repo:idea-01-back"]["detail"])
+        self.assertEqual(state["steps"]["repo:shopinow-back"]["status"], "FAILED")
+        self.assertIn("after 2 retries", state["steps"]["repo:shopinow-back"]["detail"])
         self.assertEqual(state["steps"]["issue:US-1"]["status"], "SKIPPED_DEPENDENCY")
         self.assertEqual(state["steps"]["deps:US-2"]["status"], "SKIPPED_DEPENDENCY")
         self.assertIn("link pending for US-1", state["steps"]["deps:US-2"]["detail"])
-        us2 = next(i for i in fake.repos["idea-01-front"]["issues"] if "US-2" in i["title"])
+        us2 = next(i for i in fake.repos["shopinow-front"]["issues"] if "US-2" in i["title"])
         self.assertIn("US-1 (link pending)", us2["body"])
         state, _ = run(fake, plan())   # transient failures exhausted: resume
         self.assertEqual(state["phase"], "COMPLETE_WITH_MANUAL_STEPS")
         self.assertEqual(sum(len(r["issues"]) for r in fake.repos.values()), 4)
-        us2 = next(i for i in fake.repos["idea-01-front"]["issues"] if "US-2" in i["title"])
-        self.assertIn("https://github.com/ibrahim-ai-team/idea-01-back/issues/1", us2["body"])
+        us2 = next(i for i in fake.repos["shopinow-front"]["issues"] if "US-2" in i["title"])
+        self.assertIn("https://github.com/ibrahim-ai-team/shopinow-back/issues/1", us2["body"])
 
     def test_transient_error_is_retried(self):
         fake = FakeGitHub()
         fake.fail("create_label", pp.TransientError(503, "unavailable"), times=1)
         state, _ = run(fake, plan())
-        self.assertEqual(state["steps"]["labels:idea-01-management"]["status"], "CREATED")
+        self.assertEqual(state["steps"]["labels:shopinow-management"]["status"], "CREATED")
 
     def test_projects_never_share_issues_or_boards(self):
         fake = FakeGitHub()
         run(fake, plan())
-        second = plan(project={"id": "idea-02", "name": "Booking"})
-        run(fake, second)
-        self.assertEqual(set(fake.projects), {"idea-01 · Shop Platform", "idea-02 · Booking"})
+        run(fake, plan(project={"id": "idea-02", "name": "Booky"}))
+        self.assertEqual(set(fake.projects), {"Shopinow (idea-01)", "Booky (idea-02)"})
+        owner = {"shopinow": "idea-01", "booky": "idea-02"}
         for name, repo in fake.repos.items():
-            pid = name[:7]
+            pid = owner[name.split("-")[0]]
+            self.assertIn(f"[ai-team:{pid}]", repo["description"])
             for issue in repo["issues"]:
                 self.assertEqual(issue["labels"][0], f"project:{pid}")
                 self.assertIn(f"ai-team-key: {pid}/", issue["body"])
-        self.assertTrue(fake.projects["idea-02 · Booking"]["repos"] <= {n for n in fake.repos if n.startswith("idea-02")})
+        self.assertEqual(fake.projects["Booky (idea-02)"]["repos"], {n for n in fake.repos if n.startswith("booky-")})
 
     def test_branch_protection_only_when_approved_in_plan(self):
         fake = FakeGitHub()
@@ -384,7 +409,7 @@ class ProvisioningTests(unittest.TestCase):
         self.assertEqual(fake.writes, [])
         self.assertTrue(state["phase"].startswith("DRY_RUN_"))
         self.assertFalse(path.exists())
-        self.assertEqual(statuses(state, "repo:"), {f"repo:idea-01-{r}": "DRY_RUN" for r in ("management", "front", "back")})
+        self.assertEqual(statuses(state, "repo:"), {f"repo:shopinow-{r}": "DRY_RUN" for r in ("management", "front", "back")})
 
 
 class GhClientErrorTests(unittest.TestCase):
@@ -432,32 +457,32 @@ class GhClientErrorTests(unittest.TestCase):
 class RobustnessTests(unittest.TestCase):
     def test_repo_failure_skips_project_instead_of_crashing(self):
         fake = FakeGitHub()
-        fake.fail("create_repo", pp.PermissionDenied(403, "no"), match="idea-01-front")
+        fake.fail("create_repo", pp.PermissionDenied(403, "no"), match="shopinow-front")
         state, path = run(fake, plan())
-        self.assertEqual(state["steps"]["repo:idea-01-front"]["status"], "PERMISSION_DENIED")
+        self.assertEqual(state["steps"]["repo:shopinow-front"]["status"], "PERMISSION_DENIED")
         self.assertEqual(state["steps"]["project"]["status"], "SKIPPED_DEPENDENCY")
         self.assertEqual(json.loads(path.read_text())["phase"], "PARTIAL")
 
     def test_unexpected_exception_is_recorded(self):
         fake = FakeGitHub()
-        fake.fail("create_label", KeyError("boom"), match="idea-01-back")
+        fake.fail("create_label", KeyError("boom"), match="shopinow-back")
         state, _ = run(fake, plan())
-        self.assertIn("unexpected KeyError", state["steps"]["labels:idea-01-back"]["detail"])
+        self.assertIn("unexpected KeyError", state["steps"]["labels:shopinow-back"]["detail"])
         self.assertEqual(state["phase"], "PARTIAL")
 
     def test_concurrently_created_label_counts_as_existing(self):
         fake = FakeGitHub()
         fake.fail("create_label", pp.GitHubError(422, "Validation Failed: already_exists"), times=1)
         state, _ = run(fake, plan())
-        self.assertEqual(state["steps"]["labels:idea-01-management"]["status"], "CREATED")
+        self.assertEqual(state["steps"]["labels:shopinow-management"]["status"], "CREATED")
 
     def test_report_not_written_to_closed_bootstrap_branch(self):
         fake = FakeGitHub()
         run(fake, plan())
-        fake.repos["idea-01-management"]["prs"][0]["state"] = "closed"
+        fake.repos["shopinow-management"]["prs"][0]["state"] = "closed"
         writes = len(fake.writes)
         state, _ = run(fake, plan())
-        self.assertNotIn(("put_file", "idea-01-management/docs/provisioning-report.md"), fake.writes[writes:])
+        self.assertNotIn(("put_file", "shopinow-management/docs/provisioning-report.md"), fake.writes[writes:])
         self.assertIn("bootstrap PR closed", state["steps"]["report"]["detail"])
 
 
@@ -499,12 +524,12 @@ class ApprovalGateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             code, out = self.main("plan", self.write_plan(plan(), folder), client=FakeGitHub())
         self.assertEqual(code, 0)
-        self.assertIn("idea-01-management", out)
+        self.assertIn("shopinow-management", out)
         self.assertIn("Plan digest:", out)
 
     def test_plan_permission_failure_names_permission(self):
         fake = FakeGitHub()
-        fake.fail("list_org_repo_names", pp.PermissionDenied(403, "forbidden"))
+        fake.fail("list_org_repos", pp.PermissionDenied(403, "forbidden"))
         with tempfile.TemporaryDirectory() as folder:
             code, out = self.main("plan", self.write_plan(plan(project={"name": "X"}), folder), "--check-github", client=fake)
         self.assertEqual(code, 3)

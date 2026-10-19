@@ -53,7 +53,7 @@ Shared rules for every specialist: [`standards/agent-contract.md`](standards/age
 
 ## Agile commands
 
-A new idea becomes its own GitHub workspace (`idea-NN-management`, `idea-NN-front`, …, one Project board) through `/provision-project`; see [project provisioning](docs/project-provisioning.md). This repository is never copied per application.
+A new idea becomes its own GitHub workspace named after the app you propose (for example `shopinow-management`, `shopinow-front`, `shopinow-back`) with one Project board through `/provision-project`; see [project provisioning](docs/project-provisioning.md). This repository is never copied per application.
 
 
 The available prompts include `/kickoff`, `/provision-project`, `/plan-sprint`, `/next-story`, `/review-pr`, `/status`, `/daily-report`, `/handover`, `/approve-gate`, `/sprint-review`, `/retro`, and `/release-check`. See [the command reference](docs/agile-command-reference.md). Commands run only when invoked in Claude Code; they are not background jobs.

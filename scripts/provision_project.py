@@ -26,6 +26,9 @@ import time
 from pathlib import Path
 
 ID_RE = re.compile(r"^idea-\d{2,}$")
+SLUG_RE = re.compile(r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$")
+RESERVED_SLUGS = {"ai-software-team", "github", "idea"}
+TAG_RE = re.compile(r"\[ai-team:(idea-\d+)\]")
 ROLE_RE = re.compile(r"^[a-z][a-z0-9-]{0,29}$")
 OWNER_RE = re.compile(r"^[A-Za-z0-9-]{1,39}$")
 STYLES = {"single-repo", "monolith", "frontend-backend", "services"}
@@ -100,8 +103,23 @@ def classify(status: int | None, message: str) -> GitHubError:
 
 # ---------------------------------------------------------------- planning
 
-def next_project_id(existing_repo_names: list[str]) -> str:
-    numbers = [int(m.group(1)) for n in existing_repo_names if (m := re.match(r"^idea-(\d+)-", n))]
+def slugify(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+def _repo_project_ids(repo) -> set[str]:
+    """Project IDs a repository belongs to, from its description tag, topics or a legacy idea-NN- name."""
+    if isinstance(repo, str):
+        repo = {"name": repo}
+    ids = set(TAG_RE.findall(repo.get("description") or ""))
+    ids |= {t for t in repo.get("topics") or [] if ID_RE.match(t)}
+    if (m := re.match(r"^(idea-\d+)-", repo.get("name", ""))):
+        ids.add(m.group(1))
+    return ids
+
+
+def next_project_id(existing_repos: list) -> str:
+    numbers = [int(i.split("-")[1]) for r in existing_repos for i in _repo_project_ids(r)]
     return f"idea-{(max(numbers) + 1 if numbers else 1):02d}"
 
 
@@ -123,7 +141,7 @@ def plan_digest(plan: dict) -> str:
     return hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()[:16]
 
 
-def validate_plan(raw: dict, existing_repo_names: list[str] | None = None) -> dict:
+def validate_plan(raw: dict, existing_repos: list | None = None) -> dict:
     """Return a normalized copy of the plan or raise PlanError with every problem found."""
     plan = copy.deepcopy(raw)
     errors: list[str] = []
@@ -131,13 +149,22 @@ def validate_plan(raw: dict, existing_repo_names: list[str] | None = None) -> di
     if not OWNER_RE.match(str(org)):
         errors.append("organization must be a GitHub organization login")
     project = plan.get("project") or {}
-    if not project.get("id") and existing_repo_names is not None:
-        project["id"] = next_project_id(existing_repo_names)
+    if not project.get("id") and existing_repos is not None:
+        project["id"] = next_project_id(existing_repos)
     pid = project.get("id", "")
     if not ID_RE.match(pid):
         errors.append(f"project.id '{pid}' must look like idea-01 (or run plan with --check-github to assign one)")
     if not str(project.get("name", "")).strip():
-        errors.append("project.name is required")
+        errors.append("project.name (the app name the sponsor proposed or confirmed, e.g. Shopinow) is required")
+    project["slug"] = slug = project.get("slug") or slugify(str(project.get("name", "")))
+    if not (SLUG_RE.match(slug) and len(slug) <= 40) or slug in RESERVED_SLUGS or ID_RE.match(slug):
+        errors.append(f"project.slug '{slug}' must be lowercase words joined by '-', max 40 characters, "
+                      "not reserved and not an idea-NN ID")
+    for repo in existing_repos or []:
+        name = repo if isinstance(repo, str) else repo.get("name", "")
+        owners = _repo_project_ids(repo)
+        if name.startswith(slug + "-") and owners and pid not in owners:
+            errors.append(f"app name '{slug}' is already used by {', '.join(sorted(owners))} ({name}); choose another name")
     if not OWNER_RE.match(str(plan.get("owner", ""))):
         errors.append("owner must be the GitHub username of the human who merges PRs")
     if plan.get("visibility", "private") not in ("private", "public", "internal"):
@@ -164,7 +191,7 @@ def validate_plan(raw: dict, existing_repo_names: list[str] | None = None) -> di
         if not ROLE_RE.match(str(role)):
             errors.append(f"repository role '{role}' must be lowercase letters, digits or '-' (max 30)")
             continue
-        repo = {"role": role, "name": f"{pid}-{role}", "coordination": role == COORDINATION_ROLE,
+        repo = {"role": role, "name": f"{slug}-{role}", "coordination": role == COORDINATION_ROLE,
                 "purpose": spec.get("purpose") or ("Project coordination: requirements, ADRs, backlog and status"
                                                      if role == COORDINATION_ROLE else ""),
                 "stack": spec.get("stack", ""), "testing": spec.get("testing", ""),
@@ -255,8 +282,9 @@ def _cycles(keys: dict[str, dict]) -> list[str]:
 def render_tree(plan: dict, with_files: bool = True) -> str:
     pid, org = plan["project"]["id"], plan["organization"]
     lines = [f"{org}/  (GitHub organization; repositories cannot be nested, so the 'apps' grouping is",
-             f"        the idea-NN- name prefix + topics '{APP_TOPIC}', '{pid}' + one Project board)",
-             f"└── {pid}  \"{plan['project']['name']}\"  [{plan['architecture']['style']}, {plan['visibility']}]"]
+             f"        the app-name prefix + topics '{APP_TOPIC}', '{pid}' + one Project board)",
+             f"└── {plan['project']['slug']}  \"{plan['project']['name']}\" (project {pid})  "
+             f"[{plan['architecture']['style']}, {plan['visibility']}]"]
     for i, repo in enumerate(plan["repos"]):
         last = i == len(plan["repos"]) - 1
         lines.append(f"    {'└──' if last else '├──'} {repo['name']}  — {repo['purpose']}")
@@ -267,13 +295,13 @@ def render_tree(plan: dict, with_files: bool = True) -> str:
     for item in plan["backlog"]:
         counts[item["repo"]] = counts.get(item["repo"], 0) + 1
     lines.append(f"    GitHub Project: \"{project_title(plan)}\" linking {len(plan['repos'])} repositories")
-    lines.append("    Issues: " + ", ".join(f"{pid}-{r}: {n}" for r, n in counts.items()))
+    lines.append("    Issues: " + ", ".join(f"{plan['project']['slug']}-{r}: {n}" for r, n in counts.items()))
     lines.append(f"    Milestones: {plan['sprint']['count']} x {plan['sprint']['length_days']}-day sprint(s) per repository")
     return "\n".join(lines)
 
 
 def project_title(plan: dict) -> str:
-    return f"{plan['project']['id']} · {plan['project']['name']}"
+    return f"{plan['project']['name']} ({plan['project']['id']})"
 
 
 def repo_tag(plan: dict) -> str:
@@ -286,7 +314,7 @@ def scaffold_files(plan: dict, repo: dict) -> dict[str, str]:
     pid, org, name = plan["project"]["id"], plan["organization"], plan["project"]["name"]
     links = "\n".join(f"| [`{r['name']}`](https://github.com/{org}/{r['name']}) | {r['purpose']} |" for r in plan["repos"])
     home = next(r for r in plan["repos"] if r["role"] == plan["home_role"])
-    readme = [f"# {repo['name']}", "", f"Part of **{pid} · {name}**. {repo['purpose']}.", "",
+    readme = [f"# {repo['name']}", "", f"Part of **{name}** (project `{pid}`). {repo['purpose']}.", "",
               "## Project repositories", "", "| Repository | Purpose |", "|---|---|", links, "",
               f"Planning and status live in [`{home['name']}`](https://github.com/{org}/{home['name']}) and the "
               f"GitHub Project \"{project_title(plan)}\". Issues carry the label `project:{pid}`.", ""]
@@ -314,7 +342,7 @@ def scaffold_files(plan: dict, repo: dict) -> dict[str, str]:
         files["docs/project-plan.json"] = json.dumps({k: v for k, v in plan.items() if k not in ("repos", "home_role")},
                                                      indent=2, sort_keys=True) + "\n"
         files["docs/project-state.md"] = (
-            f"# Project state — {pid} · {name}\n\nCurrent phase: BACKLOG_READY (workspace provisioned from the "
+            f"# Project state — {name} ({pid})\n\nCurrent phase: BACKLOG_READY (workspace provisioned from the "
             f"approved plan).\nSprint length: {plan['sprint']['length_days']} days, first sprint starts "
             f"{plan['sprint']['start']}.\n\n## Repositories\n\n" + "\n".join(f"- {r['name']}: {r['purpose']}" for r in plan["repos"])
             + "\n\n## Next action\n\nOwner merges the bootstrap PRs; then `agile-orchestrator` runs `/plan-sprint`.\n"
@@ -340,7 +368,7 @@ KEY_RE = re.compile(r"<!-- ai-team-key: (idea-\d+)/([A-Z][A-Z0-9]*-\d+) -->")
 class Provisioner:
     def __init__(self, client, plan: dict, state_path: Path, sleep=time.sleep, dry_run: bool = False):
         self.gh, self.plan, self.path, self.sleep, self.dry_run = client, plan, state_path, sleep, dry_run
-        self.org, self.pid = plan["organization"], plan["project"]["id"]
+        self.org, self.pid, self.slug = plan["organization"], plan["project"]["id"], plan["project"]["slug"]
         self.state = {"project_id": self.pid, "plan_digest": plan_digest(plan),
                       "dry_run": dry_run, "phase": "PROVISIONING", "steps": {}, "resources": {},
                       "manual_actions": [], "started_at": _now()}
@@ -432,7 +460,7 @@ class Provisioner:
         self.state["phase"] = ("DRY_RUN_" if self.dry_run else "") + phase
 
     def repo_name(self, role: str) -> str:
-        return f"{self.pid}-{role}"
+        return f"{self.slug}-{role}"
 
     # -- steps (each returns (status, detail))
     def preflight(self):
@@ -485,7 +513,7 @@ class Provisioner:
     def milestone_titles(self):
         start = dt.date.fromisoformat(self.plan["sprint"]["start"])
         days = self.plan["sprint"]["length_days"]
-        return {n: (f"{self.pid} Sprint {n}", start + dt.timedelta(days=days * n - 1))
+        return {n: (f"Sprint {n}", start + dt.timedelta(days=days * n - 1))
                 for n in range(1, self.plan["sprint"]["count"] + 1)}
 
     def ensure_milestones(self, repo):
@@ -700,8 +728,9 @@ class GhClient:
             raise classify(403 if "permission" in msg.lower() or "access" in msg.lower() else 422, msg)
         return data["data"]
 
-    def list_org_repo_names(self, org):
-        return [r["name"] for r in self._list(f"orgs/{org}/repos?per_page=100&type=all")]
+    def list_org_repos(self, org):
+        return [{"name": r["name"], "description": r.get("description") or "", "topics": r.get("topics") or []}
+                for r in self._list(f"orgs/{org}/repos?per_page=100&type=all")]
 
     def get_repo(self, org, name):
         try:
@@ -838,7 +867,7 @@ def main(argv: list[str] | None = None, client=None) -> int:
     raw = json.loads(Path(args.plan).read_text(encoding="utf-8"))
     gh = client or GhClient()
     try:
-        existing = gh.list_org_repo_names(raw.get("organization", "ibrahim-ai-team")) if (
+        existing = gh.list_org_repos(raw.get("organization", "ibrahim-ai-team")) if (
             args.command == "plan" and args.check_github) else None
         plan = validate_plan(raw, existing)
     except PlanError as exc:

@@ -11,10 +11,10 @@ GitHub organizations do not have nested repository folders. Represent the layout
 | Logical area | Repository naming pattern | When to create |
 |---|---|---|
 | Shared AI delivery platform | `ai-software-team` | Exists; reusable agents, skills, standards, templates, workflows. Never copied per application |
-| Project coordination | `idea-NN-management` | When an idea's architecture has more than one repository |
-| Single-repository application | `idea-NN-app` | Monolith or single-repo architecture |
-| Frontend / backend | `idea-NN-front`, `idea-NN-back` | Frontend-backend architecture |
-| Independent service | `idea-NN-<service>` | Only for services with their own deployment |
+| Project coordination | `<app>-management` (e.g. `shopinow-management`) | When an idea's architecture has more than one repository |
+| Single-repository application | `<app>-app` | Monolith or single-repo architecture |
+| Frontend / backend | `<app>-front`, `<app>-back` | Frontend-backend architecture |
+| Independent service | `<app>-<service>` | Only for services with their own deployment |
 | Organization profile and shared community health files | `.github` | Create a special repository named exactly `.github` when ready |
 
 Do not create empty application repositories just to imitate folders. Start new repositories when a real product and its first increment are understood.

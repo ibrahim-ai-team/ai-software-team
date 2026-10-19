@@ -17,27 +17,28 @@
 
 GitHub repositories cannot be nested in folders. The "apps" grouping is therefore expressed with:
 
-- **Name prefix:** every project gets a unique ID `idea-NN`, and its repositories are `idea-NN-<role>`. The next free ID is computed from existing `idea-NN-*` repositories.
+- **App-name prefix:** repositories are named after the app the sponsor proposes, `<app>-<role>`. For example "Shopinow" gives `shopinow-front` and `shopinow-back`. If no name was given, the Product Owner proposes one and the sponsor confirms it. The slug is derived from `project.name` (lowercase, words joined by `-`), or set explicitly with `project.slug`. A name already used by another idea is rejected during `plan`.
+- **Hidden project ID:** every idea also gets a unique, stable ID `idea-NN`. It is assigned from the IDs found on existing repositories (description tag or topic). It is used for tracking so ideas never mix, and renaming an app later does not break it.
 - **Topics:** `ai-team-app`, the project ID (for example `idea-01`) and the role, on every repository.
 - **Description tag:** `[ai-team:idea-NN]`, used to tell this project's repositories from unrelated ones.
-- **One GitHub Project board per idea:** titled `idea-NN · <Name>`, linked to all of the project's repositories.
+- **One GitHub Project board per idea:** titled `<App name> (idea-NN)`, for example `Shopinow (idea-01)`, linked to all of the project's repositories.
 - **One label per idea:** `project:idea-NN` on every issue, plus a hidden key comment (`ai-team-key: idea-NN/US-1`) in the body.
 
 Roles depend on the architecture the team chose:
 
 | `architecture.style` | Repositories |
 |---|---|
-| single-repo, monolith | `idea-NN-app` (coordination docs live in its `docs/`) |
-| frontend-backend | `idea-NN-management`, `idea-NN-front`, `idea-NN-back` |
-| services | `idea-NN-management`, optional `idea-NN-front`, one `idea-NN-<service>` per service |
+| single-repo, monolith | `<app>-app` (coordination docs live in its `docs/`) |
+| frontend-backend | `<app>-management`, `<app>-front`, `<app>-back` |
+| services | `<app>-management`, optional `<app>-front`, one `<app>-<service>` per service |
 
-`coordination_repo` defaults to `auto`: a coordination repository `idea-NN-management` is created when there is more than one repository. Set it to `true` or `false` to override. Explicit `repositories` entries replace the defaults. Every application repository must declare `purpose`, `stack` and `testing` before it can be created, matching the creation gate in `docs/workspace-architecture.md`.
+`coordination_repo` defaults to `auto`: a coordination repository `<app>-management` is created when there is more than one repository. Set it to `true` or `false` to override. Explicit `repositories` entries replace the defaults. Every application repository must declare `purpose`, `stack` and `testing` before it can be created, matching the creation gate in `docs/workspace-architecture.md`.
 
 ## What one run creates
 
 For each repository:
 - the repository (private by default) with an initial commit;
-- topics, labels and one `idea-NN Sprint n` milestone per sprint (14 days by default);
+- topics, labels and one `Sprint n` milestone per sprint (14 days by default);
 - a bootstrap/initial-structure branch with README, CONTRIBUTING, SECURITY, CODEOWNERS and a PR template, plus an open bootstrap PR for the owner to merge;
 - in the coordination repository only: requirements, ADR-0001, the repository plan, the approved plan, `docs/project-state.md` and `docs/provisioning-report.md`.
 
@@ -110,20 +111,20 @@ Run provisioning from a local Claude Code session where `gh auth login` was done
 
 ## Example: one idea to a workspace
 
-1. You say: "Build an e-commerce platform."
+1. You say: "Build an e-commerce platform called Shopinow." (without a name, the Product Owner proposes one for you to confirm)
 2. `agile-orchestrator` runs `/kickoff`.
    - `product-owner` and `business-analyst` write the requirements and stories.
    - `software-architect` chooses "frontend-backend" with a modular-monolith API, and writes the trade-offs as an ADR.
    - `tech-lead` confirms each repository's stack and tests.
    - `project-manager` sets a two-week sprint.
-3. The orchestrator writes `.provisioning/idea-01-plan.json` (like `templates/project-plan.example.json`) and runs `plan --check-github`. That prints the repository tree, `idea-01-management` / `idea-01-front` / `idea-01-back`, and a digest.
+3. The orchestrator writes `.provisioning/idea-01-plan.json` (like `templates/project-plan.example.json`) and runs `plan --check-github`. That prints the repository tree, `shopinow-management` / `shopinow-front` / `shopinow-back` (hidden project ID `idea-01`), and a digest.
 4. You approve the tree and digest in one answer.
 5. `apply --dry-run`, then `apply`, create:
    - the three repositories;
    - three bootstrap PRs;
    - four issues (an epic in management, an API story in back, a page story and an end-to-end QA task in front), with `US-2` linking to `US-1` across repositories;
-   - `idea-01 Sprint 1` milestones;
-   - the board `idea-01 · Shop Platform`.
+   - `Sprint 1` milestones;
+   - the board `Shopinow (idea-01)`.
 6. You merge the bootstrap PRs. The orchestrator continues with `/plan-sprint` and `/next-story` in the new repositories.
 
 ## Testing

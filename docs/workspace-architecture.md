@@ -16,14 +16,16 @@ GitHub organizations do not provide nested repository folders. Use repository na
 
 ## Naming convention
 
-Each application idea gets a unique project ID `idea-NN`, assigned by `scripts/provision_project.py` from existing repositories. Its repositories are named `idea-NN-<role>`:
+Repositories are named after the app: the sponsor proposes the app name (or confirms one the Product Owner suggests), and its slug prefixes every repository, `<app>-<role>`. For "Shopinow":
 
-- `idea-NN-management`: coordination repository (requirements, ADRs, backlog epics, status); created when the project has more than one repository
-- `idea-NN-app`: the single application repository of a monolith
-- `idea-NN-front` / `idea-NN-back`: separate frontend and backend
-- `idea-NN-<service>`: one repository per independently deployed service
+- `shopinow-management`: coordination repository (requirements, ADRs, backlog epics, status); created when the project has more than one repository
+- `shopinow-app`: the single application repository of a monolith
+- `shopinow-front` / `shopinow-back`: separate frontend and backend
+- `shopinow-<service>`: one repository per independently deployed service
 
-Create only the roles the approved architecture justifies. Every repository carries the topics `ai-team-app` and `idea-NN`, the description tag `[ai-team:idea-NN]`, and is linked to one GitHub Project board per idea. See `docs/project-provisioning.md`. This replaces the earlier `<product>-api` / `<product>-web` examples.
+Each idea also gets a hidden, stable project ID `idea-NN` (assigned by `scripts/provision_project.py`). It is used in topics, the description tag `[ai-team:idea-NN]`, issue labels and issue keys, so ideas never mix and renaming an app does not break tracking.
+
+Create only the roles the approved architecture justifies. Every repository carries the topics `ai-team-app` and `idea-NN` and is linked to one GitHub Project board per idea. See `docs/project-provisioning.md`. This replaces the earlier `<product>-api` / `<product>-web` examples.
 
 ## Delivery workflow
 
