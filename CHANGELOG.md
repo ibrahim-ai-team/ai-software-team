@@ -4,6 +4,10 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
+- Added: `agile-orchestrator` as the single entry point (`claude --agent agile-orchestrator`) and the only agent allowed to delegate; `tech-lead` for task breakdown, standards and technical review; `standards/agent-contract.md` with shared scope, return and evidence rules.
+- Changed: agents get role-specific definition of done and escalation sections instead of repeated boilerplate; sprints default to two weeks and are reported rather than approved by the sponsor; Scrum Master and QA Engineer roles are named in their agents.
+- Security: removed six `Write(path)` ask rules that Claude Code 2.1.303 never matches (each had an effective `Edit(path)` rule); the validator now rejects such rules.
+- Fixed: the cross-reference check accepts documented model values and frontmatter keys and verifies the orchestrator names every required agent.
 - Added: MIT License (#36).
 - Security: deny GitHub MCP merge and auto-merge tools for agents (#24).
 - Added: CI checks for command references, agent frontmatter, unresolved placeholders (#32, #43) and a pre-dispatch claim-conflict check with a documented claim/release/recovery protocol (#42).
