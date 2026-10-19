@@ -55,7 +55,7 @@ For the exact phases, recovery rules, evidence requirements and safety boundarie
 - This repository does not itself run a background agent team when Claude Code is closed.
 - Markdown task records and GitHub labels are not atomic distributed locks. The documented protocol is single-coordinator/single-writer unless separate isolated worktrees and a real coordination mechanism are configured.
 - The validator reads `.claude/manifest.json` for minimum agent/skill inventories and required command/template files. The offline `scripts/smoke_discovery.py` checks whether inventory files and agent/skill metadata can be discovered without launching Claude Code. Neither check proves real Claude Code discovery, delegation, application correctness, deployment, or branch protection.
-- No repository license has been selected yet. Do not present the project as licensed open-source software until the owner selects and adds a license.
+- Licensed under the [MIT License](LICENSE): free to use, copy, modify and share, including in your own applications, provided the copyright notice is kept. Applications built with this kit choose their own licence.
 
 ## Verification
 

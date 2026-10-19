@@ -42,7 +42,7 @@ Use GitHub secret scanning / push protection when available for the repository p
 
 ## License
 
-No license is added by this change because choosing a license changes the legal permissions granted to users. The repository owner should explicitly choose one (for example, MIT, Apache-2.0, or another suitable license) before publishing reusable code under a declared license.
+The repository is licensed under the [MIT License](../LICENSE) (owner decision, 2026-10-19, #36). MIT was chosen because it is free, permissive and short, and the kit contains configuration, documentation and small scripts for which a patent grant (Apache-2.0) adds little. Applications created with the kit are separate repositories and choose their own licence (`templates/product-repository/README.md`).
 
 ## Verification boundaries
 

@@ -4,6 +4,7 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
+- Added: MIT License (#36).
 - Security: deny GitHub MCP merge and auto-merge tools for agents (#24).
 - Added: CI checks for command references, agent frontmatter, unresolved placeholders (#32, #43) and a pre-dispatch claim-conflict check with a documented claim/release/recovery protocol (#42).
 - Changed: the Project status workflow targets a configurable Project, finds items from the issue side (no 100-item limit), supports `dry_run` and `add_if_missing`, and was verified by a real update and read-back (#40).
