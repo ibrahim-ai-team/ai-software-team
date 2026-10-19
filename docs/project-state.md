@@ -1,9 +1,9 @@
 # AI Software Team — Project State
 
-Last analysed: 2026-10-17
+Last analysed: 2026-10-19
 Repository: https://github.com/ibrahim-ai-team/ai-software-team
 Default branch: `main`
-Current phase: Infrastructure hardening and supervised pilot readiness
+Current phase: Supervised pilot readiness (team kit), no application work started
 
 ## Operating rules
 
@@ -13,27 +13,24 @@ Current phase: Infrastructure hardening and supervised pilot readiness
 - Keep secrets, credentials, and private chain-of-thought out of this file and issue bodies.
 - Use GitHub Issues as durable task records; update this file at meaningful session boundaries.
 
-## Verified repository evidence
+## Verified repository evidence (2026-10-19)
 
-- Latest inspected main commit: `f2fa3576ed61b50c5393303723a0eb5876abdc6c` (includes merged PR #30).
-- [Validation workflow run](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39076389223): success on the inspected revision.
-- [Secret scanning workflow run](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39076389175): success on the inspected revision.
-- [PR #30](https://github.com/ibrahim-ai-team/ai-software-team/pull/30): merged; adds a reusable per-application GitHub Project blueprint and updates the setup guide.
-- `docs/project-state.md` was absent from `main` during the 2026-10-17 audit; this document is proposed on a feature branch and is not canonical on `main` until merged.
-- GitHub API reported `main` as protected, but detailed protection rules could not be retrieved by the available integration. Exact review/check/force-push/deletion settings: **NOT VERIFIED**.
-- Real Claude Code agent discovery, delegation, and permission enforcement: **NOT VERIFIED**.
-- Real GitHub Project status update and read-back: **NOT VERIFIED**.
-- Actual Project board fields/views have not been runtime-verified by this repository audit.
+- Latest inspected `main` commit: `8bf343a` (merge of PR #44). CI on that commit: [Validate](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39077920728) and [Secret scanning](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39077920727) succeeded.
+- PRs #29, #30, #31 and #44 are merged; #23 (durable state) is closed and this file is on `main`.
+- Claude Code runtime discovery, one delegation and representative deny rules were observed in a cloud session: see [`docs/verification-report.md`](verification-report.md). A local CLI/Termux run and `ask`-rule prompting remain NOT VERIFIED.
+- `main` is protected but has **no required status checks** (enforcement `non_admins`) and no rulesets. Pull-request requirement, review policy, force-push and deletion settings: NOT VERIFIED.
+- GitHub MCP merge/auto-merge tools are not denied by `.claude/settings.json`.
+- GitHub Project #1 fields, views and item statuses could not be read from the session; `project-status.yml` has never run. Board state: NOT VERIFIED.
 
-## Active work and next actions
+## Launch blockers for the first supervised pilot
 
-| Issue | Purpose | Current assessment | Next action |
+| Order | Issue | Blocker | Owner of next action |
 |---|---|---|---|
-| [#23 — Durable project state](https://github.com/ibrahim-ai-team/ai-software-team/issues/23) | Canonical state and session handover | IN PROGRESS; this file is proposed on a branch | Review and merge the PR, then verify this file exists on `main`; only then close the issue |
-| [#24 — Security and branch protection](https://github.com/ibrahim-ai-team/ai-software-team/issues/24) | Verify security guardrails and GitHub branch rules | NOT VERIFIED | Inspect actual GitHub rules and run safe permission checks; attach evidence |
-| [#25 — Claude Code smoke test](https://github.com/ibrahim-ai-team/ai-software-team/issues/25) | Verify discovery, delegation and permissions in a real runtime | IN PROGRESS / NOT VERIFIED | Run controlled tests in an isolated throwaway clone using fake data; record results in `docs/verification-report.md` |
-| [#26 — Sprint sizing and model routing](https://github.com/ibrahim-ai-team/ai-software-team/issues/26) | Define task budgets and routing based on supported runtime controls | BLOCKED pending runtime evidence | Resume after #25 documents actual installed-runtime capabilities |
-| [#30 — Per-application Project blueprint](https://github.com/ibrahim-ai-team/ai-software-team/pull/30) | Reusable board setup guidance | MERGED | No board was created by this PR; configure boards manually when an actual application is initialized |
+| 1 | [#24](https://github.com/ibrahim-ai-team/ai-software-team/issues/24) | Require PR + CI checks on `main`; close the MCP merge-tool gap | Repository owner (settings) and approved PR |
+| 2 | [#25](https://github.com/ibrahim-ai-team/ai-software-team/issues/25) | Runtime evidence recorded; merge it and, if the pilot runs locally, repeat the smoke test there | Repository owner review |
+| 3 | IA-PILOT-01 (card to create; text in [`docs/pilot-readiness.md`](pilot-readiness.md)) | Run the first supervised pilot through discovery, backlog and the first reviewed PR | Coordinator, after 1–2 |
+
+Everything else open (#26, #32, #34, #35, #36, #39, #40, #42, #43) can wait until after the pilot. Board corrections that could not be applied from the session are listed in [`docs/pilot-readiness.md`](pilot-readiness.md).
 
 Always re-fetch issue/PR status before acting; the table is a dated snapshot, not a live status feed.
 
