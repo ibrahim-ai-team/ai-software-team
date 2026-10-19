@@ -3,13 +3,14 @@
 ## Operating model and accountability
 
 - The Product Owner owns product discovery, requirements, user stories, acceptance criteria, and backlog priority. The user who provides the initial idea is the project sponsor/supervisor, not the day-to-day Product Owner.
-- The Project Manager / Scrum Master is accountable for the delivery plan, task breakdown, dependencies, work in progress, follow-ups, status accuracy, risks, and daily report.
-- The main Claude Code session coordinates active work and remains accountable for integration and truthful reporting. A Project Manager subagent is a role invoked by the coordinator, not a continuously running background service.
+- The Project Manager / Scrum Master is accountable for the delivery plan, sprint plan, story sequencing, dependencies, work in progress, follow-ups, status accuracy, risks, and daily report.
+- `agile-orchestrator` (the main session, `claude --agent agile-orchestrator`) coordinates active work and remains accountable for integration and truthful reporting. A Project Manager subagent is a role invoked by the orchestrator, not a continuously running background service.
+- The Tech Lead (`tech-lead`) splits Ready stories into small, independent tasks, owns implementation standards and performs the technical review of each PR.
 - GitHub Issues are the durable record for backlog items, acceptance criteria, decisions, blockers, delegation summaries, and links to code/evidence.
 - GitHub Projects is the planning board for the sprint. Keep status, priority, iteration, estimate, and owner visible when configured.
 - GitHub does not automatically know which local subagent was called, what it returned, or whether a local test ran unless that is recorded.
 - Every implementation task uses an isolated branch. Use a separate Git worktree per concurrently running coding agent where practical.
-- The `code-review-security` agent performs a read-only review of supplied diffs and evidence and returns findings. The coordinator records review disposition; the reviewer does not approve its own implementation. The repository owner/user alone performs the final merge; agents must never merge PRs or configure automation to merge on the user's behalf.
+- `tech-lead` (technical quality) and `code-review-security` (security, read-only) review supplied diffs and evidence independently and return findings; `qa-automation` validates behaviour. The coordinator records review disposition; the reviewer does not approve its own implementation. The repository owner/user alone performs the final merge; agents must never merge PRs or configure automation to merge on the user's behalf.
 
 ## End-to-end workflow from an idea
 
@@ -18,7 +19,7 @@
 3. **Design:** Architect compares viable architecture and technology options against the requirements, documents the recommendation and trade-offs, and creates ADRs for consequential decisions.
 4. **Prepare delivery:** Project Manager builds the prioritized backlog, dependencies, estimates, delivery slices, and sprint plan. QA contributes acceptance and test strategy early. DevOps proposes the required environments and CI/CD.
 5. **Set up the project:** Create repositories, project boards, cloud resources, paid services, permissions, or secrets only when the required target and authorization are clear. Never invent credentials or bypass missing access.
-6. **Implement incrementally:** Project Manager selects Ready work, delegates bounded tasks, tracks claims and dependencies, and follows up on stale or blocked work. Specialist agents create branches/PRs and report exact checks and evidence.
+6. **Implement incrementally:** Project Manager selects Ready work and prepares bounded delegation records, tracks claims and dependencies, and flags stale or blocked work. `agile-orchestrator` dispatches each task and owns branches, PRs and GitHub writes. Specialists work on the assigned branch and report exact checks and evidence.
 7. **Verify and review:** QA and reviewers inspect evidence and actual diffs. Keep implemented, tested, merged, and deployed as separate states.
 8. **Report and resume:** Reconcile every delegation, update Issues/Project status and project-state summary, publish the daily report, and leave a session handover. On the next session, read durable state before starting new work.
 
@@ -73,7 +74,7 @@ Follow docs/agent-traceability.md. Assign IDs such as TASK-142-D01 for each suba
 
 ## Sprint cadence
 
-The `project-manager` role owns routine sprint planning and tracking. The `product-owner` maintains product priorities; `software-architect` checks technical feasibility; `qa-automation` plans verification. The main session remains the actual delegation coordinator. Record sprint goals and changes in GitHub. Do not block routine, already-scoped work on repeated user approvals. At sprint end, report merged outcomes separately from open PRs and unfinished work.
+Sprints last two weeks unless the project records a different length. The `project-manager` role owns routine sprint planning and tracking. The `product-owner` maintains product priorities; `software-architect` and `tech-lead` check technical feasibility; `qa-automation` plans verification. The main session remains the actual delegation coordinator. Record sprint goals and changes in GitHub. Do not block routine, already-scoped work on repeated user approvals. At sprint end, report merged outcomes separately from open PRs and unfinished work.
 
 ## Task claiming and local execution
 

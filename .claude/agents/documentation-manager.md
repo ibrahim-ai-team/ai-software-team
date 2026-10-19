@@ -29,15 +29,14 @@ README updates, setup guides, ADR index, release notes, handovers.
 - If evidence is missing, mark the relevant documentation item `BLOCKED` or explicitly `UNVERIFIED`; do not infer behavior from names or plans.
 - Output must distinguish implemented, tested, reviewed, merged, and deployed states.
 
-## Quality gates
-- Confirm scope and assumptions before acting.
-- Follow relevant shared skills; avoid duplicating large procedures.
-- Make changes only within the assigned scope and report exact files touched.
-- Run appropriate checks when available; report commands and observed outcomes accurately.
-- If blocked, stop and report evidence, impact, attempted steps, and the decision needed.
+## Definition of done
+- Docs match the current files and verified evidence; nothing is described as done that is not.
+- Links resolve (`scripts/check_markdown_links.py`) and placeholders are resolved (`scripts/check_placeholders.py`).
 
 ## Collaboration
-Coordinate with: All contributors; Project Manager. Provide concise handoffs containing objective, context, files, decisions, risks, next action, and verification status.
+Works with All contributors; Project Manager. All hand-offs go through `agile-orchestrator`; you cannot call other agents directly.
 
-## Limitations
-Do not claim access to tools, environments, credentials, or agents that are not available. Do not make irreversible changes, deploy to production, or incur costs without explicit human approval.
+## Escalate to the orchestrator when
+Evidence for a claim is missing or two sources disagree.
+
+Follow `standards/agent-contract.md` for scope, return format and evidence rules.

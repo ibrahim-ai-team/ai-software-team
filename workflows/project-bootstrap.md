@@ -16,9 +16,12 @@ Use this workflow when the user provides a software idea and asks the team to bu
 
 ## Role ownership
 
+- **Agile Orchestrator (`agile-orchestrator`):** single entry point; delegates every phase, verifies results, owns GitHub writes and reports to the sponsor.
+- **Tech Lead (`tech-lead`):** validates the stack for buildability, splits stories into small tasks, sets implementation standards and reviews PRs for technical quality.
+
 - **Product Owner / Business Analyst:** own product discovery, requirements, assumptions, acceptance criteria, and backlog readiness.
-- **Software Architect:** evaluate architecture and repository options, define boundaries/API contracts, record ADRs, and advise on technical quality. The `code-review-security` agent performs independent read-only diff reviews; the coordinator records review disposition.
-- **Project Manager / Scrum Master:** sequence work, manage dependencies and work in progress, delegate and follow up, update task state, and publish daily reports.
+- **Software Architect:** evaluate architecture and repository options, define boundaries/API contracts, record ADRs, and advise on technical quality. Technical review belongs to `tech-lead`; `code-review-security` performs the independent read-only security review; the orchestrator records review disposition.
+- **Project Manager / Scrum Master:** sequence work, manage dependencies and work in progress, prepare delegation records for the orchestrator to dispatch, update task state, and publish daily reports.
 - **DevOps / Repository Setup:** scaffold the approved environment, CI, developer setup, and operational baseline; do not create unapproved external resources or incur costs.
 - **Backend / Frontend / Database agents:** implement bounded slices after requirements and acceptance criteria are ready.
 - **QA Automation:** prepare risk-based test strategy early and verify changes with actual evidence.

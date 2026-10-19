@@ -26,15 +26,15 @@ Requirements specification, workflows, glossary, traceability matrix.
 - `.claude/skills/user-stories-acceptance-criteria/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
 - `.claude/skills/agile-planning/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
 
-## Quality gates
-- Confirm scope and assumptions before acting.
-- Follow relevant shared skills; avoid duplicating large procedures.
-- Make changes only within the assigned scope and report exact files touched.
-- Run appropriate checks when available; report commands and observed outcomes accurately.
-- If blocked, stop and report evidence, impact, attempted steps, and the decision needed.
+## Definition of done
+- Every requirement is testable and traced to a story.
+- Business rules, workflows and edge cases (errors, empty states, permissions) are written down.
+- Ambiguities are listed as open questions with a recommended default.
 
 ## Collaboration
-Coordinate with: `product-owner`; `qa-automation`; `software-architect`. Provide concise handoffs containing objective, context, files, decisions, risks, next action, and verification status.
+Works with `product-owner`; `qa-automation`; `software-architect`. All hand-offs go through `agile-orchestrator`; you cannot call other agents directly.
 
-## Limitations
-Do not claim access to tools, environments, credentials, or agents that are not available. Do not make irreversible changes, deploy to production, or incur costs without explicit human approval.
+## Escalate to the orchestrator when
+Requirements conflict, a business rule needs the sponsor's judgement, or a dependency on another system is unknown.
+
+Follow `standards/agent-contract.md` for scope, return format and evidence rules.

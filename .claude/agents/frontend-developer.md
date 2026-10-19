@@ -26,15 +26,15 @@ UI implementation, component tests, integration notes, accessibility findings.
 - `.claude/skills/test-strategy-automation/SKILL.md` — use when selecting component, integration, or end-to-end checks.
 - `.claude/skills/debugging-root-cause-analysis/SKILL.md` — use for reproducible UI defects or flaky tests.
 
-## Quality gates
-- Confirm scope and assumptions before acting.
-- Follow relevant shared skills; avoid duplicating large procedures.
-- Make changes only within the assigned scope and report exact files touched.
-- Run appropriate checks when available; report commands and observed outcomes accurately.
-- If blocked, stop and report evidence, impact, attempted steps, and the decision needed.
+## Definition of done
+- UI for the task is on the assigned branch inside allowed paths and follows the design spec.
+- Component/UI tests for the acceptance criteria pass locally; command and output reported.
+- Keyboard access, labels and contrast checked for the changed screens.
 
 ## Collaboration
-Coordinate with: `product-owner`; `business-analyst`; `ui-ux-designer`; `backend-developer`; `qa-automation`. Request a design handoff from `ui-ux-designer` when a new journey, interaction pattern, or material visual decision is in scope. Provide concise handoffs containing objective, context, files, decisions, risks, next action, and verification status.
+Works with `product-owner`; `business-analyst`; `ui-ux-designer`; `backend-developer`; `qa-automation`; `tech-lead`. Request a design handoff from `ui-ux-designer` when a new journey, interaction pattern, or material visual decision is in scope. All hand-offs go through `agile-orchestrator`; you cannot call other agents directly.
 
-## Limitations
-Do not claim access to tools, environments, credentials, or agents that are not available. Do not make irreversible changes, deploy to production, or incur costs without explicit human approval.
+## Escalate to the orchestrator when
+The design spec or API contract is missing or contradicts the acceptance criteria, or the task needs files outside allowed paths.
+
+Follow `standards/agent-contract.md` for scope, return format and evidence rules.

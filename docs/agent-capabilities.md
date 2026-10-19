@@ -1,6 +1,6 @@
 # Agent Capabilities and Runtime Caveats
 
-This kit contains 16 agent profile files. Their presence as Markdown files does not prove runtime discovery or guarantee that all agents can be spawned in parallel. Actual capabilities depend on installed Claude Code version, settings, permissions, and available tools.
+This kit contains 18 agent profile files: `agile-orchestrator` (run as the main session with `claude --agent agile-orchestrator`) and 17 specialists. Their presence as Markdown files does not prove runtime discovery or guarantee that all agents can be spawned in parallel. Actual capabilities depend on installed Claude Code version, settings, permissions, and available tools.
 
 The `description` frontmatter is intended to help routing. Agent definitions intentionally do not hard-code a project stack. Skills are shared procedural references and do not grant permissions by themselves.
 
@@ -12,8 +12,9 @@ Each agent declares an explicit `tools:` allowlist in its frontmatter; the stati
 
 | Agent group | Tools | Rationale |
 |---|---|---|
+| Orchestrator (`agile-orchestrator` only) | Agent, Read, Grep, Glob, Edit, Write, Bash | Delegates to specialists; the validator rejects `Agent` on any other agent, so specialists cannot spawn agents |
 | Implementation and delivery roles | Read, Grep, Glob, Edit, Write, Bash | Implement changes and run checks where authorized |
-| Planning/documentation roles | Read, Grep, Glob, Edit, Write | Prepare requirements, plans and documentation |
+| Planning/documentation roles, `tech-lead` | Read, Grep, Glob, Edit, Write | Prepare requirements, plans, task breakdowns, reviews and documentation |
 | Read-only review roles | Read, Grep, Glob | Inspect code without direct edits or shell execution |
 | Technical research | Read, Grep, Glob, WebSearch, WebFetch | Research current sources and return recommendations; no direct file writes |
 
