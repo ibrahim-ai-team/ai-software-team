@@ -89,7 +89,7 @@ Apply only topics that accurately describe each repository.
 - [ ] Verify the free Gitleaks CLI workflow has a successful run.
 - [ ] Review rulesets/branch protection on `main`; require checks and review where supported.
 - [ ] Confirm the human owner approves merges.
-- [ ] Choose and document a repository license before representing the toolkit as open source.
+- [x] Choose and document a repository license before representing the toolkit as open source (MIT, #36).
 
 ### Planning and delivery
 - [ ] Create a GitHub Project only when there is a real product backlog to manage.

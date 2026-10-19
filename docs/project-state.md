@@ -29,7 +29,6 @@ Current phase: Supervised pilot readiness (team kit), no application work starte
 | [#24](https://github.com/ibrahim-ai-team/ai-software-team/issues/24) | Blocked | Set the `main` rule: 0 approvals, 4 required checks, no bypass; then read back and close | Repository owner |
 | [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45) | Blocked | Start the pilot after #24 and once the owner gives an idea | Owner input, then coordinator |
 | [#26](https://github.com/ibrahim-ai-team/ai-software-team/issues/26) | Backlog | Calibrate sizing/budgets from pilot data | After #45 |
-| [#36](https://github.com/ibrahim-ai-team/ai-software-team/issues/36) | Backlog | Choose a licence | Repository owner (deferred) |
 
 Board housekeeping still owner-only: #25 shows `In Progress` although closed (the Done gate needs a PR saying `Closes #25`; drag it or enable the Project's "Item closed → Done" workflow); enable "Auto-add to project" so new issues land on the board.
 
