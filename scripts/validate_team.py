@@ -15,6 +15,8 @@ import os
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_TOOLS = {"Agent", "Read", "Grep", "Glob", "Edit", "Write", "Bash", "WebSearch", "WebFetch"}
 ORCHESTRATOR = "agile-orchestrator"  # the only agent allowed to delegate (Agent tool)
+# Reviewers must not be able to change what they review; enforced through their tools allowlist.
+READ_ONLY_AGENTS = {"code-review-security", "tech-lead"}
 HARD_MINIMUMS = {"agents": 18, "skills": 22}
 MANIFEST_PATH = ROOT / ".claude" / "manifest.json"
 errors: list[str] = []
@@ -199,8 +201,8 @@ def check_agent_tools(paths: list[Path]) -> None:
             errors.append(f"Unknown tools {unknown} in {path.relative_to(ROOT)}")
         if len(set(names)) != len(names):
             errors.append(f"Duplicate tools in {path.relative_to(ROOT)}")
-        if path.stem == "code-review-security" and {"Edit", "Write", "Bash"} & set(names):
-            errors.append("code-review-security must remain read-only (no Edit/Write/Bash)")
+        if path.stem in READ_ONLY_AGENTS and {"Edit", "Write", "Bash"} & set(names):
+            errors.append(f"{path.stem} must remain read-only (no Edit/Write/Bash)")
         if "Agent" in names and path.stem != ORCHESTRATOR:
             errors.append(f"Only {ORCHESTRATOR} may delegate; remove 'Agent' from {path.relative_to(ROOT)}")
         if path.stem == ORCHESTRATOR and "Agent" not in names:

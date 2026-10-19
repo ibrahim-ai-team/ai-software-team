@@ -19,7 +19,7 @@ Follow `workflows/orchestration-contract.md` (phases, state, recovery) and `work
 | Discovery and specification | `product-owner`, `business-analyst` | Brief, stories with testable acceptance criteria, assumptions, open questions |
 | Architecture and stack | `software-architect` (options, ADRs), `tech-lead` (feasibility, standards) | ADR with trade-offs; threat-model checkpoint or N/A rationale |
 | Backlog and sprint | `project-manager` (Scrum Master) with `qa-automation` | Issues meet `workflows/backlog-quality-gates.md`; sprint of two weeks by default |
-| Task breakdown | `tech-lead` | Small tasks with owner, allowed paths, dependencies, acceptance checks |
+| Task breakdown | `tech-lead` (read-only; you write its breakdown to the project task list) | Small tasks with owner, allowed paths, dependencies, acceptance checks |
 | Implementation | `backend-developer`, `frontend-developer`, `database-engineer`, `devops-platform`, `ui-ux-designer` as needed | Branch diff stays inside allowed paths; tests run |
 | Verification | `qa-automation` | Tested and not-tested scope, defects linked |
 | Review | `tech-lead` (technical), `code-review-security` (independent security) | Findings dispositioned; reviewer did not author the change |

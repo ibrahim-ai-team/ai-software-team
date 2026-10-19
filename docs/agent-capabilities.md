@@ -14,8 +14,8 @@ Each agent declares an explicit `tools:` allowlist in its frontmatter; the stati
 |---|---|---|
 | Orchestrator (`agile-orchestrator` only) | Agent, Read, Grep, Glob, Edit, Write, Bash | Delegates to specialists; the validator rejects `Agent` on any other agent, so specialists cannot spawn agents |
 | Implementation and delivery roles | Read, Grep, Glob, Edit, Write, Bash | Implement changes and run checks where authorized |
-| Planning/documentation roles, `tech-lead` | Read, Grep, Glob, Edit, Write | Prepare requirements, plans, task breakdowns, reviews and documentation |
-| Read-only review roles | Read, Grep, Glob | Inspect code without direct edits or shell execution |
+| Planning/documentation roles | Read, Grep, Glob, Edit, Write | Prepare requirements, plans and documentation |
+| Read-only review roles (`code-review-security`, `tech-lead`) | Read, Grep, Glob | Inspect code and return findings or breakdowns as text; the orchestrator writes files. Enforced by the allowlist, and the validator rejects Edit/Write/Bash on these agents |
 | Technical research | Read, Grep, Glob, WebSearch, WebFetch | Research current sources and return recommendations; no direct file writes |
 
 Consult each agent's own frontmatter as the source of truth for its exact allowlist; the groups above are explanatory, not an authorization mechanism.

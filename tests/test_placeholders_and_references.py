@@ -116,6 +116,19 @@ class OrchestrationContractTests(unittest.TestCase):
         self.assertEqual(result.returncode, 1, result.stdout)
         self.assertIn("Missing required agent: .claude/agents/tech-lead.md", result.stdout)
 
+    def test_tech_lead_cannot_regain_edit_tools(self):
+        for tool in ("Edit", "Write", "Bash"):
+            with self.subTest(tool=tool):
+                result = self.run_validator(".claude/agents/tech-lead.md", "tools: Read, Grep, Glob",
+                                            f"tools: Read, Grep, Glob, {tool}")
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("tech-lead must remain read-only", result.stdout)
+
+    def test_tech_lead_allowlist_is_read_only(self):
+        text = (ROOT / ".claude" / "agents" / "tech-lead.md").read_text(encoding="utf-8")
+        tools = next(line for line in text.splitlines() if line.startswith("tools:"))
+        self.assertEqual({t.strip() for t in tools.split(":", 1)[1].split(",")}, {"Read", "Grep", "Glob"})
+
     def test_ineffective_write_path_rules_are_rejected(self):
         result = self.run_validator(".claude/settings.json", '"Edit(./.claude/settings.json)",',
                                     '"Edit(./.claude/settings.json)", "Write(./docs/x.md)",')
