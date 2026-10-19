@@ -13,33 +13,33 @@ Current phase: Supervised pilot readiness (team kit), no application work starte
 - Keep secrets, credentials, and private chain-of-thought out of this file and issue bodies.
 - Use GitHub Issues as durable task records; update this file at meaningful session boundaries.
 
-## Verified repository evidence (2026-10-19)
+## Verified repository evidence (2026-10-19, end of session)
 
-- Latest inspected `main` commit: `8bf343a` (merge of PR #44). CI on that commit: [Validate](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39077920728) and [Secret scanning](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39077920727) succeeded.
-- PRs #29, #30, #31 and #44 are merged; #23 (durable state) is closed and this file is on `main`.
-- Claude Code runtime discovery, one delegation and representative deny rules were observed in a cloud session: see [`docs/verification-report.md`](verification-report.md). A local CLI/Termux run and `ask`-rule prompting remain NOT VERIFIED.
+- `main` at `2b388aa` (merge of PR #48). Merged today: #46 (readiness evidence), #47 (MCP merge-tool denial), #48 (backlog items).
+- Closed today: #25 (runtime smoke test) and #32, #34, #35, #39, #40, #42, #43 (via #48).
+- Runtime evidence (cloud session, Claude Code 2.1.303): discovery, delegation, deny rules and MCP merge-tool denial observed — [`docs/verification-report.md`](verification-report.md). Local CLI/Termux run and `ask`-rule prompting: NOT VERIFIED.
 - `main` protection (read back): PR required with 1 approval + code-owner review; force-push and deletion blocked; **no required status checks**; admins not enforced; no rulesets.
-- GitHub MCP merge/auto-merge tools are not denied by `.claude/settings.json`.
-- GitHub Project #1 fields, views and item statuses are not reachable from cloud sessions (GraphQL and org Project endpoints blocked); `project-status.yml` has never run. Board Status: NOT VERIFIED.
+- GitHub secret scanning, push protection and Dependabot security updates: **disabled** (owner settings; see `docs/security-and-governance.md`).
+- Project #1 Status is updated and read back through `.github/workflows/project-status.yml` (verified runs in the verification report). Cloud sessions cannot reach Projects directly; use the workflow.
 
-## Launch blockers for the first supervised pilot
+## Open work
 
-| Order | Issue | Blocker | Owner of next action |
+| Issue | Status on board | Next action | Owner |
 |---|---|---|---|
-| 1 | [#24](https://github.com/ibrahim-ai-team/ai-software-team/issues/24) | Require PR + CI checks on `main`; close the MCP merge-tool gap | Repository owner (settings) and approved PR |
-| 2 | [#25](https://github.com/ibrahim-ai-team/ai-software-team/issues/25) | Runtime evidence recorded; merge it and, if the pilot runs locally, repeat the smoke test there | Repository owner review |
-| 3 | [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45) | Run the first supervised pilot through discovery, backlog and the first reviewed PR | Coordinator, after 1–2 |
+| [#24](https://github.com/ibrahim-ai-team/ai-software-team/issues/24) | Blocked | Set the `main` rule: 0 approvals, 4 required checks, no bypass; then read back and close | Repository owner |
+| [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45) | Blocked | Start the pilot after #24 and once the owner gives an idea | Owner input, then coordinator |
+| [#26](https://github.com/ibrahim-ai-team/ai-software-team/issues/26) | Backlog | Calibrate sizing/budgets from pilot data | After #45 |
+| [#36](https://github.com/ibrahim-ai-team/ai-software-team/issues/36) | Backlog | Choose a licence | Repository owner (deferred) |
 
-Everything else open (#26, #32, #34, #35, #36, #39, #40, #42, #43) can wait until after the pilot. Issue corrections were applied 2026-10-19; Project Status/view changes (not reachable from cloud sessions) are listed in [`docs/pilot-readiness.md`](pilot-readiness.md).
+Board housekeeping still owner-only: #25 shows `In Progress` although closed (the Done gate needs a PR saying `Closes #25`; drag it or enable the Project's "Item closed → Done" workflow); enable "Auto-add to project" so new issues land on the board.
 
 Always re-fetch issue/PR status before acting; the table is a dated snapshot, not a live status feed.
 
 ## Known workflow limitations
 
-- `.github/workflows/project-status.yml` is manually triggered; the target Project is configurable (default organization Project #1) and lookup no longer depends on board size (#40).
-- The workflow has not been proven by a successful real status update and read-back.
+- `.github/workflows/project-status.yml` updates one issue per run; GitHub keeps one pending run per issue, so wait for each step before dispatching the next transition for the same issue.
 - Use it for application Projects only after copying it into the application repository and testing it there.
-- GitHub Projects does not coordinate local Claude Code sessions by itself. A future orchestrator needs task claim/lock handling, isolated branches/worktrees, evidence collection, and safe status updates.
+- Claims are coordination records checked by `scripts/check_claims.py`, not locks; parallel coding needs separate worktrees/branches.
 - Static CI success does not prove live Claude Code permission enforcement.
 
 ## Session-resume checklist
