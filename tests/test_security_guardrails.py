@@ -170,6 +170,10 @@ class ValidatorRejectsWeakenedGuardrails(unittest.TestCase):
     def test_rejects_missing_env_edit_protection(self):
         self.assert_rejected(lambda p: p["deny"].remove("Edit(./.env)"), "deny rule missing: Edit(./.env)")
 
+    def test_rejects_missing_mcp_merge_tool_denial(self):
+        self.assert_rejected(lambda p: p["deny"].remove("mcp__github__merge_pull_request"),
+                             "deny rule missing: mcp__github__merge_pull_request")
+
     def test_rejects_missing_credential_exposure_rule(self):
         self.assert_rejected(lambda p: p["deny"].remove("Bash(gh auth token*)"), "deny rule missing: Bash(gh auth token*)")
 

@@ -55,7 +55,7 @@ Views: keep the existing ones; ensure one view (e.g. "Pilot readiness") filters 
 | Runtime discovery of agents, skills, commands | PASS (cloud) / NOT VERIFIED (local) | verification-report RT-01–04 |
 | Actual subagent delegation and handoff | PASS (one read-only delegation) | RT-05 |
 | Permission enforcement / sensitive files | PASS for tested deny rules; `ask` prompts NOT VERIFIED | RT-06–11 |
-| Agent cannot merge | **FAIL** — MCP merge/auto-merge tools not denied | Gaps, #24 |
+| Agent cannot merge | PASS once merged — MCP merge/auto-merge tools denied, runtime denial observed | verification-report RT-12, #24 |
 | Branch protection and required CI | **FAIL** — PR required (1 approval + code owner), force-push/deletion blocked, but **no required checks** and admins exempt | `branches/main/protection` read-back, #24 |
 | Human-controlled merging | **FAIL** — owner cannot self-approve agent PRs, so merges rely on admin bypass that an agent with the same identity could also use | #24 |
 | Issue-based planning, AC, traceability | PASS — agent issue create/edit/comment verified; board Status manual | #45, A10 |
@@ -73,10 +73,10 @@ Views: keep the existing ones; ensure one view (e.g. "Pilot readiness") filters 
 
 1. **O3 — Agent write access** — done for Issues (Claude GitHub App installed 2026-10-19). Install it on the pilot application repository too when it is created.
 2. **O4 — Branch protection on `main`** (owner, Settings → Branches → rule for `main`): keep "Require a pull request" but set approvals to 0 (agents act under the owner's account, so the owner cannot approve their PRs); require status checks `Static configuration checks (Python 3.10)`, `(3.11)`, `(3.12)` and `Scan repository for secrets`; do not allow bypass; keep force-push and deletion disabled. Apply the same rule in the pilot application repository.
-3. **O5 — Deny agent merge tools** (approve the proposal below; one small PR).
+3. **O5 — Deny agent merge tools** — implemented in a PR for #24; owner merge pending.
 4. Merge the PR carrying this file and `verification-report.md` (closes the evidence part of #25).
 
-### Proposal requiring approval (not implemented)
+### Merge-tool denial (implemented on a feature branch, pending owner merge)
 
 Add to `permissions.deny` in `.claude/settings.json`: `mcp__github__merge_pull_request` and `mcp__github__enable_pr_auto_merge`; add a validator assertion and test so CI fails if they are removed. Verify by attempting a merge call against a closed/nonexistent PR and recording the denial.
 
