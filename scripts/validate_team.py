@@ -311,6 +311,7 @@ if settings_text:
             "Bash(grep*.env*)", "Bash(sed*.env*)", "Bash(awk*.env*)",
             "Read(./secrets/**)", "Edit(./.env)", "Edit(./.env.*)",
             "Edit(./**/*.pem)", "Edit(./**/*.key)", "Edit(./secrets/**)",
+            "mcp__github__merge_pull_request", "mcp__github__enable_pr_auto_merge",
         )
         required_asks = (
             "Bash(git push*)", "Bash(rm -r*)", "Bash(rm -R*)",
