@@ -4,7 +4,7 @@ Use this checklist when a real application is approved. Do not create placeholde
 
 ## Repository metadata
 
-- **Name:** `<product>-api`, `<product>-web`, or another component-specific name
+- **Name:** `idea-NN-<role>` (for example `idea-01-back`), assigned by `scripts/provision_project.py`
 - **Description:** One sentence stating component purpose and owner
 - **Topics:** Product name plus relevant areas such as `backend`, `frontend`, `testing`, or `infrastructure`
 - **Visibility:** Choose deliberately based on product confidentiality

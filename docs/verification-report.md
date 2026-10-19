@@ -89,6 +89,18 @@ Fresh headless Claude Code `2.1.303` processes (`claude --agent agile-orchestrat
 
 Not covered by these runs: implementation, QA and review delegations, PR creation and CI on a real remote, interactive `ask` prompts. The human merge gate is enforced by the deny rules (RT-09, RT-12) and branch protection on `main` (PR, 4 required checks, no bypass, read back 2026-10-19). It was not exercised in RT-17. Reported cost for the two runs: about USD 0.19 (`total_cost_usd` from the stream).
 
+## Run 2026-10-20 — Project provisioning (`scripts/provision_project.py`)
+
+| ID | Case | Observed | Result |
+|---|---|---|---|
+| PV-01 | Mocked engine tests (`tests/test_provision_project.py`, in-memory fake GitHub) | 23 tests: naming, architecture-dependent repository plans, validation, full run, idempotent rerun, foreign-repo block, permission failure, partial failure and resume, retries, project isolation, dry run, approval gate | PASS (mocked) |
+| PV-02 | Real `GhClient` read paths against `ibrahim-ai-team/ai-software-team` (read-only, cloud session) | `get_repo`, `get_topics`, `get_ref_sha` (existing and missing), `get_file` (existing and missing), `find_pr`, `list_labels`, `list_milestones`, `list_issues` returned correctly parsed data | PASS (real, read-only) |
+| PV-03 | Real org-level and GraphQL calls from the cloud session | `list_org_repo_names` and `find_project` returned HTTP 403 and were classified as `PermissionDenied`; a repository outside the session scope also returned 403 | PASS (permission handling); creation NOT TESTED |
+| PV-05 | Ask rule for `apply` in a fresh Claude Code session (all Bash allowed with `--allowedTools Bash`) | `python3 scripts/provision_project.py plan …` ran; `./scripts/provision_project.py apply … --dry-run` and `python3 scripts/provision_project.py apply … --dry-run` were held for permission | PASS (prompt-based; can be avoided, e.g. `python -c`) |
+| PV-06 | Same check without `--allowedTools` (PT-02) | Every Bash command, including `plan`, needed approval, so the ask rule could not be isolated | INCONCLUSIVE (superseded by PV-05) |
+| PV-07 | Reviews `REV-PROV-TL` (tech-lead) and `REV-PROV-SEC` (code-review-security) | Changes requested, no blockers. Fixed: GraphQL error classification, uncaught exceptions, project step dependencies, secondary rate limits, new-repo retry, report rewrite and closed branch, label race, org validation, foreign board adoption, default-branch protection, token redaction. Documented: self-attested approval, prompt-based ask rule, pagination and label-removal limits | Addressed |
+| PV-04 | Real repository, issue, PR and board creation | Not run: cloud sessions cannot reach org endpoints, and no throwaway project was authorized | NOT RUN |
+
 ## Template for future runs
 
 ### Static package checks

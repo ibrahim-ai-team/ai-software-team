@@ -4,6 +4,7 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
+- Added: `/provision-project` and `scripts/provision_project.py`. They validate a team-produced project plan, print the repository tree, require the sponsor's approval of the plan digest, then idempotently create `idea-NN-<role>` repositories, bootstrap PRs, labels, sprint milestones, linked issues and a Project board, recording every step. Mocked tests only; the real GitHub path is not yet verified.
 - Security: `tech-lead` is read-only (Read, Grep, Glob); the review-mode "do not edit" instruction is replaced by allowlist enforcement, and the validator rejects Edit/Write/Bash on it.
 - Added: `agile-orchestrator` as the single entry point (`claude --agent agile-orchestrator`) and the only agent allowed to delegate; `tech-lead` for task breakdown, standards and technical review; `standards/agent-contract.md` with shared scope, return and evidence rules.
 - Changed: agents get role-specific definition of done and escalation sections instead of repeated boilerplate; sprints default to two weeks and are reported rather than approved by the sponsor; Scrum Master and QA Engineer roles are named in their agents.
