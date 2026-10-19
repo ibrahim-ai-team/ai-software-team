@@ -25,8 +25,10 @@
 Allowed statuses: Draft, Ready, In Progress, Blocked, In Review, Done, Cancelled. Use Done only after acceptance criteria and verification evidence are checked.
 
 ## Active delegations
-| Delegation ID | Owner | Scope/allowed paths | Expected output | Status | Evidence |
-|---|---|---|---|---|---|
+| Delegation ID | Task ID | Owner | Branch/worktree | Scope/allowed paths | Expected output | Status | Evidence |
+|---|---|---|---|---|---|---|---|
+
+Before dispatching, run `python scripts/check_claims.py <this file>`; it rejects two active claims on the same task, branch/worktree or overlapping paths.
 
 ## Pull requests and verification
 | PR | Purpose | CI/test evidence | Review status | Next action |

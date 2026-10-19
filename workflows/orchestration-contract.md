@@ -50,6 +50,11 @@ Transitions must be recorded with timestamp, previous phase, new phase, reason, 
 - A claim is not a real lock unless backed by a mechanism with atomic exclusivity. GitHub labels/comments and markdown records are coordination conventions, not distributed locks. If no lock service exists, use a single-writer policy: one coordinator assigns one coding task per shared working tree, records owner/branch, and does not dispatch overlapping file ownership. Parallel work requires separate branches/worktrees and non-overlapping ownership.
 - Never let two coding agents edit the same working tree or the same owned files concurrently. If ownership conflict appears, pause the later task, preserve both results separately, and ask the coordinator to reconcile.
 - Claims record `claimed-at`, last observed checkpoint, owner, branch/worktree, and allowed paths. Do not promise heartbeat/timeout behavior unless a real mechanism exists. At the next coordinator session, reconfirm ownership and inspect artifacts before resuming or reassigning; do not auto-steal a claim solely because time elapsed.
+- **Claim protocol (single coordinator, no lock service):**
+  1. *Claim:* the coordinator adds a row to the project state file's Active delegations table (delegation ID, task ID, owner, branch/worktree, allowed paths, status `CLAIMED`), runs `python scripts/check_claims.py <state file>`, and dispatches only if it passes. Then it sets `IN_PROGRESS`.
+  2. *Release:* when the agent returns, the coordinator verifies the branch/PR evidence, then sets the row to `IN_REVIEW`, `BLOCKED`, `DONE` or `CANCELLED`. Only `CLAIMED`/`IN_PROGRESS` rows hold paths.
+  3. *Recover:* at the next coordinator session, mark unconfirmed active rows `NEEDS_REVALIDATION`, inspect their branch/worktree, then either resume, release to `BLOCKED` with the partial work preserved, or reassign after release. Never reassign a row that is still active.
+  4. *Conflict:* if two writers touched the same branch or paths, stop both, keep each result on its own branch, and reconcile in one follow-up task.
 - Agents return: delegation ID, status, changed paths, commit/branch, checks actually run and their results, evidence links, risks, unresolved items, and next recommendation. The coordinator verifies repository state before marking work complete.
 
 ## Session and cost budget defaults
