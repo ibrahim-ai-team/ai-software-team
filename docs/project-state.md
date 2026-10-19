@@ -3,7 +3,7 @@
 Last analysed: 2026-10-19
 Repository: https://github.com/ibrahim-ai-team/ai-software-team
 Default branch: `main`
-Current phase: Supervised pilot readiness (team kit), no application work started
+Current phase: Ready for the first supervised pilot (team kit); no application work started
 
 ## Operating rules
 
@@ -22,12 +22,17 @@ Current phase: Supervised pilot readiness (team kit), no application work starte
 - GitHub secret scanning, push protection and Dependabot security updates: **disabled** (owner settings; see `docs/security-and-governance.md`).
 - Project #1 Status is updated and read back through `.github/workflows/project-status.yml` (verified runs in the verification report). Cloud sessions cannot reach Projects directly; use the workflow.
 
+## Vision alignment (2026-10-19)
+
+- Team model: `agile-orchestrator` is the single entry point and the only agent that can delegate; `tech-lead` added; 18 agents. Gap analysis: [`docs/vision-alignment-audit.md`](vision-alignment-audit.md).
+- `main` protection read back: PR required, 0 approvals, 4 required checks, no bypass, force-push and deletion blocked (#24 closed).
+- Live runs RT-13 to RT-18 in [`docs/verification-report.md`](verification-report.md): delegation from idea to task breakdown, and resume from this file.
+
 ## Open work
 
 | Issue | Status on board | Next action | Owner |
 |---|---|---|---|
-| [#24](https://github.com/ibrahim-ai-team/ai-software-team/issues/24) | Blocked | Set the `main` rule: 0 approvals, 4 required checks, no bypass; then read back and close | Repository owner |
-| [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45) | Blocked | Start the pilot after #24 and once the owner gives an idea | Owner input, then coordinator |
+| [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45) | Ready | Start with `claude --agent agile-orchestrator` once the owner gives an idea | Owner input, then `agile-orchestrator` |
 | [#26](https://github.com/ibrahim-ai-team/ai-software-team/issues/26) | Backlog | Calibrate sizing/budgets from pilot data | After #45 |
 
 Board housekeeping still owner-only: #25 shows `In Progress` although closed (the Done gate needs a PR saying `Closes #25`; drag it or enable the Project's "Item closed → Done" workflow); enable "Auto-add to project" so new issues land on the board.

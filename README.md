@@ -6,7 +6,7 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 
 | Area | Contents |
 |---|---|
-| Agents | 16 focused roles under `.claude/agents/` |
+| Agents | 18 roles under `.claude/agents/`: one `agile-orchestrator` plus specialists (see [team roles](#team-roles)) |
 | Skills | 23 reusable procedures under `.claude/skills/` (the manifest minimum is 22) |
 | Shared instructions | `.claude/CLAUDE.md` and local permission guardrails in `.claude/settings.json` |
 | Standards | Engineering, security, Git workflow, and definition of done |
@@ -25,10 +25,31 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 
 1. Clone or download this repository.
 2. From the repository root, run `python scripts/validate_team.py`, `python scripts/smoke_discovery.py` (offline inventory check only), and `python -m unittest discover -s tests -v`.
-3. Start Claude Code from this directory.
-4. Ask Claude Code to inspect the team configuration only, report which agents and skills it discovers, and identify version-specific issues. Do not authorize application creation unless you are ready to start a separate project.
+3. Start the team from this directory with `claude --agent agile-orchestrator`. This makes the orchestrator the main session; it delegates to the specialists.
+4. To check the setup only, ask it to report which agents and skills it discovers. To start a project, give it your idea (next section).
 
 For a fictional end-to-end illustration, see [Example Walkthrough](docs/example-walkthrough.md). The example is documentation, not runtime evidence.
+
+## Team roles
+
+One orchestrator coordinates; specialists do the work and return results to it. Only the orchestrator can delegate.
+
+| Role | Agent file |
+|---|---|
+| Agile Orchestrator (entry point) | `.claude/agents/agile-orchestrator.md` |
+| Product Owner | `.claude/agents/product-owner.md` |
+| Business Analyst | `.claude/agents/business-analyst.md` |
+| Scrum Master / Project Manager | `.claude/agents/project-manager.md` |
+| Architect | `.claude/agents/software-architect.md` |
+| Tech Lead | `.claude/agents/tech-lead.md` |
+| Frontend / Backend Developer | `.claude/agents/frontend-developer.md`, `.claude/agents/backend-developer.md` |
+| QA Engineer | `.claude/agents/qa-automation.md` |
+| DevOps Engineer | `.claude/agents/devops-platform.md` |
+| Code / Security Reviewer | `.claude/agents/code-review-security.md` (read-only) |
+| GitHub integration | `agile-orchestrator` (Issues, PRs, board status via `gh` and `.github/workflows/project-status.yml`) |
+| Used when needed | `database-engineer`, `ui-ux-designer`, `technical-research`, `performance-engineer`, `sre-observability-engineer`, `release-manager`, `documentation-manager` |
+
+Shared rules for every specialist: [`standards/agent-contract.md`](standards/agent-contract.md).
 
 ## Agile commands
 

@@ -13,8 +13,11 @@ import sys
 import os
 
 ROOT = Path(__file__).resolve().parents[1]
-ALLOWED_TOOLS = {"Read", "Grep", "Glob", "Edit", "Write", "Bash", "WebSearch", "WebFetch"}
-HARD_MINIMUMS = {"agents": 16, "skills": 22}
+ALLOWED_TOOLS = {"Agent", "Read", "Grep", "Glob", "Edit", "Write", "Bash", "WebSearch", "WebFetch"}
+ORCHESTRATOR = "agile-orchestrator"  # the only agent allowed to delegate (Agent tool)
+# Reviewers must not be able to change what they review; enforced through their tools allowlist.
+READ_ONLY_AGENTS = {"code-review-security", "tech-lead"}
+HARD_MINIMUMS = {"agents": 18, "skills": 22}
 MANIFEST_PATH = ROOT / ".claude" / "manifest.json"
 errors: list[str] = []
 
@@ -198,8 +201,12 @@ def check_agent_tools(paths: list[Path]) -> None:
             errors.append(f"Unknown tools {unknown} in {path.relative_to(ROOT)}")
         if len(set(names)) != len(names):
             errors.append(f"Duplicate tools in {path.relative_to(ROOT)}")
-        if path.stem == "code-review-security" and {"Edit", "Write", "Bash"} & set(names):
-            errors.append("code-review-security must remain read-only (no Edit/Write/Bash)")
+        if path.stem in READ_ONLY_AGENTS and {"Edit", "Write", "Bash"} & set(names):
+            errors.append(f"{path.stem} must remain read-only (no Edit/Write/Bash)")
+        if "Agent" in names and path.stem != ORCHESTRATOR:
+            errors.append(f"Only {ORCHESTRATOR} may delegate; remove 'Agent' from {path.relative_to(ROOT)}")
+        if path.stem == ORCHESTRATOR and "Agent" not in names:
+            errors.append(f"{ORCHESTRATOR} must list the 'Agent' tool to delegate")
 
 
 check_agent_tools(agents)
@@ -244,6 +251,7 @@ def check_required_files(kind: str, paths: list[Path]) -> None:
         errors.append(f"Missing required {kind[:-1] if kind.endswith('s') else kind}: {spec.get('directory', kind)}/{name}")
 
 
+check_required_files("agents", agents)
 check_required_files("commands", commands)
 for path in commands:
     text = require_nonempty(path, "command")
@@ -318,10 +326,7 @@ if settings_text:
             "Bash(gh api*)", "Bash(gh repo edit*)", "Bash(gh secret*)",
             "Edit(./.claude/settings.json)", "Edit(./.github/workflows/**)",
             "Edit(./.github/CODEOWNERS)", "Edit(./.github/dependabot.yml)",
-            "Write(./.claude/settings.json)", "Write(./.github/workflows/**)",
-            "Write(./.github/CODEOWNERS)", "Write(./.github/dependabot.yml)",
-            "Edit(./.claude/CLAUDE.md)", "Write(./.claude/CLAUDE.md)",
-            "Edit(./.claude/manifest.json)", "Write(./.claude/manifest.json)",
+            "Edit(./.claude/CLAUDE.md)", "Edit(./.claude/manifest.json)",
         )
         permissions = settings.get("permissions", {})
         ask = permissions.get("ask", [])
@@ -338,6 +343,10 @@ if settings_text:
             for rule in required_asks:
                 if rule not in ask:
                     errors.append(f"Claude Code permission ask rule missing: {rule}")
+            # Claude Code 2.1.303 warns that Write(path) rules are never matched; Edit(path) covers all file edits.
+            for rule in deny + ask + allow:
+                if isinstance(rule, str) and rule.startswith("Write(") and rule != "Write(*)":
+                    errors.append(f"Use Edit(...) instead of ineffective path rule {rule}")
             unrestricted = {"*", "Bash", "Bash(*)", "Edit", "Edit(*)", "Write", "Write(*)", "Read", "Read(*)"}
             for rule in allow:
                 if isinstance(rule, str) and rule.strip() in unrestricted:

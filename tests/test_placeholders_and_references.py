@@ -1,4 +1,6 @@
 import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -61,10 +63,84 @@ class CrossReferenceTests(unittest.TestCase):
         relative = ".claude/agents/business-analyst.md"
         self.assertTrue(any("does not match file name" in e for e in
                             self.mutated(relative, "name: business-analyst", "name: analyst")))
-        self.assertTrue(any("unknown frontmatter key 'color'" in e for e in
-                            self.mutated(relative, "name: business-analyst", "name: business-analyst\ncolor: blue")))
+        self.assertTrue(any("unknown frontmatter key 'colour'" in e for e in
+                            self.mutated(relative, "name: business-analyst", "name: business-analyst\ncolour: blue")))
         self.assertTrue(any("model 'gpt-x'" in e for e in
                             self.mutated(relative, "name: business-analyst", "name: business-analyst\nmodel: gpt-x")))
+
+    def test_accepts_documented_model_values(self):
+        relative = ".claude/agents/business-analyst.md"
+        for model in ("fable", "inherit", "claude-opus-5-5"):
+            with self.subTest(model=model):
+                self.assertEqual(self.mutated(relative, "name: business-analyst", f"name: business-analyst\nmodel: {model}"), [])
+
+    def test_orchestrator_must_name_every_required_agent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "repo"
+            shutil.copytree(ROOT, target, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+            path = target / ".claude" / "agents" / "agile-orchestrator.md"
+            path.write_text(path.read_text(encoding="utf-8").replace("`tech-lead`", "the lead"), encoding="utf-8")
+            errors = [e for e in check(target) if "cannot delegate" in e]
+        self.assertTrue(errors and "tech-lead" in errors[0], errors)
+
+
+class OrchestrationContractTests(unittest.TestCase):
+    """Static checks of the delegation model; they do not prove runtime behaviour."""
+
+    def run_validator(self, relative: str, old: str, new: str):
+        with tempfile.TemporaryDirectory() as temp:
+            target = Path(temp) / "repo"
+            shutil.copytree(ROOT, target, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+            path = target / relative
+            if new is None:
+                path.unlink()
+            else:
+                text = path.read_text(encoding="utf-8")
+                self.assertIn(old, text)
+                path.write_text(text.replace(old, new, 1), encoding="utf-8")
+            return subprocess.run([sys.executable, "scripts/validate_team.py"], cwd=target,
+                                  capture_output=True, text=True, check=False)
+
+    def test_only_orchestrator_may_delegate(self):
+        result = self.run_validator(".claude/agents/tech-lead.md", "tools: Read,", "tools: Agent, Read,")
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("Only agile-orchestrator may delegate", result.stdout)
+
+    def test_orchestrator_needs_agent_tool(self):
+        result = self.run_validator(".claude/agents/agile-orchestrator.md", "tools: Agent, Read,", "tools: Read,")
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("must list the 'Agent' tool", result.stdout)
+
+    def test_required_role_cannot_be_removed(self):
+        result = self.run_validator(".claude/agents/tech-lead.md", "", None)
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("Missing required agent: .claude/agents/tech-lead.md", result.stdout)
+
+    def test_tech_lead_cannot_regain_edit_tools(self):
+        for tool in ("Edit", "Write", "Bash"):
+            with self.subTest(tool=tool):
+                result = self.run_validator(".claude/agents/tech-lead.md", "tools: Read, Grep, Glob",
+                                            f"tools: Read, Grep, Glob, {tool}")
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("tech-lead must remain read-only", result.stdout)
+
+    def test_tech_lead_allowlist_is_read_only(self):
+        text = (ROOT / ".claude" / "agents" / "tech-lead.md").read_text(encoding="utf-8")
+        tools = next(line for line in text.splitlines() if line.startswith("tools:"))
+        self.assertEqual({t.strip() for t in tools.split(":", 1)[1].split(",")}, {"Read", "Grep", "Glob"})
+
+    def test_ineffective_write_path_rules_are_rejected(self):
+        result = self.run_validator(".claude/settings.json", '"Edit(./.claude/settings.json)",',
+                                    '"Edit(./.claude/settings.json)", "Write(./docs/x.md)",')
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("ineffective path rule Write(./docs/x.md)", result.stdout)
+
+    def test_contract_names_tech_lead_and_human_merge(self):
+        contract = (ROOT / "workflows" / "orchestration-contract.md").read_text(encoding="utf-8")
+        self.assertNotIn("no separate Tech Lead agent", contract)
+        self.assertIn("`tech-lead` reviews technical quality", contract)
+        self.assertIn("Only the human repository owner merges PRs", contract)
+        self.assertIn("two-week sprint", contract)
 
 
 if __name__ == "__main__":

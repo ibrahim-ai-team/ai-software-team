@@ -8,7 +8,7 @@ For reusable files and native agent/skill discovery, choose Claude Code. Claude 
 2. Extract this package.
 3. Open a terminal in the extracted `ai-software-team` directory.
 4. Run `python scripts/validate_team.py`.
-5. Start Claude Code from this directory and ask it to inspect configuration only.
+5. Start the team with `claude --agent agile-orchestrator` from this directory, and first ask it to inspect configuration only.
 6. Review its observed agent/skill discovery and correct any version-specific issues.
 
 ## Do not assume

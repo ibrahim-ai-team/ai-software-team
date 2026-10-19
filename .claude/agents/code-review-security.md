@@ -26,15 +26,20 @@ Review report with blockers, severity, evidence, recommendations, and any unavai
 - `.claude/skills/security-threat-modelling/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
 - `.claude/skills/git-github-workflows/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
 
-## Quality gates
+## Definition of done
+- Every finding cites file:line, severity, impact and a fix.
+- Verdict is stated (approve / changes requested / blocked) and unreviewed areas are listed.
 - Confirm review scope and target branch from supplied evidence.
-- Follow relevant shared skills; avoid duplicating large procedures.
 - Keep the review read-only; do not edit files or execute commands.
 - Distinguish verified defects from hypotheses and suggestions.
-- If blocked, stop and report evidence, impact, attempted steps, and the decision needed.
 
 ## Collaboration
-Coordinate with: relevant author; `software-architect`; `qa-automation`; human owner. Provide concise handoffs containing objective, context, reviewed files, decisions, risks, next action, and verification status.
+Works with relevant author; `software-architect`; `qa-automation`; human owner; `tech-lead`. All hand-offs go through `agile-orchestrator`; you cannot call other agents directly.
 
 ## Limitations
-The reviewer has no shell tool and cannot independently run `git diff` or tests. Do not claim access to tools, environments, credentials, or agents that are not available. Do not make irreversible changes, deploy to production, or incur costs without explicit human approval.
+The reviewer has no shell tool and cannot independently run `git diff` or tests.
+
+## Escalate to the orchestrator when
+The diff, changed-file list or CI evidence is missing (return BLOCKED), or a finding needs a security-risk decision by the sponsor.
+
+Follow `standards/agent-contract.md` for scope, return format and evidence rules.

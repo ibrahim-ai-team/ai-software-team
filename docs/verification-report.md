@@ -72,6 +72,23 @@ Board Status after corrections (each value confirmed by the workflow's read-back
 | Done | #23, #28, #32, #33, #34, #35, #37, #39, #40, #41, #42, #43 |
 | Not on board | #38 (closed; cosmetic) |
 
+## Run 2026-10-19 — Orchestrator end-to-end and resume (vision alignment)
+
+Fresh headless Claude Code `2.1.303` processes (`claude --agent agile-orchestrator -p …`, `--permission-mode acceptEdits`) in a throwaway local copy of the feature branch with **no git remote**. The idea was a fictional single-user CLI to-do tool. The runs did planning only: no application code, git push or GitHub.
+
+| ID | Case | Observed | Result |
+|---|---|---|---|
+| RT-13 | Settings warnings before the fix | Start-up printed six "Permission ask rule … Write(…) is not matched by file permission checks — only Edit(path) rules are" warnings | FINDING (fixed: A8 in `docs/vision-alignment-audit.md`) |
+| RT-14 | Settings warnings after the fix | No permission warnings at start-up (empty stderr) | PASS |
+| RT-15 | New agents discoverable | Running session (started before the files existed) reported `tech-lead` not found; fresh sessions loaded all 18 | PASS (agents load at session start) |
+| RT-16 | Orchestrator as main session | Main thread ran with tools Bash, Edit, Read, Task (Agent), Write. Grep/Glob were not offered as separate tools in this build | PASS (observation recorded) |
+| RT-17 | Delegation flow E2E-01 | Orchestrator delegated, in order, to `product-owner`, `business-analyst`, `software-architect`, `tech-lead`, and wrote `docs/discovery.md`, `docs/adr-001.md`, `docs/tasks.md`, `docs/project-state.md`. It recorded assumptions instead of asking, and did not create a branch without approval | PASS |
+| RT-19 | `Write` tool on a protected path with no `Write` rules (`acceptEdits`, headless) | `Write docs/pt01.txt` succeeded; `Write .claude/settings.json` returned "Claude requested permissions to write … but you haven't granted it yet"; file unchanged | PASS (`Edit(path)` rule covers `Write`) |
+| RT-20 | `tech-lead` read-only in a fresh session (task TL-RO-01: list tools, try to create `docs/tl-ro.txt`) | Subagent reported tools Read, Grep, Glob; it made no Write/Edit/Bash calls (stream shows none) and the file was not created. It did not attempt a write because it had no write tool, so the tool list is self-reported and the absence of write calls is observed | PASS (allowlist enforcement consistent with RT-05) |
+| RT-18 | Session resume | A second new session read `docs/project-state.md`, checked the repo, reported phase, artifacts, assumptions and next action with owner. It made no delegations and no file changes | PASS |
+
+Not covered by these runs: implementation, QA and review delegations, PR creation and CI on a real remote, interactive `ask` prompts. The human merge gate is enforced by the deny rules (RT-09, RT-12) and branch protection on `main` (PR, 4 required checks, no bypass, read back 2026-10-19). It was not exercised in RT-17. Reported cost for the two runs: about USD 0.19 (`total_cost_usd` from the stream).
+
 ## Template for future runs
 
 ### Static package checks

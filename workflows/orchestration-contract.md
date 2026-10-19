@@ -1,7 +1,7 @@
 # Orchestration Contract
 
 ## Purpose and limits
-This contract defines the repeatable control loop for a Claude Code session. It is a protocol, not a background service, distributed lock manager, or proof that Claude Code can discover or delegate to every profile. The active top-level session is the coordinator of record. Work stops when the session stops unless an independently configured scheduler invokes it.
+This contract defines the repeatable control loop for a Claude Code session. It is a protocol, not a background service, distributed lock manager, or proof that Claude Code can discover or delegate to every profile. The coordinator of record is `agile-orchestrator`, started as the main session with `claude --agent agile-orchestrator`. If a session is started without it, the top-level session follows this same contract. Delegation is hub-and-spoke: only the orchestrator has the `Agent` tool; specialists return results to it and never call each other. Work stops when the session stops unless an independently configured scheduler invokes it.
 
 ## Canonical state and precedence
 For each project, maintain a durable project state file in the project repository (recommended: `docs/project-state.md`) and task records in GitHub Issues when available. Keep sensitive values out of state files.
@@ -23,8 +23,8 @@ During `ARCHITECTURE`, before implementation begins, require a documented threat
 Project phases:
 - `DISCOVERY`: capture idea, goals, users, outcomes, constraints.
 - `SPECIFICATION`: PO/BA produce requirements, journeys, edge cases, acceptance criteria, NFRs, assumptions and open questions.
-- `ARCHITECTURE`: Architect compares options and records recommended architecture and material trade-offs.
-- `BACKLOG_READY`: PM decomposes into prioritized, dependency-aware, testable work; QA/DevOps contribute verification and delivery needs.
+- `ARCHITECTURE`: Architect compares options and records recommended architecture and material trade-offs; Tech Lead validates buildability and sets implementation standards.
+- `BACKLOG_READY`: PM (Scrum Master) builds the prioritized backlog and a two-week sprint (default length); Tech Lead splits stories into small, path-bounded tasks; QA/DevOps contribute verification and delivery needs.
 - `AWAITING_SPONSOR_DECISION`: pause only for material business direction, budget/spending, access/visibility, security-risk acceptance, destructive actions, production release, or other irreversible commitment.
 - `DELIVERY`: execute bounded Ready tasks.
 - `INTEGRATION_REVIEW`: integrate compatible outputs, run checks, QA and security review.
@@ -78,7 +78,7 @@ Transitions must be recorded with timestamp, previous phase, new phase, reason, 
 Follow `workflows/backlog-quality-gates.md` before a task is considered Ready. QA must map acceptance criteria to verification methods and identify distinct linked QA issues before sprint commitment. Follow `workflows/project-status-transitions.md` for the canonical GitHub Projects Status field and allowed transitions. A title prefix, issue body text, label, or agent assertion does not prove a board status changed. The coordinator must verify the actual Project V2 field after a status update. Report status-update failures without claiming success; keep the last verified state. Never set Done without a verified human-merged PR and completion evidence.
 
 ## Quality and merge gate
-A task can enter review only when its acceptance checks and relevant tests have evidence. Review must inspect the actual diff, test results, security/privacy impact, docs/config changes, and compatibility. QA reports tested and not-tested scope. The `code-review-security` agent produces a read-only review report with findings and evidence. The coordinator records the review disposition in the delegation/PR record; the reviewer never approves its own implementation. The Architect may advise on architecture, but no separate Tech Lead agent is assumed. A PR may be labelled ready only when required CI checks pass and the evidence is linked; if checks are unavailable, state that explicitly and do not imply they passed.
+A task can enter review only when its acceptance checks and relevant tests have evidence. Review must inspect the actual diff, test results, security/privacy impact, docs/config changes, and compatibility. QA reports tested and not-tested scope. Two independent reviews are required before a PR is presented: `tech-lead` reviews technical quality, design, maintainability and test adequacy; `code-review-security` reviews security, secrets and dependencies (read-only). QA (`qa-automation`) validates behaviour against acceptance criteria. The coordinator records each disposition in the delegation/PR record; no reviewer approves work it authored. The Architect advises when a change touches ADRs. A PR may be labelled ready only when required CI checks pass and the evidence is linked; if checks are unavailable, state that explicitly and do not imply they passed.
 
 Only the human repository owner merges PRs. Agents must not merge, enable auto-merge, push directly to the default branch, deploy production, or change repository permissions. Documentation is not enforcement: verify GitHub branch protection/rulesets and repository permissions separately.
 

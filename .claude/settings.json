@@ -62,15 +62,9 @@
       "Edit(./.claude/settings.json)",
       "Edit(./.github/workflows/**)",
       "Edit(./.github/CODEOWNERS)",
-      "Write(./.claude/settings.json)",
-      "Write(./.github/workflows/**)",
-      "Write(./.github/CODEOWNERS)",
       "Edit(./.github/dependabot.yml)",
-      "Write(./.github/dependabot.yml)",
       "Edit(./.claude/CLAUDE.md)",
-      "Write(./.claude/CLAUDE.md)",
-      "Edit(./.claude/manifest.json)",
-      "Write(./.claude/manifest.json)"
+      "Edit(./.claude/manifest.json)"
     ]
   }
 }

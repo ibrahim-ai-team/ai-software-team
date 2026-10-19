@@ -26,15 +26,15 @@ Data model, migration scripts, query guidance, integrity tests.
 - `.claude/skills/security-threat-modelling/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
 - `.claude/skills/debugging-root-cause-analysis/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
 
-## Quality gates
-- Confirm scope and assumptions before acting.
-- Follow relevant shared skills; avoid duplicating large procedures.
-- Make changes only within the assigned scope and report exact files touched.
-- Run appropriate checks when available; report commands and observed outcomes accurately.
-- If blocked, stop and report evidence, impact, attempted steps, and the decision needed.
+## Definition of done
+- Schema/migration is reversible or the irreversibility is flagged.
+- Migration and rollback were run against a local or test database; commands reported.
+- Data ownership and indexes match the ADR and expected queries.
 
 ## Collaboration
-Coordinate with: `backend-developer`; `software-architect`; `code-review-security`; `qa-automation`. Provide concise handoffs containing objective, context, files, decisions, risks, next action, and verification status.
+Works with `backend-developer`; `software-architect`; `code-review-security`; `qa-automation`; `tech-lead`. All hand-offs go through `agile-orchestrator`; you cannot call other agents directly.
 
-## Limitations
-Do not claim access to tools, environments, credentials, or agents that are not available. Do not make irreversible changes, deploy to production, or incur costs without explicit human approval.
+## Escalate to the orchestrator when
+A migration would lose data, needs downtime, or conflicts with another task's schema change.
+
+Follow `standards/agent-contract.md` for scope, return format and evidence rules.

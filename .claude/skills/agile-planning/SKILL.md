@@ -10,7 +10,7 @@ Use this skill before selecting sprint scope, splitting work, sequencing depende
 
 
 ## Procedure
-Clarify the goal, capacity, dependencies, risks, and acceptance checks. Break work into sprint-sized slices with clear ownership. Track blockers and scope changes; do not start a sprint without explicit approval.
+Clarify the goal, capacity, dependencies, risks, and acceptance checks. Break work into sprint-sized slices with clear ownership. Default to a two-week sprint. Track blockers and scope changes. Agree the sprint scope and report it to the sponsor; ask for approval only when the plan changes agreed scope, cost, risk or a deadline.
 
 ## Expected outputs
 - Sprint goal and bounded scope, with explicit exclusions

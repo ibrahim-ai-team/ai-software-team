@@ -145,11 +145,11 @@ class ValidatorRegressionTests(unittest.TestCase):
             import json
             path = copy / ".claude/manifest.json"
             manifest = json.loads(path.read_text(encoding="utf-8"))
-            manifest["inventory"]["agents"]["minimum_count"] = 15
+            manifest["inventory"]["agents"]["minimum_count"] = 17
             path.write_text(json.dumps(manifest), encoding="utf-8")
             result = self.run_validator(copy)
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("hard floor 16", result.stdout)
+            self.assertIn("hard floor 18", result.stdout)
 
     def test_validator_rejects_manifest_path_escape(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
 """Check command references and agent frontmatter without network access.
 
-- Commands: every backticked hyphenated name must be an existing agent, skill
-  or command, and every backticked repository path must exist.
+- Commands and agents: every backticked hyphenated name must be an existing
+  agent, skill or command, and every backticked repository path must exist.
+- The orchestrator must name every manifest-required agent it delegates to.
 - Agents: frontmatter keys must be known, `name` must match the file name and
-  an optional `model` must be one of the documented aliases.
+  an optional `model` must be a documented alias or a claude-* model ID.
 Tool allowlists are already validated by validate_team.py.
 """
+import json
 from pathlib import Path
 import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
-AGENT_KEYS = {"name", "description", "tools", "model"}
-MODEL_ALIASES = {"inherit", "sonnet", "opus", "haiku"}
+# Documented subagent frontmatter fields (code.claude.com/docs/en/sub-agents, checked 2026-10-19).
+AGENT_KEYS = {"name", "description", "tools", "disallowedTools", "model", "permissionMode", "maxTurns",
+              "autoCompactWindow", "skills", "mcpServers", "hooks", "memory", "background", "omitClaudeMd",
+              "effort", "isolation", "color", "initialPrompt", "experimental"}
+MODEL_ALIASES = {"inherit", "sonnet", "opus", "haiku", "fable"}
+MODEL_ID = re.compile(r"^claude-[a-z0-9.-]+$")
 CODE_SPAN = re.compile(r"`([^`\s]+)`")
 NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)+$")
 PATH = re.compile(r"^\.?[\w.-]+(?:/[\w.*-]+)+$")
@@ -50,10 +56,19 @@ def check(root: Path) -> list[str]:
                 errors.append(f"{shown}:{line_number}: unknown frontmatter key '{key}'")
             elif key == "name" and value != path.stem:
                 errors.append(f"{shown}:{line_number}: name '{value}' does not match file name '{path.stem}'")
-            elif key == "model" and value not in MODEL_ALIASES:
-                errors.append(f"{shown}:{line_number}: model '{value}' is not one of {sorted(MODEL_ALIASES)}")
+            elif key == "model" and value not in MODEL_ALIASES and not MODEL_ID.match(value):
+                errors.append(f"{shown}:{line_number}: model '{value}' is not an alias {sorted(MODEL_ALIASES)} or a claude-* model ID")
 
-    for path in sorted((claude / "commands").glob("*.md")):
+    orchestrator = claude / "agents" / "agile-orchestrator.md"
+    if orchestrator.is_file():
+        manifest = json.loads((claude / "manifest.json").read_text(encoding="utf-8"))
+        named = set(CODE_SPAN.findall(orchestrator.read_text(encoding="utf-8")))
+        for required in manifest.get("inventory", {}).get("agents", {}).get("required", []):
+            role = required.removesuffix(".md")
+            if role != "agile-orchestrator" and role not in named:
+                errors.append(f"{orchestrator.relative_to(root)}: does not name required agent '{role}', so it cannot delegate to it")
+
+    for path in sorted((claude / "commands").glob("*.md")) + agents:
         shown = path.relative_to(root)
         for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             for token in CODE_SPAN.findall(line):
