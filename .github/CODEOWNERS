@@ -1,2 +1,9 @@
-# Request review from the repository owner for all changes.
+# The repository owner reviews every change and alone performs final merges.
 * @IbrhimGhorafi
+
+# Sensitive paths: agent permissions and instructions, CI/workflows, validators.
+# Listed explicitly so review expectations stay visible if reviewers are added.
+/.claude/ @IbrhimGhorafi
+/.github/ @IbrhimGhorafi
+/scripts/ @IbrhimGhorafi
+/tests/ @IbrhimGhorafi

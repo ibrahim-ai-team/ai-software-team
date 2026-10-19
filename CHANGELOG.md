@@ -4,6 +4,11 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
+- Security: deny GitHub MCP merge and auto-merge tools for agents (#24).
+- Added: CI checks for command references, agent frontmatter, unresolved placeholders (#32, #43) and a pre-dispatch claim-conflict check with a documented claim/release/recovery protocol (#42).
+- Changed: the Project status workflow targets a configurable Project, finds items from the issue side (no 100-item limit), supports `dry_run` and `add_if_missing`, and was verified by a real update and read-back (#40).
+- Added: changelog/release convention, CODEOWNERS sensitive paths and an owner-unavailability rule (#39, #35); dated secret-scanning status (#34).
+- Added: pilot readiness record, runtime verification report and pilot issue (#45).
 - Add local Claude Code permission deny rules for selected dangerous commands and sensitive paths.
 - Add a Gitleaks GitHub Actions workflow and common local-secret ignore patterns.
 - Harden repository validation for required command/template inventories, non-empty content, and selected security configuration.
