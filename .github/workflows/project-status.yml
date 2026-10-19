@@ -8,7 +8,7 @@ on:
         required: true
         type: number
       status:
-        description: "Target status on organization Project #1"
+        description: "Target status on the selected Project"
         required: true
         type: choice
         options:
@@ -32,6 +32,25 @@ on:
         description: "Required only when setting Done; merged PR number"
         required: false
         type: number
+      project_owner:
+        description: "Organization or user that owns the Project (default: this repository's owner)"
+        required: false
+        type: string
+      project_number:
+        description: "Project number (default: 1, the infrastructure board)"
+        required: false
+        type: number
+        default: 1
+      dry_run:
+        description: "Only report the current status and check the transition; change nothing"
+        required: false
+        type: boolean
+        default: false
+      add_if_missing:
+        description: "Add the issue to the Project first if it is not on it"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -93,56 +112,80 @@ jobs:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
           ISSUE_NUMBER: ${{ inputs.issue_number }}
           TARGET_STATUS: ${{ inputs.status }}
-          OWNER: ${{ github.repository_owner }}
+          PROJECT_OWNER: ${{ inputs.project_owner || github.repository_owner }}
+          PROJECT_NUMBER: ${{ inputs.project_number || 1 }}
+          ADD_IF_MISSING: ${{ inputs.add_if_missing && !inputs.dry_run }}
           REPOSITORY: ${{ github.repository }}
         run: |
           set -euo pipefail
-          QUERY='query($org:String!, $number:Int!) {
-            organization(login:$org) {
-              projectV2(number:$number) {
+          [[ "$PROJECT_NUMBER" =~ ^[1-9][0-9]*$ ]] || { echo "::error::Project number must be a positive integer."; exit 1; }
+          [[ "$PROJECT_OWNER" =~ ^[A-Za-z0-9-]+$ ]] || { echo "::error::Project owner must be a GitHub login."; exit 1; }
+          # Look the item up from the issue side: no pagination over Project items is needed,
+          # and the issue is proven to exist in this repository.
+          QUERY='query($owner:String!, $name:String!, $issue:Int!) {
+            repository(owner:$owner, name:$name) {
+              issue(number:$issue) {
                 id
-                fields(first:50) {
-                  nodes {
-                    ... on ProjectV2SingleSelectField {
-                      id
-                      name
-                      options { id name }
-                    }
-                  }
-                }
-                items(first:100) {
+                number
+                projectItems(first:50, includeArchived:false) {
                   nodes {
                     id
-                    content {
-                      ... on Issue {
-                        number
-                        title
-                        repository { nameWithOwner }
+                    project {
+                      id
+                      number
+                      owner { ... on Organization { login } ... on User { login } }
+                      fields(first:100) {
+                        nodes { ... on ProjectV2SingleSelectField { id name options { id name } } }
                       }
                     }
-                    fieldValues(first:20) {
-                      nodes {
-                        ... on ProjectV2ItemFieldSingleSelectValue {
-                          name
-                          field { ... on ProjectV2SingleSelectField { name } }
-                        }
-                      }
-                    }
+                    fieldValueByName(name:"Status") { ... on ProjectV2ItemFieldSingleSelectValue { name } }
                   }
                 }
               }
             }
           }'
-          DATA="$(gh api graphql -f query="$QUERY" -F org="$OWNER" -F number=1)"
-          PROJECT_ID="$(jq -r '.data.organization.projectV2.id // empty' <<<"$DATA")"
-          [[ -n "$PROJECT_ID" ]] || { echo "::error::Project #1 unavailable. Check org access and Projects: Read and write."; exit 1; }
-          ITEM_JSON="$(jq -c --arg repo "$REPOSITORY" --argjson issue "$ISSUE_NUMBER" '[.data.organization.projectV2.items.nodes[] | select(.content != null and .content.number == $issue and .content.repository.nameWithOwner == $repo)] | first // empty' <<<"$DATA")"
-          [[ -n "$ITEM_JSON" && "$ITEM_JSON" != "null" ]] || { echo "::error::Issue #$ISSUE_NUMBER was not found in the first 100 items of Project #1. Confirm project membership."; exit 1; }
+          DATA="$(gh api graphql -f query="$QUERY" -F owner="${REPOSITORY%/*}" -F name="${REPOSITORY#*/}" -F issue="$ISSUE_NUMBER")"
+          [[ "$(jq -r '.data.repository.issue.number // empty' <<<"$DATA")" == "$ISSUE_NUMBER" ]] || {
+            echo "::error::Issue #$ISSUE_NUMBER does not exist in $REPOSITORY or is not readable with PROJECTS_TOKEN."
+            jq -r '.errors[]?.message // empty' <<<"$DATA"
+            exit 1
+          }
+          select_items() {
+            jq -c --arg owner "$PROJECT_OWNER" --argjson number "$PROJECT_NUMBER" '[.data.repository.issue.projectItems.nodes[] | select(.project.number == $number and ((.project.owner.login // "") | ascii_downcase) == ($owner | ascii_downcase))]' <<<"$DATA"
+          }
+          ITEMS="$(select_items)"
+          if [[ "$(jq 'length' <<<"$ITEMS")" == "0" && "$ADD_IF_MISSING" == "true" ]]; then
+            OWNER_QUERY='query($login:String!, $number:Int!) {
+              organization(login:$login) { projectV2(number:$number) { id } }
+            }'
+            TARGET_PROJECT_ID="$(gh api graphql -f query="$OWNER_QUERY" -F login="$PROJECT_OWNER" -F number="$PROJECT_NUMBER" --jq '.data.organization.projectV2.id // empty' 2>/dev/null || true)"
+            if [[ -z "$TARGET_PROJECT_ID" ]]; then
+              OWNER_QUERY='query($login:String!, $number:Int!) { user(login:$login) { projectV2(number:$number) { id } } }'
+              TARGET_PROJECT_ID="$(gh api graphql -f query="$OWNER_QUERY" -F login="$PROJECT_OWNER" -F number="$PROJECT_NUMBER" --jq '.data.user.projectV2.id // empty')"
+            fi
+            [[ -n "$TARGET_PROJECT_ID" ]] || { echo "::error::Project $PROJECT_OWNER/#$PROJECT_NUMBER not found or not accessible."; exit 1; }
+            ADD='mutation($projectId:ID!, $contentId:ID!) {
+              addProjectV2ItemById(input:{projectId:$projectId, contentId:$contentId}) { item { id } }
+            }'
+            gh api graphql -f query="$ADD" -F projectId="$TARGET_PROJECT_ID" -F contentId="$(jq -r '.data.repository.issue.id' <<<"$DATA")" --jq '.data.addProjectV2ItemById.item.id' >/dev/null
+            echo "Added issue #$ISSUE_NUMBER to Project $PROJECT_OWNER/#$PROJECT_NUMBER."
+            DATA="$(gh api graphql -f query="$QUERY" -F owner="${REPOSITORY%/*}" -F name="${REPOSITORY#*/}" -F issue="$ISSUE_NUMBER")"
+            ITEMS="$(select_items)"
+          fi
+          case "$(jq 'length' <<<"$ITEMS")" in
+            0) echo "::error::Issue #$ISSUE_NUMBER is not on Project $PROJECT_OWNER/#$PROJECT_NUMBER. Add it to the board first or rerun with add_if_missing."; exit 1 ;;
+            1) ;;
+            *) echo "::error::Issue #$ISSUE_NUMBER appears more than once on Project $PROJECT_OWNER/#$PROJECT_NUMBER; remove the duplicate item."; exit 1 ;;
+          esac
+          ITEM_JSON="$(jq -c '.[0]' <<<"$ITEMS")"
+          STATUS_FIELDS="$(jq -c '[.project.fields.nodes[] | select(.name == "Status")]' <<<"$ITEM_JSON")"
+          [[ "$(jq 'length' <<<"$STATUS_FIELDS")" == "1" ]] || { echo "::error::Project must have exactly one single-select field named 'Status'."; exit 1; }
+          PROJECT_ID="$(jq -r '.project.id' <<<"$ITEM_JSON")"
           ITEM_ID="$(jq -r '.id' <<<"$ITEM_JSON")"
-          CURRENT_STATUS="$(jq -r '[.fieldValues.nodes[] | select(.field.name == "Status") | .name] | first // empty' <<<"$ITEM_JSON")"
-          FIELD_ID="$(jq -r '[.data.organization.projectV2.fields.nodes[] | select(.name == "Status") | .id] | first // empty' <<<"$DATA")"
-          OPTION_ID="$(jq -r --arg status "$TARGET_STATUS" '[.data.organization.projectV2.fields.nodes[] | select(.name == "Status") | .options[]? | select(.name == $status) | .id] | first // empty' <<<"$DATA")"
-          [[ -n "$FIELD_ID" && -n "$OPTION_ID" ]] || { echo "::error::Status field/option '$TARGET_STATUS' not found. Match the exact Project field options."; exit 1; }
+          CURRENT_STATUS="$(jq -r '.fieldValueByName.name // empty' <<<"$ITEM_JSON")"
+          FIELD_ID="$(jq -r '.[0].id' <<<"$STATUS_FIELDS")"
+          OPTION_ID="$(jq -r --arg status "$TARGET_STATUS" '[.[0].options[] | select(.name == $status) | .id] | first // empty' <<<"$STATUS_FIELDS")"
+          [[ -n "$OPTION_ID" ]] || { echo "::error::Status option '$TARGET_STATUS' not found. Available: $(jq -r '[.[0].options[].name] | join(", ")' <<<"$STATUS_FIELDS")"; exit 1; }
           {
             echo "project_id=$PROJECT_ID"
             echo "item_id=$ITEM_ID"
@@ -150,7 +193,7 @@ jobs:
             echo "option_id=$OPTION_ID"
             echo "current_status=$CURRENT_STATUS"
           } >> "$GITHUB_OUTPUT"
-          echo "Current board status: ${CURRENT_STATUS:-unset}; requested status: $TARGET_STATUS"
+          echo "Project $PROJECT_OWNER/#$PROJECT_NUMBER: current status ${CURRENT_STATUS:-unset}; requested $TARGET_STATUS"
 
       - name: Validate transition
         shell: bash
@@ -168,13 +211,25 @@ jobs:
             "Backlog->Ready"|"Backlog->Blocked"|"Ready->In Progress"|"Ready->Blocked"|"In Progress->In Review"|"In Progress->Blocked"|"In Review->Changes Requested"|"In Review->Approved — Awaiting Human Merge"|"In Review->Blocked"|"Changes Requested->In Progress"|"Changes Requested->In Review"|"Changes Requested->Blocked"|"Approved — Awaiting Human Merge->Done"|"Approved — Awaiting Human Merge->Blocked"|"Blocked->Backlog"|"Blocked->Ready"|"Done->In Progress") ALLOWED=true ;;
           esac
           if [[ "$TARGET_STATUS" == "Blocked" && -n "$CURRENT_STATUS" && "$CURRENT_STATUS" != "Done" ]]; then ALLOWED=true; fi
+          # Items added to the board without a Status may be triaged into Backlog, Ready or Blocked.
+          if [[ -z "$CURRENT_STATUS" && "$TARGET_STATUS" =~ ^(Backlog|Ready|Blocked)$ ]]; then ALLOWED=true; fi
           [[ "$ALLOWED" == true ]] || {
             echo "::error::Transition '$CURRENT_STATUS' -> '$TARGET_STATUS' is not allowed by workflows/project-status-transitions.md."
             exit 1
           }
 
+      - name: Report dry run
+        if: inputs.dry_run
+        shell: bash
+        env:
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+          CURRENT_STATUS: ${{ steps.lookup.outputs.current_status }}
+          TARGET_STATUS: ${{ inputs.status }}
+        run: |
+          echo "Dry run: issue #$ISSUE_NUMBER is '${CURRENT_STATUS:-unset}'; transition to '$TARGET_STATUS' is allowed. Nothing was changed."
+
       - name: Update the Project V2 Status field
-        if: steps.lookup.outputs.current_status != inputs.status
+        if: ${{ !inputs.dry_run && steps.lookup.outputs.current_status != inputs.status }}
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}
@@ -202,6 +257,7 @@ jobs:
           echo "Updated issue #$ISSUE_NUMBER to '$TARGET_STATUS'. Reason: $REASON. Evidence: $EVIDENCE_URL"
 
       - name: Read back and verify the board status
+        if: ${{ !inputs.dry_run }}
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.PROJECTS_TOKEN }}

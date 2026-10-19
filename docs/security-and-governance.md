@@ -26,6 +26,18 @@ A workflow file cannot enable branch protection by itself. Verify the active rul
 
 ## Secret scanning
 
+Status observed 2026-10-19 (`GET /repos/ibrahim-ai-team/ai-software-team`, `security_and_analysis`):
+
+| Control | What it does | Status |
+|---|---|---|
+| Gitleaks CI (`.github/workflows/secret-scan.yml`) | Scans history on every push/PR; fails the check | Enabled, green on `main` |
+| GitHub secret scanning | GitHub detects provider tokens already pushed and alerts | **Disabled** |
+| Push protection | GitHub blocks a push that contains a detected secret | **Disabled** |
+| Dependabot security updates | Opens PRs for vulnerable dependencies | **Disabled** |
+| Dependabot version updates | Weekly GitHub Actions updates (`.github/dependabot.yml`) | Enabled |
+
+The repository is public, where secret scanning and push protection are available without a paid plan. Enabling them is an owner action (Settings → Code security). Gitleaks only reports after a push; push protection is the only control here that stops a secret before it reaches GitHub. Dependency coverage is complete for this repository: the Python scripts use only the standard library, so GitHub Actions is the only dependency ecosystem. Add ecosystems to Dependabot only when matching manifests (for example `requirements.txt`, `package.json`) exist.
+
 Use GitHub secret scanning / push protection when available for the repository plan. Run an established local scanner (for example, Gitleaks) in CI if the project adopts and pins it. Any custom regex scanner is heuristic and must fail closed when it cannot inspect the repository; it must never report a successful scan after skipping work.
 
 ## License

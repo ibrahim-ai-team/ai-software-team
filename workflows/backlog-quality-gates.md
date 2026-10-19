@@ -30,7 +30,7 @@ A task cannot move to Ready until all applicable items are true:
 - [ ] Clear outcome and bounded scope.
 - [ ] Acceptance criteria are testable; relevant negative/error/boundary cases are considered.
 - [ ] Priority is set in the issue and, when configured, on the Project board.
-- [ ] Estimate is set or explicitly marked TBD with a refinement task/deadline; do not silently treat TBD as estimated.
+- [ ] Estimate is set or explicitly marked TBD with a refinement task/deadline (cite the issue `#n` or date `YYYY-MM-DD` on the same line so `scripts/check_placeholders.py` accepts it); do not silently treat TBD as estimated.
 - [ ] Dependencies and related issues are listed, or explicitly None.
 - [ ] QA mapped each acceptance criterion to a verification method or documented why it is not applicable.
 - [ ] Required distinct QA issues are created and linked, or the decision to keep tests in the parent issue is recorded with rationale.

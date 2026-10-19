@@ -40,6 +40,26 @@ Record only observed results. Static checks do not prove runtime behavior, and o
 - **GitHub Project #1:** not reachable from cloud sessions (GraphQL and org Project endpoints return 403 by design); `project-status.yml` has never run. Board state: NOT VERIFIED.
 - **Issues:** after the Claude GitHub App install, issue create/edit/comment succeeded and were read back (#45 created).
 
+## Run 2026-10-19 — Project status workflow and board read-back (#40)
+
+Workflow `.github/workflows/project-status.yml` from branch `claude/ai-team-project-readiness-td7x2s`, dispatched via `workflow_dispatch`, `PROJECTS_TOKEN` present.
+
+| ID | Case | Observed | Result |
+|---|---|---|---|
+| PS-01 | Issue not on the Project (#45) | Failed with "Issue #45 is not on Project ibrahim-ai-team/#1" ([run](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39297846952)) | PASS (clear error) |
+| PS-02 | Real update #24 → Blocked | Updated, then read back "actual Project Status 'Blocked'" ([run](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39297917731)) | PASS |
+| PS-03 | `dry_run` on 18 issues | Reported each Status without changing it; `Done → Blocked` refused as an invalid transition | PASS |
+
+Board Status read back on 2026-10-19 (Project #1):
+
+| Status | Issues |
+|---|---|
+| Blocked | #24, #26 |
+| In Progress | #25 (issue closed: board out of sync; the Done gate needs a merged PR that says `Closes #25`, so the owner moves it by hand or enables the Project's "Item closed → Done" workflow) |
+| Backlog | #32, #34, #36, #39, #40, #42, #43 |
+| Done | #23, #28, #33, #37, #41 |
+| Not on board | #35, #38, #45 (no auto-add workflow on the Project) |
+
 ## Template for future runs
 
 ### Static package checks

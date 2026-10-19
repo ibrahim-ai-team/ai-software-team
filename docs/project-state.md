@@ -36,10 +36,9 @@ Always re-fetch issue/PR status before acting; the table is a dated snapshot, no
 
 ## Known workflow limitations
 
-- `.github/workflows/project-status.yml` is manually triggered and targets organization Project #1 (infrastructure board) only.
-- The current status workflow only searches the first 100 Project items.
+- `.github/workflows/project-status.yml` is manually triggered; the target Project is configurable (default organization Project #1) and lookup no longer depends on board size (#40).
 - The workflow has not been proven by a successful real status update and read-back.
-- Do not use the infrastructure Project status workflow for application Projects without parameterization, pagination, and safe testing.
+- Use it for application Projects only after copying it into the application repository and testing it there.
 - GitHub Projects does not coordinate local Claude Code sessions by itself. A future orchestrator needs task claim/lock handling, isolated branches/worktrees, evidence collection, and safe status updates.
 - Static CI success does not prove live Claude Code permission enforcement.
 
