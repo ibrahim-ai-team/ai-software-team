@@ -18,9 +18,9 @@ Current phase: Supervised pilot readiness (team kit), no application work starte
 - Latest inspected `main` commit: `8bf343a` (merge of PR #44). CI on that commit: [Validate](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39077920728) and [Secret scanning](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39077920727) succeeded.
 - PRs #29, #30, #31 and #44 are merged; #23 (durable state) is closed and this file is on `main`.
 - Claude Code runtime discovery, one delegation and representative deny rules were observed in a cloud session: see [`docs/verification-report.md`](verification-report.md). A local CLI/Termux run and `ask`-rule prompting remain NOT VERIFIED.
-- `main` is protected but has **no required status checks** (enforcement `non_admins`) and no rulesets. Pull-request requirement, review policy, force-push and deletion settings: NOT VERIFIED.
+- `main` protection (read back): PR required with 1 approval + code-owner review; force-push and deletion blocked; **no required status checks**; admins not enforced; no rulesets.
 - GitHub MCP merge/auto-merge tools are not denied by `.claude/settings.json`.
-- GitHub Project #1 fields, views and item statuses could not be read from the session; `project-status.yml` has never run. Board state: NOT VERIFIED.
+- GitHub Project #1 fields, views and item statuses are not reachable from cloud sessions (GraphQL and org Project endpoints blocked); `project-status.yml` has never run. Board Status: NOT VERIFIED.
 
 ## Launch blockers for the first supervised pilot
 
@@ -28,9 +28,9 @@ Current phase: Supervised pilot readiness (team kit), no application work starte
 |---|---|---|---|
 | 1 | [#24](https://github.com/ibrahim-ai-team/ai-software-team/issues/24) | Require PR + CI checks on `main`; close the MCP merge-tool gap | Repository owner (settings) and approved PR |
 | 2 | [#25](https://github.com/ibrahim-ai-team/ai-software-team/issues/25) | Runtime evidence recorded; merge it and, if the pilot runs locally, repeat the smoke test there | Repository owner review |
-| 3 | IA-PILOT-01 (card to create; text in [`docs/pilot-readiness.md`](pilot-readiness.md)) | Run the first supervised pilot through discovery, backlog and the first reviewed PR | Coordinator, after 1–2 |
+| 3 | [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45) | Run the first supervised pilot through discovery, backlog and the first reviewed PR | Coordinator, after 1–2 |
 
-Everything else open (#26, #32, #34, #35, #36, #39, #40, #42, #43) can wait until after the pilot. Board corrections that could not be applied from the session are listed in [`docs/pilot-readiness.md`](pilot-readiness.md).
+Everything else open (#26, #32, #34, #35, #36, #39, #40, #42, #43) can wait until after the pilot. Issue corrections were applied 2026-10-19; Project Status/view changes (not reachable from cloud sessions) are listed in [`docs/pilot-readiness.md`](pilot-readiness.md).
 
 Always re-fetch issue/PR status before acting; the table is a dated snapshot, not a live status feed.
 

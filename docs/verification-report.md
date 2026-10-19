@@ -35,8 +35,9 @@ Record only observed results. Static checks do not prove runtime behavior, and o
 ### Gaps found
 
 - **GitHub MCP merge tools are not denied.** `.claude/settings.json` denies `gh pr merge`, but in sessions with the GitHub MCP server the tools `mcp__github__merge_pull_request` and `mcp__github__enable_pr_auto_merge` are available and not covered. Because agents act with the owner's GitHub identity, branch protection cannot tell an agent merge from an owner merge. Tracked in #24.
-- **Branch protection on `main` (public API, unauthenticated, 2026-10-19):** `protected: true`; required status checks enforcement `non_admins` with **no required contexts/checks**; no repository rulesets. Pull-request requirement, review policy, force-push and deletion settings are not visible through this API: NOT VERIFIED. Tracked in #24.
-- **GitHub Project #1:** not readable from this session (no Projects API access); `project-status.yml` has never run. Board state: NOT VERIFIED.
+- **Branch protection on `main` (`GET branches/main/protection`, 2026-10-19):** PR required with 1 approval and code-owner review; force pushes and deletions blocked; **no required status checks**; `enforce_admins` off; no rulesets. Because agents act under the owner's account, merges rely on the admin bypass. Tracked in #24.
+- **GitHub Project #1:** not reachable from cloud sessions (GraphQL and org Project endpoints return 403 by design); `project-status.yml` has never run. Board state: NOT VERIFIED.
+- **Issues:** after the Claude GitHub App install, issue create/edit/comment succeeded and were read back (#45 created).
 
 ## Template for future runs
 
