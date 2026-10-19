@@ -10,14 +10,11 @@ GitHub organizations do not have nested repository folders. Represent the layout
 
 | Logical area | Repository naming pattern | When to create |
 |---|---|---|
-| Shared AI delivery platform | `ai-software-team` | Exists; reusable agents, skills, standards, templates, workflows |
-| Product backend | `<product>-api` | When a real product has a defined backend boundary |
-| Product frontend | `<product>-web` | When the frontend needs an independent lifecycle |
-| Background processing | `<product>-worker` | Only when a worker is actually required |
-| API test automation | `<product>-api-tests` | When test code needs its own lifecycle; otherwise keep it with the product |
-| End-to-end automation | `<product>-e2e-tests` | When independently maintained; otherwise keep it with the product |
-| Performance tests | `<product>-performance-tests` | When justified by its own tooling, cadence, or ownership |
-| Shared infrastructure | `platform-infra` | Only when infrastructure is genuinely shared |
+| Shared AI delivery platform | `ai-software-team` | Exists; reusable agents, skills, standards, templates, workflows. Never copied per application |
+| Project coordination | `<app>-management` (e.g. `shopinow-management`) | When an idea's architecture has more than one repository |
+| Single-repository application | `<app>-app` | Monolith or single-repo architecture |
+| Frontend / backend | `<app>-front`, `<app>-back` | Frontend-backend architecture |
+| Independent service | `<app>-<service>` | Only for services with their own deployment |
 | Organization profile and shared community health files | `.github` | Create a special repository named exactly `.github` when ready |
 
 Do not create empty application repositories just to imitate folders. Start new repositories when a real product and its first increment are understood.

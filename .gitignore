@@ -19,3 +19,6 @@ venv/
 .DS_Store
 Thumbs.db
 .claude/settings.local.json
+
+# Local provisioning state and plans (project data belongs in each project's repositories)
+.provisioning/

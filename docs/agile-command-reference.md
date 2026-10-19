@@ -6,6 +6,7 @@ The commands under .claude/commands/ are reusable session prompts, not a backgro
 
 1. /kickoff — discover the idea, capture assumptions, and identify material decisions.
 2. Follow workflows/project-bootstrap.md to produce requirements and architecture decisions.
+2a. /provision-project — after sponsor approval of the plan, create the idea's repositories, issues and board idempotently (docs/project-provisioning.md).
 3. /plan-sprint — select a small set of Ready stories with testable acceptance criteria.
 4. /next-story — take one dependency-ready task and work within its bounded scope.
 5. /review-pr — inspect the real diff and evidence before requesting merge.

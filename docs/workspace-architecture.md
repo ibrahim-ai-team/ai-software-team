@@ -16,18 +16,16 @@ GitHub organizations do not provide nested repository folders. Use repository na
 
 ## Naming convention
 
-Use short, stable names that describe the component rather than a temporary team or sprint:
+Repositories are named after the app: the sponsor proposes the app name (or confirms one the Product Owner suggests), and its slug prefixes every repository, `<app>-<role>`. For "Shopinow":
 
-- `<product>-api` — backend API
-- `<product>-web` — frontend web application
-- `<product>-worker` — background worker
-- `<product>-api-tests` — separately maintained API tests
-- `<product>-e2e-tests` — separately maintained end-to-end tests
-- `platform-infra` — shared infrastructure, if justified
+- `shopinow-management`: coordination repository (requirements, ADRs, backlog epics, status); created when the project has more than one repository
+- `shopinow-app`: the single application repository of a monolith
+- `shopinow-front` / `shopinow-back`: separate frontend and backend
+- `shopinow-<service>`: one repository per independently deployed service
 
-Examples only (do not create these repositories until a real product requires them): `store-api`, `store-web`, `store-e2e-tests`.
+Each idea also gets a hidden, stable project ID `idea-NN` (assigned by `scripts/provision_project.py`). It is used in topics, the description tag `[ai-team:idea-NN]`, issue labels and issue keys, so ideas never mix and renaming an app does not break tracking.
 
-Add GitHub topics consistently, such as `backend`, `frontend`, `testing`, `infrastructure`, and a product topic. Keep descriptions concise and identify the repository's owner and purpose.
+Create only the roles the approved architecture justifies. Every repository carries the topics `ai-team-app` and `idea-NN` and is linked to one GitHub Project board per idea. See `docs/project-provisioning.md`. This replaces the earlier `<product>-api` / `<product>-web` examples.
 
 ## Delivery workflow
 

@@ -4,7 +4,7 @@ Use this checklist when a real application is approved. Do not create placeholde
 
 ## Repository metadata
 
-- **Name:** `<product>-api`, `<product>-web`, or another component-specific name
+- **Name:** `<app>-<role>` after the sponsor's app name (for example `shopinow-back`), created by `scripts/provision_project.py`
 - **Description:** One sentence stating component purpose and owner
 - **Topics:** Product name plus relevant areas such as `backend`, `frontend`, `testing`, or `infrastructure`
 - **Visibility:** Choose deliberately based on product confidentiality

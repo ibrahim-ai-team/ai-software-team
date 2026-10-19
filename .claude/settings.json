@@ -64,7 +64,8 @@
       "Edit(./.github/CODEOWNERS)",
       "Edit(./.github/dependabot.yml)",
       "Edit(./.claude/CLAUDE.md)",
-      "Edit(./.claude/manifest.json)"
+      "Edit(./.claude/manifest.json)",
+      "Bash(*provision_project.py apply*)"
     ]
   }
 }

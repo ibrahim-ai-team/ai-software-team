@@ -327,6 +327,7 @@ if settings_text:
             "Edit(./.claude/settings.json)", "Edit(./.github/workflows/**)",
             "Edit(./.github/CODEOWNERS)", "Edit(./.github/dependabot.yml)",
             "Edit(./.claude/CLAUDE.md)", "Edit(./.claude/manifest.json)",
+            "Bash(*provision_project.py apply*)",
         )
         permissions = settings.get("permissions", {})
         ask = permissions.get("ask", [])

@@ -1,0 +1,107 @@
+{
+  "organization": "ibrahim-ai-team",
+  "owner": "IbrhimGhorafi",
+  "visibility": "private",
+  "project": {
+    "id": "idea-01",
+    "name": "Shopinow"
+  },
+  "summary": "Online store where customers browse products, buy them and track orders.",
+  "requirements": [
+    "Customers browse and search a product catalogue",
+    "Customers add products to a cart and check out with a payment provider",
+    "Customers see the status of their orders",
+    "Staff manage products and stock"
+  ],
+  "architecture": {
+    "style": "frontend-backend",
+    "decision": "A single web frontend and one backend API with one database. The storefront and the API have different release cadences and toolchains, so they are separate repositories. A modular monolith backend was preferred over microservices: one team, modest scale, and no independent scaling need yet. Payment is delegated to a hosted provider so card data never touches our systems."
+  },
+  "repositories": [
+    {
+      "role": "front",
+      "purpose": "Customer-facing storefront web application",
+      "stack": "TypeScript, React, Vite",
+      "testing": "Unit tests with Vitest; end-to-end checkout flow with Playwright in CI",
+      "setup": "Install Node.js 20, run `npm ci`, then `npm run dev`."
+    },
+    {
+      "role": "back",
+      "purpose": "Backend API for catalogue, cart, orders and admin",
+      "stack": "Python 3.12, FastAPI, PostgreSQL",
+      "testing": "pytest unit and API tests against a disposable PostgreSQL container in CI",
+      "setup": "Install Python 3.12, run `pip install -e .[dev]`, then `uvicorn app.main:app --reload`."
+    }
+  ],
+  "coordination_repo": "auto",
+  "sprint": {
+    "start": "2026-10-26",
+    "length_days": 14,
+    "count": 1
+  },
+  "backlog": [
+    {
+      "key": "EP-1",
+      "type": "epic",
+      "repo": "management",
+      "priority": "P1",
+      "title": "Browse and buy products",
+      "description": "First increment: a customer can find a product and place an order."
+    },
+    {
+      "key": "US-1",
+      "type": "story",
+      "repo": "back",
+      "priority": "P1",
+      "sprint": 1,
+      "title": "Product catalogue API",
+      "description": "As a customer I can list and view products so that I can choose what to buy.",
+      "acceptance_criteria": [
+        "GET /products returns a paginated list with name, price and stock",
+        "GET /products/{id} returns 404 for an unknown product"
+      ],
+      "depends_on": [
+        "EP-1"
+      ]
+    },
+    {
+      "key": "US-2",
+      "type": "story",
+      "repo": "front",
+      "priority": "P1",
+      "sprint": 1,
+      "title": "Product list page",
+      "description": "As a customer I can browse products in the storefront.",
+      "acceptance_criteria": [
+        "The home page shows products from the catalogue API",
+        "An empty catalogue shows a friendly message"
+      ],
+      "depends_on": [
+        "US-1"
+      ]
+    },
+    {
+      "key": "QA-1",
+      "type": "qa",
+      "repo": "front",
+      "priority": "P2",
+      "sprint": 1,
+      "title": "End-to-end test: browse products",
+      "acceptance_criteria": [
+        "Playwright test opens the home page and sees at least one product from a seeded API"
+      ],
+      "depends_on": [
+        "US-2"
+      ]
+    }
+  ],
+  "options": {
+    "branch_protection": false,
+    "project_board": true
+  },
+  "approval": {
+    "approved_by": "",
+    "approved_at": "",
+    "plan_digest": ""
+  }
+}
