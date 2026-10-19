@@ -31,6 +31,7 @@ If the existing board uses different exact labels, document an explicit mapping 
 | Blocked | Backlog | Scope/dependency changed; task needs replanning | Updated dependency and reason |
 | Blocked | Ready | Blocker resolved and Definition of Ready still passes | Resolution evidence and readiness re-check |
 | Done | In Progress | A regression/reopen is explicitly approved | Reopen reason, linked regression/bug and owner |
+| (unset) | Backlog, Ready or Blocked | Item was added to the board without a Status | Triage reason; Ready also needs the Definition of Ready evidence |
 
 A task cannot transition directly to Done just because a developer or subagent says done, a PR was opened/approved, or a test plan exists. Only a verified human merge and completion check permit Done under this policy. If the repository chooses a different Definition of Done, record it explicitly.
 

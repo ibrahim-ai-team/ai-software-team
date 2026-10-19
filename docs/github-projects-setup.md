@@ -58,6 +58,6 @@ Labels do not enforce access control or prove an agent has claimed a task. Treat
 
 ## Important limitations
 
-The current `.github/workflows/project-status.yml` is configured for organization Project #1 (the infrastructure board), not for arbitrary application Projects. Do not use it for app boards. Before adapting it, parameterize the target project, handle pagination beyond the first 100 items, and test against a non-production issue.
+`.github/workflows/project-status.yml` updates one issue's Status on a selected Project (`project_owner`, default the repository owner; `project_number`, default 1). It finds the item from the issue side, so board size does not matter, validates the transition and reads the value back. It needs a `PROJECTS_TOKEN` secret with Projects read/write and runs only in the repository that holds the issue. Until a real update and read-back is recorded in `docs/verification-report.md`, treat it as untested.
 
 GitHub Issues and Projects provide the board and durable task records, but they do not automatically coordinate Claude Code sessions running on a local machine. A local orchestrator must implement task selection, claim/lock handling, branch/worktree isolation, delegation, and status updates. Do not launch multiple coding agents against one working directory. Keep final merge authority with the repository owner.
