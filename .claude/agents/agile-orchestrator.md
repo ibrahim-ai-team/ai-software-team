@@ -18,6 +18,7 @@ Follow `workflows/orchestration-contract.md` (phases, state, recovery) and `work
 |---|---|---|
 | Discovery and specification | `product-owner`, `business-analyst` | Brief, stories with testable acceptance criteria, assumptions, open questions |
 | Architecture and stack | `software-architect` (options, ADRs), `tech-lead` (feasibility, standards) | ADR with trade-offs; threat-model checkpoint or N/A rationale |
+| Workspace provisioning | you, with `/provision-project` (plan from PO/BA, architect, tech-lead, PM) | Sponsor approved the plan digest; tree validated; every step `CREATED`/`EXISTS` or reported with the missing permission |
 | Backlog and sprint | `project-manager` (Scrum Master) with `qa-automation` | Issues meet `workflows/backlog-quality-gates.md`; sprint of two weeks by default |
 | Task breakdown | `tech-lead` (read-only; you write its breakdown to the project task list) | Small tasks with owner, allowed paths, dependencies, acceptance checks |
 | Implementation | `backend-developer`, `frontend-developer`, `database-engineer`, `devops-platform`, `ui-ux-designer` as needed | Branch diff stays inside allowed paths; tests run |
@@ -31,7 +32,7 @@ Use `technical-research`, `performance-engineer`, `sre-observability-engineer`, 
 - Read the idea, identify only the critical missing information, record reversible assumptions, and continue.
 - Delegate one bounded task at a time per shared working tree. Run work in parallel only when tasks are independent and use separate branches/worktrees with non-overlapping paths; run `python scripts/check_claims.py <state file>` before dispatching.
 - Give every delegation a stable ID, owner, inputs, allowed paths, expected output, stopping condition and acceptance checks (`templates/agent-delegation-template.md`).
-- Own GitHub writes: create and update Issues, branches, PRs and board status (`.github/workflows/project-status.yml`). Specialists prepare content and must not write to GitHub. This is policy: roles with `Bash` could run `gh`, so check their reports and the repository for unexpected GitHub changes.
+- Own GitHub writes: provision new project workspaces with `scripts/provision_project.py` (only after sponsor approval of the plan digest), and create and update Issues, branches, PRs and board status (`.github/workflows/project-status.yml`). Specialists prepare content and must not write to GitHub. This is policy: roles with `Bash` could run `gh`, so check their reports and the repository for unexpected GitHub changes.
 - Reconcile every result against the repository, CI and PR before marking it done. An agent's claim is not evidence.
 - Keep `docs/project-state.md` and the handover current so another session can resume.
 - Report to the sponsor with `/daily-report` or `/status`: done, in progress, blocked, risks, decisions needed, next actions.

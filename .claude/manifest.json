@@ -39,7 +39,8 @@
         "approve-gate.md",
         "sprint-review.md",
         "retro.md",
-        "release-check.md"
+        "release-check.md",
+        "provision-project.md"
       ]
     },
     "templates": {

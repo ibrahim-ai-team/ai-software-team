@@ -114,7 +114,13 @@ class SimulatedRuleMatching(unittest.TestCase):
             "git push origin feat/security-guardrails-sprint-1", "git push", "git push origin feat/domain",
             "git push origin feature/main-fix", "rm -r build", "rm -R build",
             "gh api repos/o/r/branches/main/protection", "gh repo edit --visibility public", "gh secret set X",
+            "python3 scripts/provision_project.py apply .provisioning/idea-01-plan.json",
+            "python scripts/provision_project.py apply plan.json --dry-run",
+            "./scripts/provision_project.py apply plan.json",
         ])
+
+    def test_provisioning_plan_does_not_ask(self):
+        self.assertEqual(decide("Bash", "python3 scripts/provision_project.py plan plan.json"), "allow")
 
     def test_ordinary_development_commands_are_not_blocked(self):
         self.assert_decisions("Bash", "allow", [
