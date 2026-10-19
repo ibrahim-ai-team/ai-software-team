@@ -40,6 +40,10 @@ jobs:
         run: python scripts/validate_team.py
       - name: Check repository-relative Markdown links
         run: python scripts/check_markdown_links.py
+      - name: Check command references and agent frontmatter
+        run: python scripts/check_cross_references.py
+      - name: Check planning artifacts for unresolved placeholders
+        run: python scripts/check_placeholders.py
       - name: Run offline inventory check (not Claude Code runtime discovery)
         run: python scripts/smoke_discovery.py
       - name: Run regression tests

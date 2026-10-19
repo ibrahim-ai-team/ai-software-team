@@ -59,4 +59,4 @@ For the exact phases, recovery rules, evidence requirements and safety boundarie
 
 ## Verification
 
-Run `python scripts/validate_team.py` and `python -m unittest discover -s tests -v` locally, then inspect the actual CI result on the pull request. Use `docs/verification-report.md` to record a real Claude Code smoke test; do not mark runtime verification complete without evidence.
+Run `python scripts/validate_team.py`, `python scripts/check_markdown_links.py`, `python scripts/check_cross_references.py`, `python scripts/check_placeholders.py` and `python -m unittest discover -s tests -v` locally, then inspect the actual CI result on the pull request. Use `docs/verification-report.md` to record a real Claude Code smoke test; do not mark runtime verification complete without evidence.
