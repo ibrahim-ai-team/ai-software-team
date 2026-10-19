@@ -4,7 +4,21 @@
     "agents": {
       "directory": ".claude/agents",
       "pattern": "*.md",
-      "minimum_count": 16
+      "minimum_count": 18,
+      "required": [
+        "agile-orchestrator.md",
+        "product-owner.md",
+        "business-analyst.md",
+        "project-manager.md",
+        "software-architect.md",
+        "tech-lead.md",
+        "frontend-developer.md",
+        "backend-developer.md",
+        "qa-automation.md",
+        "devops-platform.md",
+        "code-review-security.md",
+        "documentation-manager.md"
+      ]
     },
     "skills": {
       "directory": ".claude/skills",

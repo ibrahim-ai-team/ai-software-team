@@ -57,7 +57,9 @@ def decide(tool, argument):
     for label, rules in (("deny", deny), ("ask", ask)):
         for rule in rules:
             rule_tool, spec = parse_rule(rule)
-            if rule_tool != tool or spec is None:
+            # Claude Code 2.1.303: Edit(path) rules cover every file-editing tool, including Write.
+            covers = rule_tool == tool or (rule_tool == "Edit" and tool == "Write")
+            if not covers or spec is None:
                 continue
             hit = bash_match(spec, argument) if tool == "Bash" else path_match(spec, argument)
             if hit:
