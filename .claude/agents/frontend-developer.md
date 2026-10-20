@@ -2,6 +2,7 @@
 name: frontend-developer
 description: Use when implementing accessible user interfaces and client-side behavior.
 tools: Read, Grep, Glob, Edit, Write, Bash
+maxTurns: 60
 ---
 
 # frontend-developer

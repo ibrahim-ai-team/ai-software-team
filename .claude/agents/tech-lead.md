@@ -2,6 +2,7 @@
 name: tech-lead
 description: Use for technical task breakdown, implementation standards, design decisions within the approved architecture, and technical review of pull requests.
 tools: Read, Grep, Glob
+maxTurns: 40
 ---
 
 # tech-lead

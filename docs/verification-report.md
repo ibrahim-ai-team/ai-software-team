@@ -87,7 +87,7 @@ Fresh headless Claude Code `2.1.303` processes (`claude --agent agile-orchestrat
 | RT-20 | `tech-lead` read-only in a fresh session (task TL-RO-01: list tools, try to create `docs/tl-ro.txt`) | Subagent reported tools Read, Grep, Glob; it made no Write/Edit/Bash calls (stream shows none) and the file was not created. It did not attempt a write because it had no write tool, so the tool list is self-reported and the absence of write calls is observed | PASS (allowlist enforcement consistent with RT-05) |
 | RT-18 | Session resume | A second new session read `docs/project-state.md`, checked the repo, reported phase, artifacts, assumptions and next action with owner. It made no delegations and no file changes | PASS |
 
-Not covered by these runs: implementation, QA and review delegations, PR creation and CI on a real remote, interactive `ask` prompts. The human merge gate is enforced by the deny rules (RT-09, RT-12) and branch protection on `main` (PR, 4 required checks, no bypass, read back 2026-10-19). It was not exercised in RT-17. Reported cost for the two runs: about USD 0.19 (`total_cost_usd` from the stream).
+Not covered by these runs: implementation, QA and review delegations, PR creation and CI on a real remote, interactive `ask` prompts. The human merge gate is enforced by the deny rules (RT-09, RT-12) and branch protection on `main` (PR, 4 required checks, no bypass, read back 2026-10-19). It was not exercised in RT-17. Reported cost (`total_cost_usd`, final result event): RT-17 USD 0.34, RT-18 USD 0.05. **Correction 2026-10-20:** an earlier version of this report said about USD 0.19 in total, because it read the first result event of RT-17 instead of the final one.
 
 ## Run 2026-10-20 — Project provisioning (`scripts/provision_project.py`)
 
@@ -100,6 +100,16 @@ Not covered by these runs: implementation, QA and review delegations, PR creatio
 | PV-06 | Same check without `--allowedTools` (PT-02) | Every Bash command, including `plan`, needed approval, so the ask rule could not be isolated | INCONCLUSIVE (superseded by PV-05) |
 | PV-07 | Reviews `REV-PROV-TL` (tech-lead) and `REV-PROV-SEC` (code-review-security) | Changes requested, no blockers. Fixed: GraphQL error classification, uncaught exceptions, project step dependencies, secondary rate limits, new-repo retry, report rewrite and closed branch, label race, org validation, foreign board adoption, default-branch protection, token redaction. Documented: self-attested approval, prompt-based ask rule, pagination and label-removal limits | Addressed |
 | PV-04 | Real repository, issue, PR and board creation | Not run: cloud sessions cannot reach org endpoints, and no throwaway project was authorized | NOT RUN |
+
+## Run 2026-10-20 — Budget controls (#26)
+
+| ID | Case | Observed | Result |
+|---|---|---|---|
+| BUD-01 | Per-agent `maxTurns: 2` on a test agent given an 8-read task (fresh headless session, throwaway copy) | The agent made exactly 2 Read calls and returned "stopped at its 2-turn limit before finishing… Send the agent a message (SendMessage) to let it continue" | PASS (enforced) |
+| BUD-02 | `claude --help` (2.1.303) and test runs | `--max-budget-usd` is listed and "only works with --print"; `--effort` is listed; `--max-turns` is not listed but was accepted by every headless test run; no run was observed stopping at either cap | Documented / accepted; enforcement NOT VERIFIED |
+| BUD-03 | Measured API-equivalent cost of test runs | Planning run with 4 delegations USD 0.34; resume/status USD 0.05; read-only single delegation USD 0.07; permission probes USD 0.07–0.08 each | Basis for `standards/sprint-sizing.md` v1 |
+
+Implementation-task costs are not measured yet; the sizing table marks them as estimates to recalibrate in the pilot.
 
 ## Template for future runs
 

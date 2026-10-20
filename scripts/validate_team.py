@@ -207,6 +207,10 @@ def check_agent_tools(paths: list[Path]) -> None:
             errors.append(f"Only {ORCHESTRATOR} may delegate; remove 'Agent' from {path.relative_to(ROOT)}")
         if path.stem == ORCHESTRATOR and "Agent" not in names:
             errors.append(f"{ORCHESTRATOR} must list the 'Agent' tool to delegate")
+        # Turn caps are the enforced stop condition for delegations (standards/sprint-sizing.md).
+        turns = parse_frontmatter(path).get("maxTurns", "").strip()
+        if path.stem != ORCHESTRATOR and not (turns.isdigit() and 5 <= int(turns) <= 100):
+            errors.append(f"Agent must declare maxTurns between 5 and 100: {path.relative_to(ROOT)}")
 
 
 check_agent_tools(agents)

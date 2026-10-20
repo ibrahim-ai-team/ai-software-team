@@ -2,6 +2,7 @@
 name: devops-platform
 description: Use when changing CI/CD, containers, infrastructure, operations, or approved repository setup.
 tools: Read, Grep, Glob, Edit, Write, Bash
+maxTurns: 60
 ---
 
 # devops-platform

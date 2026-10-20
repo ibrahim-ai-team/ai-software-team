@@ -2,6 +2,7 @@
 name: database-engineer
 description: Use when designing schemas, migrations, data integrity, or query behavior.
 tools: Read, Grep, Glob, Edit, Write, Bash
+maxTurns: 60
 ---
 
 # database-engineer

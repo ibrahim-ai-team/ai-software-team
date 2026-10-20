@@ -10,6 +10,10 @@
 - **Last checkpoint (observed):**
 - **Branch / worktree:**
 - **Allowed paths (exact directories/files):**
+- **Size / points:** XS / S / M / L (1 / 2 / 3 / 5); XL (8) must be split
+- **Turn cap (agent `maxTurns`):**
+- **Estimated cost / measured cost (API-equivalent):**
+- **Re-delegations after hitting the turn cap (max 1):**
 - **Started at (observed):** 
 - **Returned at (observed):** 
 
