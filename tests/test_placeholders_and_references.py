@@ -129,6 +129,21 @@ class OrchestrationContractTests(unittest.TestCase):
         tools = next(line for line in text.splitlines() if line.startswith("tools:"))
         self.assertEqual({t.strip() for t in tools.split(":", 1)[1].split(",")}, {"Read", "Grep", "Glob"})
 
+    def test_specialists_need_a_turn_cap(self):
+        for old, new in (("maxTurns: 25\n", ""), ("maxTurns: 25", "maxTurns: 500"), ("maxTurns: 25", "maxTurns: many")):
+            with self.subTest(new=new):
+                result = self.run_validator(".claude/agents/business-analyst.md", old, new)
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("maxTurns between 5 and 100", result.stdout)
+
+    def test_sizing_standard_matches_agent_caps(self):
+        standard = (ROOT / "standards" / "sprint-sizing.md").read_text(encoding="utf-8")
+        for role, cap in (("tech-lead", 40), ("product-owner", 25), ("backend-developer", 60)):
+            text = (ROOT / ".claude" / "agents" / f"{role}.md").read_text(encoding="utf-8")
+            self.assertIn(f"maxTurns: {cap}", text)
+            self.assertIn(f"| {cap} ", standard.replace("| 60 + ", "| 60 "))
+        self.assertIn("**Must be split**", standard)
+
     def test_ineffective_write_path_rules_are_rejected(self):
         result = self.run_validator(".claude/settings.json", '"Edit(./.claude/settings.json)",',
                                     '"Edit(./.claude/settings.json)", "Write(./docs/x.md)",')

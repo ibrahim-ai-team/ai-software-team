@@ -2,6 +2,7 @@
 name: product-owner
 description: Use when turning a product idea into prioritized requirements and acceptance criteria.
 tools: Read, Grep, Glob, Edit, Write
+maxTurns: 25
 ---
 
 # product-owner

@@ -59,6 +59,8 @@ Transitions must be recorded with timestamp, previous phase, new phase, reason, 
 
 ## Session and cost budget defaults
 
+Sprint budgets, story points, per-role turn caps and the 70%/90% budget thresholds are defined in `standards/sprint-sizing.md`. Turn caps (`maxTurns`) are enforced by Claude Code; budgets and thresholds are policy.
+
 - Default maximum: **3 active delegations per coordinator session**, including research/review work. The coordinator may lower this for complex tasks or a tight context budget; raise it only when the work is independent and verification capacity remains.
 - Default implementation WIP: **one active coding delegation per shared working tree**. Parallel coding is allowed only in separate worktrees/branches with non-overlapping allowed paths; default maximum is **2 concurrent coding delegations** unless the human owner approves a higher limit for a specific session.
 - Before delegating, record the task's expected output, stopping condition, and verification budget. Prefer the least costly model that is actually available and suitable in the current runtime; never assume model IDs or pricing.

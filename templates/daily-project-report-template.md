@@ -4,6 +4,7 @@
 - **Evidence snapshot:** <last time/source state was checked>
 - **Current goal / sprint:** <goal and sprint or iteration>
 - **Overall status:** On track / At risk / Blocked / Not enough evidence
+- **Sprint budget:** <used> of <budget> API-equivalent (<measured / estimated>); threshold reached: none / 70% / 90%
 
 ## Executive summary
 <Three to five concise lines. Distinguish verified facts from agent-reported status.>

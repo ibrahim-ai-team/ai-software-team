@@ -2,6 +2,7 @@
 name: technical-research
 description: Use when researching technical claims with current, verifiable sources.
 tools: Read, Grep, Glob, WebSearch, WebFetch
+maxTurns: 25
 ---
 
 # technical-research

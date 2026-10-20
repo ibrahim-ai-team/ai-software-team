@@ -2,6 +2,7 @@
 name: qa-automation
 description: Use as QA Engineer to plan risk-based tests, implement automated tests, validate features against acceptance criteria, report defects and re-test fixes.
 tools: Read, Grep, Glob, Edit, Write, Bash
+maxTurns: 60
 ---
 
 # qa-automation
