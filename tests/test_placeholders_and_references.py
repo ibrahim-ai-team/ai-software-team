@@ -144,6 +144,21 @@ class OrchestrationContractTests(unittest.TestCase):
             self.assertIn(f"| {cap} ", standard.replace("| 60 + ", "| 60 "))
         self.assertIn("**Must be split**", standard)
 
+    def test_operating_model_has_no_dollar_budgets(self):
+        # Pro-subscription model: usage is sessions, delegations and turn caps, never $ budgets.
+        paths = [ROOT / "standards" / "sprint-sizing.md", ROOT / "workflows" / "orchestration-contract.md",
+                 *(ROOT / "templates").glob("*.md"), *(ROOT / ".claude" / "agents").glob("*.md"),
+                 *(ROOT / ".claude" / "commands").glob("*.md"), *(ROOT / ".claude" / "skills").glob("*/SKILL.md")]
+        for path in paths:
+            text = path.read_text(encoding="utf-8")
+            with self.subTest(path=path.relative_to(ROOT).as_posix()):
+                self.assertNotRegex(text, r"\$\d")
+                self.assertNotRegex(text, r"(?i)sprint budget|API-equivalent\)|budget-usd \d")
+        contract = (ROOT / "workflows" / "orchestration-contract.md").read_text(encoding="utf-8")
+        self.assertIn("one active delegation at a time", contract)
+        self.assertIn("Every session ends with a Project Manager report", contract)
+        self.assertIn("ANTHROPIC_API_KEY", (ROOT / "standards" / "sprint-sizing.md").read_text(encoding="utf-8"))
+
     def test_ineffective_write_path_rules_are_rejected(self):
         result = self.run_validator(".claude/settings.json", '"Edit(./.claude/settings.json)",',
                                     '"Edit(./.claude/settings.json)", "Write(./docs/x.md)",')

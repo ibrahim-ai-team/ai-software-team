@@ -41,7 +41,7 @@ Transitions must be recorded with timestamp, previous phase, new phase, reason, 
 3. Identify active, stale, blocked, duplicated, and dependency-ready tasks. Claims are session-scoped coordination records, not locks or heartbeats. At the start of each new coordinator session, any claim not reconfirmed by its owner must be marked `NEEDS_REVALIDATION`; inspect branch/worktree and artifacts before resuming or reassigning. Never infer that an agent is dead from elapsed time alone.
 4. Resume incomplete tasks from their last verified checkpoint. Do not redo completed work without a reason.
 5. Choose the highest-priority unblocked task that fits the current phase and session budget; delegate only if the task is bounded and the environment supports the required agent/tool behavior.
-6. Before ending, persist outcomes, evidence, blockers, next action and handover; update the daily report from reconciled state.
+6. Before ending, persist outcomes, evidence, blockers, next action and handover. **Every session ends with a Project Manager report** (`/daily-report`, saved with the `/handover`): completed work, Issue and PR links, validation results, blockers and next steps, from reconciled state. A session stopped by a usage-limit warning still writes the report first.
 
 ## Task ownership and concurrency
 - Give each task a stable ID and each delegation a unique ID, e.g. `STORY-12-D02`.
@@ -57,14 +57,16 @@ Transitions must be recorded with timestamp, previous phase, new phase, reason, 
   4. *Conflict:* if two writers touched the same branch or paths, stop both, keep each result on its own branch, and reconcile in one follow-up task.
 - Agents return: delegation ID, status, changed paths, commit/branch, checks actually run and their results, evidence links, risks, unresolved items, and next recommendation. The coordinator verifies repository state before marking work complete.
 
-## Session and cost budget defaults
+## Session and usage defaults
 
-Sprint budgets, story points, per-role turn caps and the 70%/90% budget thresholds are defined in `standards/sprint-sizing.md`. Turn caps (`maxTurns`) are enforced by Claude Code; budgets and thresholds are policy.
+The team runs on the sponsor's Claude Pro subscription through Claude Code: no Claude API, API keys, API credits or dollar budgets. Story points, per-role turn caps, sessions per sprint and usage-limit checkpoints are defined in `standards/sprint-sizing.md`. Turn caps (`maxTurns`) and the subscription's five-hour and weekly limits are enforced; the delegation limits below are policy.
 
-- Default maximum: **3 active delegations per coordinator session**, including research/review work. The coordinator may lower this for complex tasks or a tight context budget; raise it only when the work is independent and verification capacity remains.
-- Default implementation WIP: **one active coding delegation per shared working tree**. Parallel coding is allowed only in separate worktrees/branches with non-overlapping allowed paths; default maximum is **2 concurrent coding delegations** unless the human owner approves a higher limit for a specific session.
-- Before delegating, record the task's expected output, stopping condition, and verification budget. Prefer the least costly model that is actually available and suitable in the current runtime; never assume model IDs or pricing.
-- Record observed token use, cost, and duration only when the runtime exposes reliable values. Otherwise record `unavailable`; do not fabricate estimates as measurements.
+- Default: **one active delegation at a time**. Run two only when the tasks are clearly independent (different files, no shared decision) and both results can be verified this session. Never run planning delegations in parallel.
+- About **4–6 delegations per session**. Do not repeat planning, research or reviews that already have a recorded result unless new information changed the inputs.
+- Implementation WIP: **one active coding delegation per shared working tree**. Parallel coding needs separate worktrees/branches with non-overlapping allowed paths, and the sponsor's approval for that session.
+- Before delegating, record the task's expected output, stopping condition and acceptance checks. Prefer the least costly model that is actually available and suitable in the current runtime; never assume model IDs or plan limits.
+- Record usage only as observed facts: delegations run, turn caps hit, sessions used, and any usage-limit warning. Do not record dollar costs or invent token counts.
+- Never set `ANTHROPIC_API_KEY` or accept offers to buy API credits or extra usage; spending is a sponsor decision.
 - Stop starting new work when context or time pressure could prevent verification, evidence capture, or a useful handover.
 
 ## Retry, failure and recovery

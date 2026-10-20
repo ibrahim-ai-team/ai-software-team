@@ -15,4 +15,6 @@ Reconcile durable project state with actual repository, task, PR, and CI evidenc
 - Blockers, risks, dependencies, and sponsor decisions
 - Scope or plan changes since the last report
 
+Run this at the end of every session as the Project Manager report, and save it with `/handover` (completed work, Issue and PR links, validation results, blockers, next steps). Include sessions and delegations used and any usage-limit warning; never dollar costs.
+
 Use concise language. Do not count unverified claims as completed work, invent remote updates, or report checks as passed unless they were run and observed.

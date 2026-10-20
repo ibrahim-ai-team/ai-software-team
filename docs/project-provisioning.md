@@ -37,7 +37,7 @@ Roles depend on the architecture the team chose:
 ## What one run creates
 
 For each repository:
-- the repository (private by default) with an initial commit;
+- the repository (private by default) with an initial commit. Private repositories share the organization's free GitHub Actions minutes (2,000 per month on GitHub Free); public repositories run Actions on standard runners for free. The sponsor chooses `visibility` per project;
 - topics, labels and one `Sprint n` milestone per sprint (14 days by default);
 - a bootstrap/initial-structure branch with README, CONTRIBUTING, SECURITY, CODEOWNERS and a PR template, plus an open bootstrap PR for the owner to merge;
 - in the coordination repository only: requirements, ADR-0001, the repository plan, the approved plan, `docs/project-state.md` and `docs/provisioning-report.md`.

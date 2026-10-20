@@ -4,7 +4,10 @@
 - **Evidence snapshot:** <last time/source state was checked>
 - **Current goal / sprint:** <goal and sprint or iteration>
 - **Overall status:** On track / At risk / Blocked / Not enough evidence
-- **Sprint budget:** <used> of <budget> API-equivalent (<measured / estimated>); threshold reached: none / 70% / 90%
+- **Report type:** end of session / daily
+- **Usage:** session <n> of <planned> this sprint; <n> delegations this session; usage-limit warning: none / five-hour / weekly
+
+Use this template for the mandatory end-of-session report as well: completed work, Issue and PR links, validation results, blockers, next steps. Save it with the handover.
 
 ## Executive summary
 <Three to five concise lines. Distinguish verified facts from agent-reported status.>

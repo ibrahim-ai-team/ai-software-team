@@ -10,7 +10,7 @@ Use this skill when recommending or choosing a language, framework, database, ho
 
 
 ## Procedure
-Capture functional and non-functional needs, team skills, deployment constraints, ecosystem maturity, licensing, cost, security, and operational burden. Compare a shortlist transparently; state assumptions and avoid premature commitment.
+Capture functional and non-functional needs, team skills, deployment constraints, ecosystem maturity, licensing, cost, security, and operational burden. Prefer free and open-source tools and free tiers (OSI-licensed libraries, GitHub Actions within the free minutes, free hosting tiers). Any paid service, plan or usage-based billing is a sponsor decision: list it with its free alternative. Compare a shortlist transparently; state assumptions and avoid premature commitment.
 
 ## Expected outputs
 - Requirements and constraints that drive the choice
@@ -21,3 +21,4 @@ Capture functional and non-functional needs, team skills, deployment constraints
 - Do not select a technology before requirements are sufficiently clear.
 - Use evidence for material claims and disclose uncertain costs or capabilities.
 - Avoid unnecessary complexity and vendor lock-in without a demonstrated benefit.
+- Every paid item names its cost driver, its free alternative, and that the sponsor must approve it.

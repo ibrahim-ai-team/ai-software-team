@@ -12,7 +12,7 @@
 - **Allowed paths (exact directories/files):**
 - **Size / points:** XS / S / M / L (1 / 2 / 3 / 5); XL (8) must be split
 - **Turn cap (agent `maxTurns`):**
-- **Estimated cost / measured cost (API-equivalent):**
+- **Turn cap hit:** yes / no
 - **Re-delegations after hitting the turn cap (max 1):**
 - **Started at (observed):** 
 - **Returned at (observed):** 
@@ -38,8 +38,7 @@ What outcome is requested?
 - **Checks actually run and results:**
 - **Evidence links:**
 - **Risks / unresolved items:**
-- **Observed token usage:** unavailable unless exposed by the runtime
-- **Observed cost:** unavailable unless exposed by the runtime
+- **Observed usage:** turns used if shown; otherwise unavailable (no dollar costs)
 - **Observed duration:**
 - **Next recommendation:**
 
