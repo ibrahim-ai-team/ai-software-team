@@ -4,12 +4,11 @@
 - Dates: TBD
 - Sprint goal: TBD
 - Capacity and availability: TBD
-- Sprint budget (API-equivalent): TBD (see `standards/sprint-sizing.md`)
-- Sessions planned: TBD
-- Capacity: TBD stories / TBD points (min of budget and session limits)
+- Sessions planned: TBD (see `standards/sprint-sizing.md`)
+- Capacity: TBD stories / TBD points (sessions planned − 1 reserve)
 
 ## Selected backlog items
-| ID | Outcome | Owner | Points | Est. cost | Dependencies | Acceptance check | Risk |
+| ID | Outcome | Owner | Points | Est. delegations | Dependencies | Acceptance check | Risk |
 |---|---|---|---|---|---|---|---|
 
 ## Out of scope
