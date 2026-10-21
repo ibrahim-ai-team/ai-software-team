@@ -1,9 +1,11 @@
 # GitHub Projects status transition policy
 
 ## Source of truth
+
 The GitHub Project's single-select Status field is the canonical board status. Issue titles are for concise identification only; never parse or modify a title to infer or set the board status. The issue body may describe workflow intent, but it is not proof that the board was updated.
 
 Use these status options when configuring the Project:
+
 - Backlog
 - Ready
 - In Progress
@@ -18,7 +20,7 @@ If the existing board uses different exact labels, document an explicit mapping 
 ## Allowed transitions and evidence
 
 | From | To | Trigger | Required evidence |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Backlog | Ready | PM accepts Definition of Ready | Completed readiness checklist; acceptance criteria; QA mapping; dependencies/estimate |
 | Ready | In Progress | Coordinator assigns one owner and work starts | Owner, branch/worktree and start checkpoint |
 | In Progress | In Review | PR opened and implementation is ready for review | PR URL, linked issue, changed files, checks run and results |
@@ -36,6 +38,7 @@ If the existing board uses different exact labels, document an explicit mapping 
 A task cannot transition directly to Done just because a developer or subagent says done, a PR was opened/approved, or a test plan exists. Only a verified human merge and completion check permit Done under this policy. If the repository chooses a different Definition of Done, record it explicitly.
 
 ## Manual/automated update contract
+
 1. The coordinator observes a real event and gathers the required evidence.
 2. The coordinator invokes the explicit status-update workflow with issue number, target status, concise reason, and an evidence URL (PR, CI run, test report, or blocker record).
 3. The workflow validates the transition and required evidence, locates the exact issue in the configured Project V2, finds the actual Status field/option IDs, and updates that field.
@@ -45,4 +48,5 @@ A task cannot transition directly to Done just because a developer or subagent s
 7. Do not automatically set Done based only on PR close events; verify merged state and required evidence. Do not merge PRs automatically; the human owner retains merge authority.
 
 ## Project configuration
+
 The current repository documentation describes manual setup and does not create boards. Board creation/configuration is a separate authorized bootstrap operation. Before creating a new Project, check whether the intended project already exists, confirm owner/org, project number, field names/options, visibility and permissions. Do not create duplicate boards or change organization permissions implicitly.

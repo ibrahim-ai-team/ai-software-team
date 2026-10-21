@@ -7,29 +7,38 @@
 - Approved scope reference: TBD
 
 ## 1. Project summary
+
 - Problem and target users:
 - Intended outcome:
 - In scope:
 - Out of scope:
 
 ## 2. Confirmed facts, assumptions, and open questions
+
 ### Confirmed facts
-- 
+
+-
+
 ### Assumptions to validate
-- 
+
+-
+
 ### Open questions / owner decisions
-- 
+
+-
 
 ## 3. Architecture options
+
 Compare at least the simplest viable option and the recommended option.
 
 | Option | Benefits | Costs / risks | Operational complexity | Why accept or reject |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Monorepo + modular monolith | | | | |
 | Multi-repo / independently deployed services | | | | |
 | Other viable option | | | | |
 
 ## 4. Recommended topology
+
 - Repository strategy: Monorepo / Multi-repo / Other
 - Application shape: Modular monolith / Microservices / Other
 - Recommendation and evidence:
@@ -50,7 +59,7 @@ Do not mark visibility, owner, or default branch as approved until the human own
 ## 6. Proposed technology stack
 
 | Concern | Recommendation | Alternative | Rationale / source | Cost or maintenance impact |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Frontend | | | | |
 | Backend | | | | |
 | Database | | | | |
@@ -59,6 +68,7 @@ Do not mark visibility, owner, or default branch as approved until the human own
 | Observability | | | | |
 
 ## 7. Security, privacy, and operations
+
 - Authentication/authorization:
 - Sensitive data and privacy:
 - Secrets and permissions:
@@ -69,12 +79,14 @@ Do not mark visibility, owner, or default branch as approved until the human own
 - Known risks:
 
 ## 8. Cost and access
+
 - Expected free/paid services:
 - Recurring costs and assumptions:
 - Required accounts/permissions:
 - External services or spending requiring approval:
 
 ## 9. Bootstrap checklist
+
 - [ ] Repository existence checked
 - [ ] Repository creation and visibility approved
 - [ ] Initial structure agreed
@@ -85,11 +97,13 @@ Do not mark visibility, owner, or default branch as approved until the human own
 - [ ] Manual actions and limitations documented
 
 ## 10. First delivery slices
+
 | Slice / issue | Outcome | Dependencies | Acceptance checks | Proposed sprint |
 |---|---|---|---|---|
 | | | | | |
 
 ## 11. Human decision record
+
 - [ ] Project scope approved
 - [ ] Architecture direction approved
 - [ ] Repository topology and names approved

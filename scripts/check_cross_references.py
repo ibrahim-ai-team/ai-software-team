@@ -8,16 +8,35 @@
   an optional `model` must be a documented alias or a claude-* model ID.
 Tool allowlists are already validated by validate_team.py.
 """
+
 import json
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 # Documented subagent frontmatter fields (code.claude.com/docs/en/sub-agents, checked 2026-10-19).
-AGENT_KEYS = {"name", "description", "tools", "disallowedTools", "model", "permissionMode", "maxTurns",
-              "autoCompactWindow", "skills", "mcpServers", "hooks", "memory", "background", "omitClaudeMd",
-              "effort", "isolation", "color", "initialPrompt", "experimental"}
+AGENT_KEYS = {
+    "name",
+    "description",
+    "tools",
+    "disallowedTools",
+    "model",
+    "permissionMode",
+    "maxTurns",
+    "autoCompactWindow",
+    "skills",
+    "mcpServers",
+    "hooks",
+    "memory",
+    "background",
+    "omitClaudeMd",
+    "effort",
+    "isolation",
+    "color",
+    "initialPrompt",
+    "experimental",
+}
 MODEL_ALIASES = {"inherit", "sonnet", "opus", "haiku", "fable"}
 MODEL_ID = re.compile(r"^claude-[a-z0-9.-]+$")
 CODE_SPAN = re.compile(r"`([^`\s]+)`")
@@ -57,7 +76,9 @@ def check(root: Path) -> list[str]:
             elif key == "name" and value != path.stem:
                 errors.append(f"{shown}:{line_number}: name '{value}' does not match file name '{path.stem}'")
             elif key == "model" and value not in MODEL_ALIASES and not MODEL_ID.match(value):
-                errors.append(f"{shown}:{line_number}: model '{value}' is not an alias {sorted(MODEL_ALIASES)} or a claude-* model ID")
+                errors.append(
+                    f"{shown}:{line_number}: model '{value}' is not an alias {sorted(MODEL_ALIASES)} or a claude-* model ID"
+                )
 
     orchestrator = claude / "agents" / "agile-orchestrator.md"
     if orchestrator.is_file():
@@ -66,7 +87,9 @@ def check(root: Path) -> list[str]:
         for required in manifest.get("inventory", {}).get("agents", {}).get("required", []):
             role = required.removesuffix(".md")
             if role != "agile-orchestrator" and role not in named:
-                errors.append(f"{orchestrator.relative_to(root)}: does not name required agent '{role}', so it cannot delegate to it")
+                errors.append(
+                    f"{orchestrator.relative_to(root)}: does not name required agent '{role}', so it cannot delegate to it"
+                )
 
     for path in sorted((claude / "commands").glob("*.md")) + agents:
         shown = path.relative_to(root)

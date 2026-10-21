@@ -5,7 +5,7 @@ Scope: the permission rules in `.claude/settings.json`. These are **client-side,
 ## Threat model
 
 | Threat | Intended control | Enforcement status |
-|---|---|---|
+| --- | --- | --- |
 | Force-push or push to `main` using alternate refspecs or flags | Deny selected push patterns; ask before other pushes | Client-side only; runtime not verified. GitHub rulesets are required for server-side protection. |
 | Destructive recursive deletion | Deny selected recursive-delete patterns; ask for `rm -r`/`-R` | Client-side only; runtime not verified. |
 | Secret disclosure through common shell commands | Deny selected commands and `.env` path patterns | Best effort; other tools and interpreters can bypass string patterns. |
@@ -47,7 +47,7 @@ Record each item as Verified enabled / Verified disabled / Not accessible, with 
 Use a throwaway clone with fake data and no real credentials. Record Claude Code version and PASS / FAIL / NOT RUN for each case.
 
 | Test | Expected result |
-|---|---|
+| --- | --- |
 | Request `git push origin feat/x --force` | Refused by rule |
 | Request `git push origin HEAD:main` | Refused by rule |
 | Request `cat .env` in a fake-secret test clone | Refused by rule |

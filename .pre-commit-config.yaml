@@ -1,0 +1,117 @@
+# Local pre-commit hooks. Free and open-source; nothing here calls a paid service.
+# Setup: pip install pre-commit && pre-commit install   (see CONTRIBUTING.md)
+# These hooks are a fast local safety net. CI and branch protection remain the enforced gate,
+# because any hook can be skipped with `git commit --no-verify`.
+minimum_pre_commit_version: "3.2.0"
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [pre-commit]
+
+repos:
+  # File hygiene and obvious mistakes.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: no-commit-to-branch
+        name: Block commits on main (use a feature branch)
+        args: [--branch, main]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-json
+      - id: check-yaml
+      - id: check-toml
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # Secrets: same scanner and version as the "Scan repository for secrets" CI job.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+
+  # Python: lint with safe auto-fixes (imports, upgrades), then format. Rules in ruff.toml.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.10
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  # Markdown structure and style (rules in .markdownlint-cli2.yaml); fixes what it safely can.
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.23.3
+    hooks:
+      - id: markdownlint-cli2
+        args: [--fix]
+
+  # Spelling in docs, code and comments.
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
+    hooks:
+      - id: codespell
+
+  # GitHub Actions workflows and Dependabot config.
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+        # SC2016 is informational: GraphQL queries use single-quoted $variables on purpose.
+        args: [-ignore, "SC2016:"]
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.38.2
+    hooks:
+      - id: check-github-workflows
+      - id: check-dependabot
+
+  # This repository's own checks: the same scripts CI runs.
+  - repo: local
+    hooks:
+      - id: no-anthropic-api-key
+        name: Block ANTHROPIC_API_KEY assignments (Pro subscription only)
+        language: pygrep
+        entry: 'ANTHROPIC_API_KEY\s*[=:]\s*\S'
+        exclude: ^\.pre-commit-config\.yaml$
+      - id: validate-team
+        name: Validate agents, skills, commands, templates and settings
+        language: python
+        entry: python scripts/validate_team.py
+        pass_filenames: false
+        always_run: true
+      - id: check-cross-references
+        name: Check command references and agent frontmatter
+        language: python
+        entry: python scripts/check_cross_references.py
+        pass_filenames: false
+        files: \.(md|json)$
+      - id: check-markdown-links
+        name: Check repository-relative Markdown links
+        language: python
+        entry: python scripts/check_markdown_links.py
+        pass_filenames: false
+        files: \.md$
+      - id: check-placeholders
+        name: Check planning artifacts for unresolved placeholders
+        language: python
+        entry: python scripts/check_placeholders.py
+        pass_filenames: false
+        files: \.md$
+      - id: smoke-discovery
+        name: Offline inventory check
+        language: python
+        entry: python scripts/smoke_discovery.py
+        pass_filenames: false
+        always_run: true
+      - id: unit-tests
+        name: Regression tests (before push)
+        language: python
+        entry: python -m unittest discover -s tests
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push, manual]

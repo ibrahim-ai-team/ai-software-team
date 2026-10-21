@@ -1,9 +1,11 @@
 # Backlog quality gates and mandatory QA decomposition
 
 ## Purpose
+
 Every backlog item must be clear, prioritized, dependency-aware, and verifiable before it enters a sprint. QA participates during specification and refinement, not only after implementation.
 
 ## Roles
+
 - Product Owner / Business Analyst: define user outcome, scope, assumptions, edge cases, and acceptance criteria.
 - Project Manager: owns backlog completeness, task decomposition, dependencies, estimates, issue links, and readiness decision.
 - QA Automation: independently reviews risk and acceptance criteria, maps each criterion to a verification method, and identifies distinct QA deliverables.
@@ -11,6 +13,7 @@ Every backlog item must be clear, prioritized, dependency-aware, and verifiable 
 - Coordinator: reconciles actual issue/board state and records evidence; a role instruction is not proof of execution.
 
 ## Required flow
+
 1. Create or update the parent story/bug/technical issue using the matching GitHub Issue Form.
 2. Review every acceptance criterion for observable outcomes and failure states.
 3. QA creates a criterion-to-test matrix with risk, test level, automation candidate, test data/environment, and evidence expected.
@@ -26,7 +29,9 @@ Every backlog item must be clear, prioritized, dependency-aware, and verifiable 
 10. At sprint review, reconcile planned QA work, executed coverage, untested risks, linked bugs, and residual risks.
 
 ## Definition of Ready
+
 A task cannot move to Ready until all applicable items are true:
+
 - [ ] Clear outcome and bounded scope.
 - [ ] Acceptance criteria are testable; relevant negative/error/boundary cases are considered.
 - [ ] Priority is set in the issue and, when configured, on the Project board.
@@ -42,7 +47,9 @@ A task cannot move to Ready until all applicable items are true:
 If a required field or ticket is missing, keep the task in Backlog and create a refinement follow-up. Do not invent evidence or create duplicate QA issues when suitable linked work already exists.
 
 ## Minimum verification evidence
+
 For each completed check record:
+
 - issue/acceptance criterion and test ID;
 - exact command, test suite, or CI job;
 - branch/commit and environment;

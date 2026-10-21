@@ -7,8 +7,9 @@
 - Decision owner:
 
 ## Readiness checks
+
 | Check | Status (PASS/FAIL/BLOCKED/N/A) | Evidence | Owner/notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Acceptance criteria and scope | | | |
 | Required reviews and approvals | | | |
 | CI and automated tests | | | |
@@ -20,11 +21,13 @@
 | Release notes and communication | | | |
 
 ## Blockers and decisions
+
 - Blocker:
 - Decision required:
 - Decision owner:
 
 ## Recommendation
+
 - READY / NOT READY / BLOCKED
 - Rationale and evidence:
 

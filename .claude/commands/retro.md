@@ -7,8 +7,8 @@ description: Facilitate an evidence-based, blameless sprint retrospective
 Facilitate a blameless, evidence-based retrospective for the most recently completed sprint.
 
 ## Procedure
-Use `project-manager` to reconcile sprint facts and `documentation-manager` to record approved actions. Use the `agile-planning` skill when converting retrospective actions into bounded follow-up work.
 
+Use `project-manager` to reconcile sprint facts and `documentation-manager` to record approved actions. Use the `agile-planning` skill when converting retrospective actions into bounded follow-up work.
 
 1. Gather observed facts: outcomes, escaped defects, blocked tasks, rework, and handoff delays.
 2. Identify what helped, what hindered, and what should change.

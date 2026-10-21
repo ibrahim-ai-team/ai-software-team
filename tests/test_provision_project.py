@@ -3,6 +3,7 @@
 These are MOCKED tests: they prove planning, naming, idempotency and failure handling logic,
 not the behaviour of the real GitHub API.
 """
+
 import copy
 import io
 import json
@@ -49,8 +50,11 @@ class FakeGitHub:
     def get_repo(self, org, name):
         self._check("get_repo", name)
         r = self.repos.get(name)
-        return None if r is None else {"name": name, "description": r["description"],
-                                       "default_branch": "main", "node_id": r["node_id"]}
+        return (
+            None
+            if r is None
+            else {"name": name, "description": r["description"], "default_branch": "main", "node_id": r["node_id"]}
+        )
 
     def get_topics(self, org, name):
         return list(self.repos[name]["topics"])
@@ -81,9 +85,18 @@ class FakeGitHub:
     # writes
     def create_repo(self, org, name, description, visibility):
         self._write("create_repo", name)
-        self.repos[name] = {"description": description, "visibility": visibility, "node_id": self._id("R_"),
-                            "topics": [], "labels": set(), "milestones": {}, "issues": [],
-                            "refs": {"main": "sha0"}, "files": {}, "prs": []}
+        self.repos[name] = {
+            "description": description,
+            "visibility": visibility,
+            "node_id": self._id("R_"),
+            "topics": [],
+            "labels": set(),
+            "milestones": {},
+            "issues": [],
+            "refs": {"main": "sha0"},
+            "files": {},
+            "prs": [],
+        }
 
     def set_topics(self, org, name, topics):
         self._write("set_topics", name)
@@ -116,9 +129,15 @@ class FakeGitHub:
     def create_issue(self, org, name, title, body, labels, milestone):
         self._write("create_issue", name)
         issues = self.repos[name]["issues"]
-        issue = {"number": len(issues) + 1, "title": title, "body": body, "labels": list(labels),
-                 "milestone": milestone, "node_id": self._id("I_"),
-                 "html_url": f"https://github.com/{org}/{name}/issues/{len(issues) + 1}"}
+        issue = {
+            "number": len(issues) + 1,
+            "title": title,
+            "body": body,
+            "labels": list(labels),
+            "milestone": milestone,
+            "node_id": self._id("I_"),
+            "html_url": f"https://github.com/{org}/{name}/issues/{len(issues) + 1}",
+        }
         issues.append(issue)
         return copy.deepcopy(issue)
 
@@ -131,9 +150,14 @@ class FakeGitHub:
 
     def create_project(self, org, title, description):
         self._write("create_project", title)
-        self.projects[title] = {"id": self._id("P_"), "url": f"https://github.com/orgs/{org}/projects/1",
-                                "description": description,
-                                "repos": set(), "fields": {"Status", "Title"}, "items": set()}
+        self.projects[title] = {
+            "id": self._id("P_"),
+            "url": f"https://github.com/orgs/{org}/projects/1",
+            "description": description,
+            "repos": set(),
+            "fields": {"Status", "Title"},
+            "items": set(),
+        }
         return copy.deepcopy(self.projects[title])
 
     def _project(self, project_id):
@@ -174,8 +198,10 @@ class NamingAndPlanTests(unittest.TestCase):
         self.assertEqual(pp.next_project_id([]), "idea-01")
         self.assertEqual(pp.next_project_id(["ai-software-team", "shopinow-front", "idea-07-management"]), "idea-08")
         self.assertEqual(pp.next_project_id(["idea-99-back"]), "idea-100")
-        tagged = [{"name": "shopinow-back", "description": "API [ai-team:idea-04]", "topics": []},
-                  {"name": "booky-app", "description": "", "topics": ["ai-team-app", "idea-06"]}]
+        tagged = [
+            {"name": "shopinow-back", "description": "API [ai-team:idea-04]", "topics": []},
+            {"name": "booky-app", "description": "", "topics": ["ai-team-app", "idea-06"]},
+        ]
         self.assertEqual(pp.next_project_id(tagged), "idea-07")
 
     def test_repository_names_come_from_the_app_name(self):
@@ -197,22 +223,23 @@ class NamingAndPlanTests(unittest.TestCase):
             pp.validate_plan(plan(project={"name": "Shopinow"}), existing_repos=existing)
         self.assertTrue(any("already used by idea-03" in e for e in ctx.exception.errors))
         same = pp.validate_plan(plan(project={"id": "idea-03", "name": "Shopinow"}), existing_repos=existing)
-        self.assertEqual(same["project"]["id"], "idea-03")   # rerun of the same idea is fine
+        self.assertEqual(same["project"]["id"], "idea-03")  # rerun of the same idea is fine
 
     def test_id_assigned_from_existing_repos_when_missing(self):
         raw = plan(project={"name": "Shopinow"})
         normalized = pp.validate_plan(raw, existing_repos=["ai-software-team", "idea-02-app"])
         self.assertEqual(normalized["project"]["id"], "idea-03")
-        self.assertEqual([r["name"] for r in normalized["repos"]],
-                         ["shopinow-management", "shopinow-front", "shopinow-back"])
+        self.assertEqual([r["name"] for r in normalized["repos"]], ["shopinow-management", "shopinow-front", "shopinow-back"])
 
     def test_frontend_backend_gets_management_front_back(self):
         roles = [r["role"] for r in pp.validate_plan(plan())["repos"]]
         self.assertEqual(roles, ["management", "front", "back"])
 
     def test_monolith_gets_one_repository_and_no_coordination_repo(self):
-        raw = plan(architecture={"style": "monolith", "decision": "One deployable is enough."},
-                   repositories=[{"role": "app", "purpose": "Shop", "stack": "Django", "testing": "pytest"}])
+        raw = plan(
+            architecture={"style": "monolith", "decision": "One deployable is enough."},
+            repositories=[{"role": "app", "purpose": "Shop", "stack": "Django", "testing": "pytest"}],
+        )
         for item in raw["backlog"]:
             item["repo"] = "app"
         normalized = pp.validate_plan(raw)
@@ -221,25 +248,34 @@ class NamingAndPlanTests(unittest.TestCase):
         self.assertIn("docs/adr/0001-architecture.md", pp.scaffold_files(normalized, normalized["repos"][0]))
 
     def test_coordination_repo_can_be_forced_for_single_repo(self):
-        raw = plan(architecture={"style": "single-repo", "decision": "CLI tool."}, coordination_repo=True,
-                   repositories=[{"role": "app", "purpose": "CLI", "stack": "Go", "testing": "go test"}])
+        raw = plan(
+            architecture={"style": "single-repo", "decision": "CLI tool."},
+            coordination_repo=True,
+            repositories=[{"role": "app", "purpose": "CLI", "stack": "Go", "testing": "go test"}],
+        )
         for item in raw["backlog"]:
             item["repo"] = "management" if item["type"] == "epic" else "app"
         self.assertEqual([r["role"] for r in pp.validate_plan(raw)["repos"]], ["management", "app"])
 
     def test_services_style_uses_declared_services(self):
-        raw = plan(architecture={"style": "services", "decision": "Independent scaling of search.",
-                                 "has_frontend": True, "services": ["catalog", "orders"]})
+        raw = plan(
+            architecture={
+                "style": "services",
+                "decision": "Independent scaling of search.",
+                "has_frontend": True,
+                "services": ["catalog", "orders"],
+            }
+        )
         raw.pop("repositories")
         with self.assertRaises(pp.PlanError) as ctx:
-            pp.validate_plan(raw)   # services need stack/testing before creation
+            pp.validate_plan(raw)  # services need stack/testing before creation
         self.assertTrue(any("repositories[catalog].stack" in e for e in ctx.exception.errors))
-        raw["repositories"] = [{"role": r, "purpose": r, "stack": "Go", "testing": "go test"}
-                               for r in ("front", "catalog", "orders")]
+        raw["repositories"] = [
+            {"role": r, "purpose": r, "stack": "Go", "testing": "go test"} for r in ("front", "catalog", "orders")
+        ]
         for item in raw["backlog"]:
             item["repo"] = {"back": "catalog"}.get(item["repo"], item["repo"])
-        self.assertEqual([r["role"] for r in pp.validate_plan(raw)["repos"]],
-                         ["management", "front", "catalog", "orders"])
+        self.assertEqual([r["role"] for r in pp.validate_plan(raw)["repos"]], ["management", "front", "catalog", "orders"])
 
     def test_invalid_plans_report_all_problems(self):
         raw = plan(project={"id": "shop", "name": ""})
@@ -250,8 +286,14 @@ class NamingAndPlanTests(unittest.TestCase):
         with self.assertRaises(pp.PlanError) as ctx:
             pp.validate_plan(raw)
         text = " | ".join(ctx.exception.errors)
-        for expected in ("project.id 'shop'", "project.name", "repositories[front].stack",
-                         "repo 'mobile'", "depends_on 'US-9'", "QA-1: acceptance_criteria"):
+        for expected in (
+            "project.id 'shop'",
+            "project.name",
+            "repositories[front].stack",
+            "repo 'mobile'",
+            "depends_on 'US-9'",
+            "QA-1: acceptance_criteria",
+        ):
             self.assertIn(expected, text)
 
     def test_dependency_cycle_is_rejected(self):
@@ -274,8 +316,14 @@ class NamingAndPlanTests(unittest.TestCase):
 
     def test_tree_explains_grouping_and_lists_repositories(self):
         tree = pp.render_tree(pp.validate_plan(plan()))
-        for text in ("cannot be nested", "ai-team-app", "shopinow-management", "shopinow-front", "shopinow-back",
-                     "GitHub Project: \"Shopinow (idea-01)\""):
+        for text in (
+            "cannot be nested",
+            "ai-team-app",
+            "shopinow-management",
+            "shopinow-front",
+            "shopinow-back",
+            'GitHub Project: "Shopinow (idea-01)"',
+        ):
             self.assertIn(text, tree)
 
 
@@ -291,11 +339,11 @@ class ProvisioningTests(unittest.TestCase):
             self.assertTrue({"ai-team-app", "idea-01"} <= set(repo["topics"]))
             self.assertEqual(len(repo["prs"]), 1)
             self.assertIn("Sprint 1", repo["milestones"])
-            self.assertNotIn(("main", "README.md"), repo["files"])   # nothing is written to main
+            self.assertNotIn(("main", "README.md"), repo["files"])  # nothing is written to main
         issues = {i["title"]: i for r in fake.repos.values() for i in r["issues"]}
         self.assertEqual(len(issues), 4)
         us1 = issues["[US-1] Product catalogue API"]
-        self.assertIn(us1["html_url"], issues["[US-2] Product list page"]["body"])   # cross-repo link
+        self.assertIn(us1["html_url"], issues["[US-2] Product list page"]["body"])  # cross-repo link
         self.assertIn("project:idea-01", us1["labels"])
         self.assertEqual(us1["milestone"], 1)
         project = fake.projects["Shopinow (idea-01)"]
@@ -318,7 +366,7 @@ class ProvisioningTests(unittest.TestCase):
         self.assertEqual(sum(len(r["issues"]) for r in fake.repos.values()), 4)
         self.assertEqual(sum(len(r["prs"]) for r in fake.repos.values()), 3)
         second = [op for op, _ in fake.writes[writes_before:]]
-        self.assertEqual(second, ["put_file"], second)   # only the refreshed provisioning report
+        self.assertEqual(second, ["put_file"], second)  # only the refreshed provisioning report
         self.assertFalse(set(statuses(state, "repo:").values()) - {"EXISTS"})
 
     def test_foreign_repository_blocks_without_changes(self):
@@ -332,8 +380,14 @@ class ProvisioningTests(unittest.TestCase):
 
     def test_foreign_project_board_is_not_adopted(self):
         fake = FakeGitHub()
-        fake.projects["Shopinow (idea-01)"] = {"id": "P_x", "url": "u", "description": "someone else's board",
-                                                    "repos": set(), "fields": set(), "items": set()}
+        fake.projects["Shopinow (idea-01)"] = {
+            "id": "P_x",
+            "url": "u",
+            "description": "someone else's board",
+            "repos": set(),
+            "fields": set(),
+            "items": set(),
+        }
         state, _ = run(fake, plan())
         self.assertEqual(state["steps"]["project"]["status"], "FAILED")
         self.assertIn("not adopting it", state["steps"]["project"]["detail"])
@@ -356,7 +410,7 @@ class ProvisioningTests(unittest.TestCase):
         self.assertEqual(step["status"], "PERMISSION_DENIED")
         self.assertIn("organization Projects: read and write", step["detail"])
         self.assertEqual(fake.projects, {})
-        self.assertEqual(sum(len(r["issues"]) for r in fake.repos.values()), 4)   # independent steps still ran
+        self.assertEqual(sum(len(r["issues"]) for r in fake.repos.values()), 4)  # independent steps still ran
 
     def test_partial_failure_skips_dependents_and_resumes(self):
         fake = FakeGitHub()
@@ -370,7 +424,7 @@ class ProvisioningTests(unittest.TestCase):
         self.assertIn("link pending for US-1", state["steps"]["deps:US-2"]["detail"])
         us2 = next(i for i in fake.repos["shopinow-front"]["issues"] if "US-2" in i["title"])
         self.assertIn("US-1 (link pending)", us2["body"])
-        state, _ = run(fake, plan())   # transient failures exhausted: resume
+        state, _ = run(fake, plan())  # transient failures exhausted: resume
         self.assertEqual(state["phase"], "COMPLETE_WITH_MANUAL_STEPS")
         self.assertEqual(sum(len(r["issues"]) for r in fake.repos.values()), 4)
         us2 = next(i for i in fake.repos["shopinow-front"]["issues"] if "US-2" in i["title"])
@@ -417,6 +471,7 @@ class GhClientErrorTests(unittest.TestCase):
 
     def run_with(self, returncode=0, stdout="", stderr="", raises=None):
         from unittest import mock
+
         result = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
         side = raises if raises else (lambda *a, **k: result)
         return mock.patch.object(pp.subprocess, "run", side_effect=side)
@@ -429,11 +484,14 @@ class GhClientErrorTests(unittest.TestCase):
     def test_http_statuses(self):
         self.assertEqual(self.assert_raises(pp.PermissionDenied, returncode=1, stderr="gh: Forbidden (HTTP 403)").status, 403)
         self.assertIsInstance(self.assert_raises(pp.TransientError, returncode=1, stderr="gh: (HTTP 502)"), pp.TransientError)
-        self.assertEqual(type(self.assert_raises(pp.GitHubError, returncode=1, stderr="gh: Not Found (HTTP 404)")), pp.GitHubError)
+        self.assertEqual(
+            type(self.assert_raises(pp.GitHubError, returncode=1, stderr="gh: Not Found (HTTP 404)")), pp.GitHubError
+        )
 
     def test_secondary_rate_limit_is_transient(self):
-        exc = self.assert_raises(pp.TransientError, returncode=1,
-                                 stderr="gh: You have exceeded a secondary rate limit (HTTP 403)")
+        exc = self.assert_raises(
+            pp.TransientError, returncode=1, stderr="gh: You have exceeded a secondary rate limit (HTTP 403)"
+        )
         self.assertEqual(exc.status, 403)
 
     def test_graphql_errors_on_stdout_are_classified(self):

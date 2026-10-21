@@ -1,7 +1,7 @@
 # AI Software Team — Project State
 
 Last analysed: 2026-10-19
-Repository: https://github.com/ibrahim-ai-team/ai-software-team
+Repository: <https://github.com/ibrahim-ai-team/ai-software-team>
 Default branch: `main`
 Current phase: Ready for the first supervised pilot (team kit); no application work started
 
@@ -31,7 +31,7 @@ Current phase: Ready for the first supervised pilot (team kit); no application w
 ## Open work
 
 | Issue | Status on board | Next action | Owner |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45) | Ready | Start with `claude --agent agile-orchestrator` once the owner gives an idea | Owner input, then `agile-orchestrator` |
 | [#26](https://github.com/ibrahim-ai-team/ai-software-team/issues/26) | Backlog | Calibrate sizing/budgets from pilot data | After #45 |
 

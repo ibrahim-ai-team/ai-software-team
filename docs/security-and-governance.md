@@ -29,7 +29,7 @@ A workflow file cannot enable branch protection by itself. Verify the active rul
 Status observed 2026-10-19 (`GET /repos/ibrahim-ai-team/ai-software-team`, `security_and_analysis`):
 
 | Control | What it does | Status |
-|---|---|---|
+| --- | --- | --- |
 | Gitleaks CI (`.github/workflows/secret-scan.yml`) | Scans history on every push/PR; fails the check | Enabled, green on `main` |
 | GitHub secret scanning | GitHub detects provider tokens already pushed and alerts | **Disabled** |
 | Push protection | GitHub blocks a push that contains a detected secret | **Disabled** |

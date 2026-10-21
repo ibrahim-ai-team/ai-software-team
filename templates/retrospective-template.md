@@ -6,12 +6,15 @@
 - Evidence sources:
 
 ## What helped?
+
 - Observation and evidence:
 
 ## What hindered?
+
 - Observation and evidence:
 
 ## Improvement actions
+
 | Action | Owner role | Due point | Success measure | Status |
 |---|---|---|---|---|
 

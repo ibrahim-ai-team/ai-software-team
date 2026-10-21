@@ -5,12 +5,13 @@ Checks inventories, non-empty content, frontmatter, permission guardrails,
 CI security settings, and critical orchestration contract markers. Static
 validation cannot prove Claude Code runtime behavior or GitHub owner settings.
 """
-from pathlib import Path
+
 import json
+import os
 import re
 import subprocess
 import sys
-import os
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOWED_TOOLS = {"Agent", "Read", "Grep", "Glob", "Edit", "Write", "Bash", "WebSearch", "WebFetch"}
@@ -67,7 +68,11 @@ def load_manifest() -> dict:
         try:
             baseline_raw = subprocess.run(
                 ["git", "show", f"{base_ref}:.claude/manifest.json"],
-                cwd=ROOT, capture_output=True, text=True, check=True, timeout=5,
+                cwd=ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=5,
             ).stdout
             baseline = json.loads(baseline_raw)
             baseline_inventory = baseline.get("inventory", {})
@@ -76,8 +81,10 @@ def load_manifest() -> dict:
                 if kind in HARD_MINIMUMS:
                     old_min = old_spec.get("minimum_count", HARD_MINIMUMS[kind])
                     new_min = new_spec.get("minimum_count", 0)
-                    if isinstance(old_min, int) and not isinstance(old_min, bool) and (
-                        not isinstance(new_min, int) or isinstance(new_min, bool) or new_min < old_min
+                    if (
+                        isinstance(old_min, int)
+                        and not isinstance(old_min, bool)
+                        and (not isinstance(new_min, int) or isinstance(new_min, bool) or new_min < old_min)
                     ):
                         errors.append(f"Manifest inventory.{kind}.minimum_count may not decrease from base ({old_min})")
                 old_required = old_spec.get("required", [])
@@ -151,7 +158,7 @@ def parse_frontmatter(path: Path, required_fields: tuple[str, ...] = ("name", "d
     if not match:
         errors.append(f"Frontmatter closing delimiter missing: {path.relative_to(ROOT)}")
         return {}
-    block = text[4:4 + match.start()]
+    block = text[4 : 4 + match.start()]
     fields: dict[str, str] = {}
     for line_number, line in enumerate(block.splitlines(), start=2):
         if not line.strip() or line.lstrip().startswith("#"):
@@ -181,10 +188,7 @@ def check_unique_names(paths: list[Path], kind: str) -> None:
         if not name:
             continue
         if name in seen:
-            errors.append(
-                f"Duplicate {kind} name '{name}': "
-                f"{seen[name].relative_to(ROOT)} and {path.relative_to(ROOT)}"
-            )
+            errors.append(f"Duplicate {kind} name '{name}': {seen[name].relative_to(ROOT)} and {path.relative_to(ROOT)}")
         else:
             seen[name] = path
 
@@ -247,6 +251,7 @@ for path in skills:
     if len(description) < 20 or description.casefold() in {"skill", "todo", "tbd", "x"}:
         errors.append(f"Skill description is missing or too generic: {path.relative_to(ROOT)}")
 
+
 def check_required_files(kind: str, paths: list[Path]) -> None:
     spec = manifest_inventory.get(kind, {})
     required = spec.get("required", [])
@@ -268,13 +273,20 @@ for path in templates:
     require_nonempty(path, "template")
 
 required_files = [
-    "README.md", ".claude/CLAUDE.md",
-    "workflows/future-project-workflow.md", "workflows/project-bootstrap.md",
-    "workflows/agile-agent-delivery.md", "workflows/orchestration-contract.md",
-    "docs/orchestration-design.md", "docs/agent-traceability.md",
-    "docs/verification-report.md", "docs/agile-command-reference.md",
-    "standards/engineering-principles.md", "standards/security-principles.md",
-    "standards/git-workflow.md", "standards/definition-of-done.md",
+    "README.md",
+    ".claude/CLAUDE.md",
+    "workflows/future-project-workflow.md",
+    "workflows/project-bootstrap.md",
+    "workflows/agile-agent-delivery.md",
+    "workflows/orchestration-contract.md",
+    "docs/orchestration-design.md",
+    "docs/agent-traceability.md",
+    "docs/verification-report.md",
+    "docs/agile-command-reference.md",
+    "standards/engineering-principles.md",
+    "standards/security-principles.md",
+    "standards/git-workflow.md",
+    "standards/definition-of-done.md",
 ]
 for relative in required_files:
     require_nonempty(ROOT / relative)
@@ -283,9 +295,12 @@ contract_path = ROOT / "workflows" / "orchestration-contract.md"
 if contract_path.is_file():
     contract = read_text(contract_path)
     for marker in (
-        "Session-start / resume protocol", "Task ownership and concurrency",
-        "Retry, failure and recovery", "Quality and merge gate",
-        "Daily report evidence rules", "human repository owner merges PRs",
+        "Session-start / resume protocol",
+        "Task ownership and concurrency",
+        "Retry, failure and recovery",
+        "Quality and merge gate",
+        "Daily report evidence rules",
+        "human repository owner merges PRs",
         "atomic exclusivity",
     ):
         if marker.casefold() not in contract.casefold():
@@ -304,33 +319,72 @@ if settings_text:
         settings = json.loads(settings_text)
         deny = settings.get("permissions", {}).get("deny", [])
         required_denies = (
-            "Bash(git push --force*)", "Bash(git push -f*)",
-            "Bash(git push origin main*)", "Bash(git push origin HEAD:main*)",
-            "Bash(git reset --hard*)", "Bash(git clean*)",
-            "Bash(gh repo delete*)", "Bash(gh pr merge*)",
-            "Bash(rm -rf*)", "Bash(gh repo create*)", "Bash(terraform apply*)", "Bash(terraform destroy*)",
-            "Bash(kubectl apply*)", "Bash(kubectl delete*)", "Bash(docker push*)",
-            "Bash(cat .env*)", "Bash(cat */.env*)", "Read(./.env)",
-            "Read(./.env.*)", "Read(./**/*.pem)", "Read(./**/*.key)",
+            "Bash(git push --force*)",
+            "Bash(git push -f*)",
+            "Bash(git push origin main*)",
+            "Bash(git push origin HEAD:main*)",
+            "Bash(git reset --hard*)",
+            "Bash(git clean*)",
+            "Bash(gh repo delete*)",
+            "Bash(gh pr merge*)",
+            "Bash(rm -rf*)",
+            "Bash(gh repo create*)",
+            "Bash(terraform apply*)",
+            "Bash(terraform destroy*)",
+            "Bash(kubectl apply*)",
+            "Bash(kubectl delete*)",
+            "Bash(docker push*)",
+            "Bash(cat .env*)",
+            "Bash(cat */.env*)",
+            "Read(./.env)",
+            "Read(./.env.*)",
+            "Read(./**/*.pem)",
+            "Read(./**/*.key)",
         )
         required_denies += (
-            "Bash(git push*--force*)", "Bash(git push* -f*)", "Bash(git push* +*)",
-            "Bash(git push* main)", "Bash(git push* main *)", "Bash(git push*:main)",
-            "Bash(git push*:refs/heads/main*)", "Bash(git push*--delete*)", "Bash(git push*--mirror*)",
-            "Bash(rm -fr*)", "Bash(rm -Rf*)", "Bash(rm --recursive*)",
-            "Bash(gh auth token*)", "Bash(gh auth status*--show-token*)", "Bash(printenv*)",
-            "Bash(source .env*)", "Bash(head*.env*)", "Bash(tail*.env*)",
-            "Bash(grep*.env*)", "Bash(sed*.env*)", "Bash(awk*.env*)",
-            "Read(./secrets/**)", "Edit(./.env)", "Edit(./.env.*)",
-            "Edit(./**/*.pem)", "Edit(./**/*.key)", "Edit(./secrets/**)",
-            "mcp__github__merge_pull_request", "mcp__github__enable_pr_auto_merge",
+            "Bash(git push*--force*)",
+            "Bash(git push* -f*)",
+            "Bash(git push* +*)",
+            "Bash(git push* main)",
+            "Bash(git push* main *)",
+            "Bash(git push*:main)",
+            "Bash(git push*:refs/heads/main*)",
+            "Bash(git push*--delete*)",
+            "Bash(git push*--mirror*)",
+            "Bash(rm -fr*)",
+            "Bash(rm -Rf*)",
+            "Bash(rm --recursive*)",
+            "Bash(gh auth token*)",
+            "Bash(gh auth status*--show-token*)",
+            "Bash(printenv*)",
+            "Bash(source .env*)",
+            "Bash(head*.env*)",
+            "Bash(tail*.env*)",
+            "Bash(grep*.env*)",
+            "Bash(sed*.env*)",
+            "Bash(awk*.env*)",
+            "Read(./secrets/**)",
+            "Edit(./.env)",
+            "Edit(./.env.*)",
+            "Edit(./**/*.pem)",
+            "Edit(./**/*.key)",
+            "Edit(./secrets/**)",
+            "mcp__github__merge_pull_request",
+            "mcp__github__enable_pr_auto_merge",
         )
         required_asks = (
-            "Bash(git push*)", "Bash(rm -r*)", "Bash(rm -R*)",
-            "Bash(gh api*)", "Bash(gh repo edit*)", "Bash(gh secret*)",
-            "Edit(./.claude/settings.json)", "Edit(./.github/workflows/**)",
-            "Edit(./.github/CODEOWNERS)", "Edit(./.github/dependabot.yml)",
-            "Edit(./.claude/CLAUDE.md)", "Edit(./.claude/manifest.json)",
+            "Bash(git push*)",
+            "Bash(rm -r*)",
+            "Bash(rm -R*)",
+            "Bash(gh api*)",
+            "Bash(gh repo edit*)",
+            "Bash(gh secret*)",
+            "Edit(./.claude/settings.json)",
+            "Edit(./.github/workflows/**)",
+            "Edit(./.github/CODEOWNERS)",
+            "Edit(./.github/dependabot.yml)",
+            "Edit(./.claude/CLAUDE.md)",
+            "Edit(./.claude/manifest.json)",
             "Bash(*provision_project.py apply*)",
         )
         permissions = settings.get("permissions", {})
@@ -394,10 +448,18 @@ dependabot_text = require_nonempty(dependabot_path, "Dependabot configuration")
 if dependabot_text and ("package-ecosystem: github-actions" not in dependabot_text or "interval: weekly" not in dependabot_text):
     errors.append("Dependabot must schedule weekly GitHub Actions updates")
 
-print(f"Agents: {len(agents)} discovered; manifest minimum {manifest_inventory.get('agents', {}).get('minimum_count', 'invalid')}")
-print(f"Skills: {len(skills)} discovered; manifest minimum {manifest_inventory.get('skills', {}).get('minimum_count', 'invalid')}")
-print(f"Commands: {len(commands)} discovered; {len(manifest_inventory.get('commands', {}).get('required', []))} required by manifest")
-print(f"Templates: {len(templates)} discovered; {len(manifest_inventory.get('templates', {}).get('required', []))} required by manifest")
+print(
+    f"Agents: {len(agents)} discovered; manifest minimum {manifest_inventory.get('agents', {}).get('minimum_count', 'invalid')}"
+)
+print(
+    f"Skills: {len(skills)} discovered; manifest minimum {manifest_inventory.get('skills', {}).get('minimum_count', 'invalid')}"
+)
+print(
+    f"Commands: {len(commands)} discovered; {len(manifest_inventory.get('commands', {}).get('required', []))} required by manifest"
+)
+print(
+    f"Templates: {len(templates)} discovered; {len(manifest_inventory.get('templates', {}).get('required', []))} required by manifest"
+)
 print(f"Required documentation files checked: {len(required_files)}")
 print("Security checks: Claude deny rules, .gitignore, read-only CI, checkout credentials, Gitleaks and Dependabot")
 print("Static-only validation: does not prove Claude Code runtime behavior or GitHub owner settings")

@@ -1,12 +1,15 @@
 # Orchestration Contract
 
 ## Purpose and limits
+
 This contract defines the repeatable control loop for a Claude Code session. It is a protocol, not a background service, distributed lock manager, or proof that Claude Code can discover or delegate to every profile. The coordinator of record is `agile-orchestrator`, started as the main session with `claude --agent agile-orchestrator`. If a session is started without it, the top-level session follows this same contract. Delegation is hub-and-spoke: only the orchestrator has the `Agent` tool; specialists return results to it and never call each other. Work stops when the session stops unless an independently configured scheduler invokes it.
 
 ## Canonical state and precedence
+
 For each project, maintain a durable project state file in the project repository (recommended: `docs/project-state.md`) and task records in GitHub Issues when available. Keep sensitive values out of state files.
 
 Precedence when records disagree:
+
 1. Actual repository contents, commits, PR state, and CI results for code/check facts.
 2. Explicit sponsor decisions and recorded ADRs for approved decisions.
 3. Canonical task/issue status for task state.
@@ -20,7 +23,9 @@ Every project state snapshot must include: project ID/name, last reconciled time
 During `ARCHITECTURE`, before implementation begins, require a documented threat-model checkpoint whenever the system handles authentication/authorization, personal or sensitive data, external integrations/webhooks, file uploads, payment flows, secrets, or privileged operations. Use `.claude/skills/security-threat-modelling/SKILL.md`. Record assets, trust boundaries, abuse cases, mitigations, residual risks, and verification tasks. If the scope has no meaningful security-sensitive data flow, record `NOT APPLICABLE` with a short rationale.
 
 ## State machine
+
 Project phases:
+
 - `DISCOVERY`: capture idea, goals, users, outcomes, constraints.
 - `SPECIFICATION`: PO/BA produce requirements, journeys, edge cases, acceptance criteria, NFRs, assumptions and open questions.
 - `ARCHITECTURE`: Architect compares options and records recommended architecture and material trade-offs; Tech Lead validates buildability and sets implementation standards.
@@ -36,6 +41,7 @@ Project phases:
 Transitions must be recorded with timestamp, previous phase, new phase, reason, and evidence. Do not skip gates. Routine assumptions should be recorded and progress should continue; do not repeatedly ask the sponsor to approve ordinary task breakdown or reversible implementation details.
 
 ## Session-start / resume protocol
+
 1. Read this contract, `.claude/CLAUDE.md`, the relevant workflow, project state, handover, open task records, ADRs, open PRs and recent CI results.
 2. Reconcile the state against observable GitHub/repository evidence; flag stale or contradictory records rather than silently overwriting them.
 3. Identify active, stale, blocked, duplicated, and dependency-ready tasks. Claims are session-scoped coordination records, not locks or heartbeats. At the start of each new coordinator session, any claim not reconfirmed by its owner must be marked `NEEDS_REVALIDATION`; inspect branch/worktree and artifacts before resuming or reassigning. Never infer that an agent is dead from elapsed time alone.
@@ -44,6 +50,7 @@ Transitions must be recorded with timestamp, previous phase, new phase, reason, 
 6. Before ending, persist outcomes, evidence, blockers, next action and handover. **Every session ends with a Project Manager report** (`/daily-report`, saved with the `/handover`): completed work, Issue and PR links, validation results, blockers and next steps, from reconciled state. A session stopped by a usage-limit warning still writes the report first.
 
 ## Task ownership and concurrency
+
 - Give each task a stable ID and each delegation a unique ID, e.g. `STORY-12-D02`.
 - Task record must state one accountable owner, dependencies, allowed paths/files, input commit, outputs, acceptance checks, and status.
 - Canonical task statuses: `BACKLOG`, `READY`, `CLAIMED`, `IN_PROGRESS`, `BLOCKED`, `IN_REVIEW`, `CHANGES_REQUESTED`, `APPROVED_AWAITING_HUMAN_MERGE`, `DONE`, `CANCELLED`. `UNKNOWN` is a reconciliation observation only; `NEEDS_REVALIDATION` is a claim flag, not a task status. GitHub Project labels such as `Ready to Claim` must map to canonical `READY` in the task record.
@@ -70,6 +77,7 @@ The team runs on the sponsor's Claude Pro subscription through Claude Code: no C
 - Stop starting new work when context or time pressure could prevent verification, evidence capture, or a useful handover.
 
 ## Retry, failure and recovery
+
 - On a failed task, preserve logs/evidence, identify the failing acceptance check, and classify as code defect, environment/tool issue, unclear requirement, dependency, or external access.
 - Permit at most two automatic retries for the same unchanged failure. Each retry must change one relevant condition or strategy; otherwise stop and report blocked. Do not loop indefinitely or burn context/tokens.
 - If an agent fails to return in the current session, mark `BLOCKED` and preserve partial work. Use `UNKNOWN` only as a reconciliation observation, not a task status. At session resume, inspect the branch/worktree and reconfirm ownership before reassignment; document the handover.
@@ -82,12 +90,15 @@ The team runs on the sponsor's Claude Pro subscription through Claude Code: no C
 Follow `workflows/backlog-quality-gates.md` before a task is considered Ready. QA must map acceptance criteria to verification methods and identify distinct linked QA issues before sprint commitment. Follow `workflows/project-status-transitions.md` for the canonical GitHub Projects Status field and allowed transitions. A title prefix, issue body text, label, or agent assertion does not prove a board status changed. The coordinator must verify the actual Project V2 field after a status update. Report status-update failures without claiming success; keep the last verified state. Never set Done without a verified human-merged PR and completion evidence.
 
 ## Quality and merge gate
+
 A task can enter review only when its acceptance checks and relevant tests have evidence. Review must inspect the actual diff, test results, security/privacy impact, docs/config changes, and compatibility. QA reports tested and not-tested scope. Two independent reviews are required before a PR is presented: `tech-lead` reviews technical quality, design, maintainability and test adequacy; `code-review-security` reviews security, secrets and dependencies (read-only). QA (`qa-automation`) validates behaviour against acceptance criteria. The coordinator records each disposition in the delegation/PR record; no reviewer approves work it authored. The Architect advises when a change touches ADRs. A PR may be labelled ready only when required CI checks pass and the evidence is linked; if checks are unavailable, state that explicitly and do not imply they passed.
 
 Only the human repository owner merges PRs. Agents must not merge, enable auto-merge, push directly to the default branch, deploy production, or change repository permissions. Documentation is not enforcement: verify GitHub branch protection/rulesets and repository permissions separately.
 
 ## Daily report evidence rules
+
 Every daily report separates:
+
 - **Implemented**: changes visible in a branch/commit.
 - **Tested**: checks actually run, with exact command/job and pass/fail result.
 - **Reviewed**: reviewer and review evidence.
@@ -98,7 +109,9 @@ Every daily report separates:
 Each item links task/delegation ID, branch/commit/PR, evidence, and blocker. Use "reported by agent" until the coordinator independently verifies it. Never infer merged from PR approval, deployed from merged, or tested from code review. Report zero progress honestly when appropriate.
 
 ## Sponsor decision boundaries
+
 Proceed with documented assumptions for routine and reversible choices. Pause and ask for explicit authorization before:
+
 - spending money, enabling paid services or creating billable infrastructure;
 - production deployment, data deletion/migration with irreversible impact, or destructive actions;
 - changing repository/org permissions, visibility, security posture or branch protection;
@@ -112,6 +125,7 @@ Ask one concise question containing the decision, recommended option, alternativ
 Before running any command that can mutate external state, credentials, infrastructure, production data, remote repositories, permissions, or published artifacts, the coordinator must classify the command and check explicit authorization. Examples include `gh repo create`, mutating `gh api` calls, `terraform apply/destroy`, cloud CLI writes, `kubectl apply/delete`, database destructive DDL/data deletion, `docker push`, deployment/publish commands, and secret/credential access. Do not run such commands unless the exact action and target are authorized. Prefer read-only inspection and dry-run/plan modes first. Existing Claude Code deny rules are defense-in-depth only; they are not a complete security boundary, and shell commands can bypass naive text patterns. Validate actual behavior in a real Claude Code session before claiming enforcement.
 
 ## Acceptance checklist for a usable orchestration run
+
 - [ ] State reconciled against current repository, issues, PRs and CI.
 - [ ] Phase and next task are explicit.
 - [ ] Every active task has unique ID, owner, dependencies, allowed paths and acceptance checks.

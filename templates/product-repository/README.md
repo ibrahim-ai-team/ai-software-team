@@ -36,6 +36,7 @@ For frontend/backend repositories, use the conventions of the selected framework
 ## Required first increment
 
 Before implementation begins, record:
+
 - Problem statement and target users
 - In-scope and out-of-scope requirements
 - Acceptance criteria for the first user story

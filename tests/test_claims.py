@@ -4,9 +4,11 @@ from pathlib import Path
 
 from scripts.check_claims import check_claims
 
-HEADER = ("## Active delegations\n"
-          "| Delegation ID | Task ID | Owner | Branch/worktree | Scope/allowed paths | Expected output | Status | Evidence |\n"
-          "|---|---|---|---|---|---|---|---|\n")
+HEADER = (
+    "## Active delegations\n"
+    "| Delegation ID | Task ID | Owner | Branch/worktree | Scope/allowed paths | Expected output | Status | Evidence |\n"
+    "|---|---|---|---|---|---|---|---|\n"
+)
 
 
 def row(delegation, task, branch, paths, status="IN_PROGRESS"):
@@ -41,7 +43,10 @@ class ClaimTests(unittest.TestCase):
     def test_missing_columns_are_reported(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp) / "state.md"
-            path.write_text("## Active delegations\n| Delegation ID | Owner | Status |\n|---|---|---|\n| D01 | a | CLAIMED |\n", encoding="utf-8")
+            path.write_text(
+                "## Active delegations\n| Delegation ID | Owner | Status |\n|---|---|---|\n| D01 | a | CLAIMED |\n",
+                encoding="utf-8",
+            )
             self.assertTrue(any("must have columns" in e for e in check_claims(path)))
 
 

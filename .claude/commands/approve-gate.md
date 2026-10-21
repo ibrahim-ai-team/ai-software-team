@@ -5,6 +5,7 @@ description: Review a material decision gate before proceeding
 # Approve gate
 
 Summarize the decision requiring sponsor input in plain language:
+
 - Decision and why it matters
 - Options and trade-offs
 - Recommended option and supporting evidence

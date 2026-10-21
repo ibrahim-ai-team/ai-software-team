@@ -1,6 +1,7 @@
 # Requirements Specification
 
 ## Status
+
 Draft / Reviewed / Approved
 
 ## Problem and goals
@@ -8,7 +9,9 @@ Draft / Reviewed / Approved
 ## Users and stakeholders
 
 ## Scope
+
 ### In scope
+
 ### Out of scope
 
 ## Functional requirements

@@ -30,6 +30,30 @@ python3 -m unittest discover -s tests -v
 
 On Windows, use `python` if `python3` is not available.
 
+### Pre-commit hooks (recommended)
+
+The free, open-source [pre-commit](https://pre-commit.com) tool runs the checks above, plus formatting and hygiene hooks, before each commit. Hooks are listed in `.pre-commit-config.yaml`:
+
+| Area | Hooks | Auto-fixes |
+|---|---|---|
+| Branch safety | Block commits on `main` | — |
+| Secrets | gitleaks (same version as CI), private-key detection, block `ANTHROPIC_API_KEY` assignments | — |
+| Python | ruff lint (`ruff.toml`: errors, bugbear, imports, pyupgrade, simplify) and `ruff format` | Yes |
+| Markdown | markdownlint (`.markdownlint-cli2.yaml`) | Yes, where safe |
+| Spelling | codespell | — |
+| Files | trailing whitespace, end-of-file newline, LF line endings, merge markers, case conflicts, files over 500 KB, JSON/YAML/TOML syntax, shebangs | Yes |
+| GitHub config | actionlint, workflow and Dependabot schemas | — |
+| Team checks | `validate_team.py`, cross-references, Markdown links, placeholders, inventory | — |
+| Before push | the full regression test suite | — |
+
+```sh
+pip install pre-commit
+pre-commit install            # installs the pre-commit and pre-push hooks
+pre-commit run --all-files    # optional: check everything once
+```
+
+When a hook fixes files, the commit stops. Review the changes, `git add` them and commit again. The first run downloads the hook tools, which can take a few minutes. The gitleaks and actionlint hooks build with Go, which pre-commit installs itself if Go is missing. `git commit --no-verify` skips the hooks, so CI stays the enforced gate: the **Pre-commit hooks** workflow runs the same formatting, lint and hygiene hooks on every pull request.
+
 ## Changelog and releases
 
 - Add a line under `## Unreleased` in `CHANGELOG.md` for every user-visible change: new or changed agents, skills, commands, templates, workflows, permission rules or CI checks. Internal refactors and typo fixes need no entry.

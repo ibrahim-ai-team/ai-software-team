@@ -1,8 +1,8 @@
 # Agent Delegation Record
 
 - **Delegation ID:** `TASK-<issue-id>-D<sequence>`
-- **Task / Issue:** 
-- **Agent role:** 
+- **Task / Issue:**
+- **Agent role:**
 - **Task status:** BACKLOG / READY / CLAIMED / IN_PROGRESS / BLOCKED / IN_REVIEW / CHANGES_REQUESTED / APPROVED_AWAITING_HUMAN_MERGE / DONE / CANCELLED
 - **Delegation result:** queued / running / completed / partial / blocked / failed / cancelled / rejected
 - **Claim validation:** CONFIRMED / NEEDS_REVALIDATION
@@ -14,23 +14,27 @@
 - **Turn cap (agent `maxTurns`):**
 - **Turn cap hit:** yes / no
 - **Re-delegations after hitting the turn cap (max 1):**
-- **Started at (observed):** 
-- **Returned at (observed):** 
+- **Started at (observed):**
+- **Returned at (observed):**
 
 ## Objective
+
 What outcome is requested?
 
 ## Inputs and context
+
 - Relevant requirements/decisions:
 - Files, code, or links supplied:
 
 ## Expected output
+
 - Deliverables:
 - Acceptance checks:
 - Dependencies:
 - Exclusive file ownership / branch / worktree:
 
 ## Standard agent return (copy the fields below into the coordinator record)
+
 - **Delegation ID:**
 - **Delegation result:**
 - **Changed paths:**
@@ -43,9 +47,11 @@ What outcome is requested?
 - **Next recommendation:**
 
 ## Result reported by agent
+
 Summarize only the actual response and artifacts returned. Do not treat an agent's claim as independent verification.
 
 ## Coordinator disposition
+
 - **Disposition:** accepted / needs changes / partial / blocked / rejected / not yet reviewed
 - **Files/commits/PRs inspected:**
 - **Acceptance criteria checked:**
@@ -55,6 +61,7 @@ Summarize only the actual response and artifacts returned. Do not treat an agent
 - **Next action and owner:**
 
 ## Reconciliation checklist
+
 - [ ] Status reflects the latest observed result.
 - [ ] Artifacts and evidence are linked.
 - [ ] Reported claims are distinguished from verified facts.

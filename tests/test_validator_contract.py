@@ -1,10 +1,11 @@
 """Regression tests for the public static validator contract."""
-from pathlib import Path
+
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 AGENTS = ROOT / ".claude" / "agents"
@@ -56,11 +57,7 @@ class ValidatorRegressionTests(unittest.TestCase):
     def test_security_reviewer_is_read_only(self):
         path = AGENTS / "code-review-security.md"
         self.assertTrue(path.is_file(), "Security reviewer agent is missing")
-        tools = {
-            tool.strip()
-            for tool in read_frontmatter(path).get("tools", "").split(",")
-            if tool.strip()
-        }
+        tools = {tool.strip() for tool in read_frontmatter(path).get("tools", "").split(",") if tool.strip()}
         forbidden = {"Edit", "Write", "Bash"} & tools
         self.assertFalse(forbidden, f"Security reviewer must remain read-only: {sorted(forbidden)}")
 
@@ -92,7 +89,6 @@ class ValidatorRegressionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("permission deny rule missing", result.stdout)
 
-
     def test_mock_discovery_smoke_passes(self):
         result = subprocess.run(
             [sys.executable, "scripts/smoke_discovery.py"],
@@ -110,6 +106,7 @@ class ValidatorRegressionTests(unittest.TestCase):
             shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", "__pycache__", ".venv", "venv"))
             manifest_path = copy / ".claude/manifest.json"
             import json
+
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
             manifest["inventory"]["agents"]["minimum_count"] = 999
             manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
@@ -137,12 +134,12 @@ class ValidatorRegressionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("read-only", result.stdout)
 
-
     def test_validator_rejects_manifest_minimum_below_hard_floor(self):
         with tempfile.TemporaryDirectory() as temporary:
             copy = Path(temporary) / "repo"
             shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", "__pycache__", ".venv", "venv"))
             import json
+
             path = copy / ".claude/manifest.json"
             manifest = json.loads(path.read_text(encoding="utf-8"))
             manifest["inventory"]["agents"]["minimum_count"] = 17
@@ -156,6 +153,7 @@ class ValidatorRegressionTests(unittest.TestCase):
             copy = Path(temporary) / "repo"
             shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", "__pycache__", ".venv", "venv"))
             import json
+
             path = copy / ".claude/manifest.json"
             manifest = json.loads(path.read_text(encoding="utf-8"))
             manifest["inventory"]["agents"]["directory"] = "../outside"
@@ -197,7 +195,6 @@ class ValidatorRegressionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("full commit SHAs", result.stdout)
 
-
     def test_validator_rejects_agent_reference_to_missing_skill(self):
         with tempfile.TemporaryDirectory() as temporary:
             copy = Path(temporary) / "repo"
@@ -225,20 +222,19 @@ class ValidatorRegressionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("missing a Relevant skills section", result.stdout)
 
-
     def test_validator_rejects_missing_high_risk_command_deny(self):
         with tempfile.TemporaryDirectory() as temporary:
             copy = Path(temporary) / "repo"
             shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", "__pycache__", ".venv", "venv"))
             settings_path = copy / ".claude/settings.json"
             import json
+
             settings = json.loads(settings_path.read_text(encoding="utf-8"))
             settings["permissions"]["deny"].remove("Bash(terraform apply*)")
             settings_path.write_text(json.dumps(settings), encoding="utf-8")
             result = self.run_validator(copy)
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("Bash(terraform apply*)", result.stdout)
-
 
     def test_validator_rejects_missing_secret_read_deny(self):
         for rule in ("Read(./.env.*)", "Read(./**/*.pem)", "Read(./**/*.key)"):
@@ -247,6 +243,7 @@ class ValidatorRegressionTests(unittest.TestCase):
                 shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", "__pycache__", ".venv", "venv"))
                 settings_path = copy / ".claude/settings.json"
                 import json
+
                 settings = json.loads(settings_path.read_text(encoding="utf-8"))
                 settings["permissions"]["deny"].remove(rule)
                 settings_path.write_text(json.dumps(settings), encoding="utf-8")
@@ -263,6 +260,7 @@ class ValidatorRegressionTests(unittest.TestCase):
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("Manifest root must be a JSON object", result.stdout)
             self.assertNotIn("Traceback", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

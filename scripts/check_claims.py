@@ -8,8 +8,9 @@ check run by the single coordinator, not a distributed lock.
 
 Usage: check_claims.py <project-state.md> [...]
 """
-from pathlib import Path
+
 import sys
+from pathlib import Path
 
 ACTIVE = {"claimed", "in_progress", "in progress"}
 REQUIRED = ("delegation id", "task id", "owner", "branch/worktree", "scope/allowed paths", "status")
@@ -31,13 +32,14 @@ def parse_rows(text: str) -> list[tuple[int, dict[str, str]]]:
         if not header:
             header = [cell.lower() for cell in cells]
         elif not all(set(cell) <= set("-: ") for cell in cells):
-            rows.append((line_number, dict(zip(header, cells))))
+            rows.append((line_number, dict(zip(header, cells, strict=False))))
     return rows
 
 
 def paths_overlap(left: str, right: str) -> bool:
     def norm(path: str) -> str:
         return path.strip().strip("`").rstrip("*").rstrip("/")
+
     a, b = norm(left), norm(right)
     return a == b or a == "" or b == "" or a.startswith(b + "/") or b.startswith(a + "/")
 
@@ -50,7 +52,7 @@ def check_claims(path: Path) -> list[str]:
     active = [(n, r) for n, r in rows if r.get("status", "").lower() in ACTIVE]
     errors: list[str] = []
     for index, (line_a, a) in enumerate(active):
-        for line_b, b in active[index + 1:]:
+        for line_b, b in active[index + 1 :]:
             where = f"{path}:{line_b}: {b['delegation id']} conflicts with {a['delegation id']} (line {line_a})"
             if a["task id"] and a["task id"] == b["task id"]:
                 errors.append(f"{where}: same task {a['task id']} claimed twice")

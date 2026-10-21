@@ -13,7 +13,7 @@ This document is a configuration blueprint. It does not create a Project or chan
 Configure these fields on each application Project. If a field already exists, reuse it; do not create a duplicate with a slightly different name.
 
 | Field | Type | Options / convention | Purpose |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Status | Single select | Backlog, Ready, In Progress, In Review, Changes Requested, Approved — Awaiting Human Merge, Blocked, Done | Canonical workflow state |
 | Priority | Single select | P0, P1, P2, P3 | Ordering and escalation |
 | Iteration | Iteration field | Two-week iterations | Sprint membership |
