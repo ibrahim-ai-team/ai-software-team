@@ -11,7 +11,7 @@ Use the fewest agents needed for each task. The coordinator should not delegate 
 Each agent declares an explicit `tools:` allowlist in its frontmatter; the static validator requires it. Allowlists are a starting point and should be tightened per project.
 
 | Agent group | Tools | Rationale |
-|---|---|---|
+| --- | --- | --- |
 | Orchestrator (`agile-orchestrator` only) | Agent, Read, Grep, Glob, Edit, Write, Bash | Delegates to specialists; the validator rejects `Agent` on any other agent, so specialists cannot spawn agents |
 | Implementation and delivery roles | Read, Grep, Glob, Edit, Write, Bash | Implement changes and run checks where authorized |
 | Planning/documentation roles | Read, Grep, Glob, Edit, Write | Prepare requirements, plans and documentation |

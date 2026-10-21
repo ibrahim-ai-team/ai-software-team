@@ -5,7 +5,7 @@ Version 2, 2026-10-20. Replaces the dollar budgets of version 1. Turn-cap enforc
 ## Operating model: Claude Pro subscription only
 
 | Setting | Value |
-|---|---|
+| --- | --- |
 | Plan | Claude Pro, used through Claude Code. No Claude API, API keys, API credits or extra-usage purchases |
 | Sprint length | 2 weeks |
 | Sessions per sprint | about 4–6 (a few times a week; nothing runs while Claude Code is closed) |
@@ -26,7 +26,7 @@ Sources: [Using Claude Code with your Pro or Max plan](https://support.claude.co
 Score each task on scope, uncertainty, dependencies, test burden and risk, and use the highest:
 
 | Points | Size | Effort field | Typical task | Rule |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | 1 | XS | Low | Copy, config or doc change in one file; known pattern | — |
 | 2 | S | Low | One endpoint, component or migration with its tests | — |
 | 3 | M | Medium | A story slice touching up to ~5 files, with tests | Default size for implementation tasks |
@@ -40,7 +40,7 @@ Score each task on scope, uncertainty, dependencies, test burden and risk, and u
 Every delegation uses subscription usage: the subagent reads its own context, and its result returns to the orchestrator. Delegate only when a role's expertise or a separate context window helps.
 
 | Delegation | Turn cap (enforced) | Typical count per story |
-|---|---|---|
+| --- | --- | --- |
 | Planning or analysis (PO, BA, architect, UX, PM, research, docs) | 25 | 0–1; planning happens once per sprint, not per story |
 | Read-only review (`tech-lead`, `code-review-security`) | 40 | 2 (one of each) |
 | Specialist checks (performance, SRE, release) | 40 | 0; only when the story's acceptance criteria need them |
@@ -51,7 +51,7 @@ A typical M story uses about **4–5 delegations**: implementation, QA, two revi
 
 ## Sprint capacity
 
-```
+```text
 delegation limit = 4–6 delegations per session     # one story's delegations, plus resume and report
 session limit    = sessions per sprint × 1          # about one story finished per session
 capacity         = session limit − 1 reserve        # 4–6 sessions → 3–5 stories
@@ -62,7 +62,7 @@ Points do not enter the formula. They decide which stories may be committed: an 
 ## What is enforced and what is policy
 
 | Control | Type | Evidence |
-|---|---|---|
+| --- | --- | --- |
 | `maxTurns` in each agent's frontmatter | **Enforced by Claude Code**: the agent stops at the cap and returns a "stopped at its N-turn limit" note | BUD-01: a 2-turn agent stopped after 2 tool calls |
 | Five-hour and weekly usage limits | **Enforced by the subscription**; Claude Code warns before the limit | Anthropic support pages above; outside this kit's control |
 | Delegations per session, one active delegation, capacity | Team policy, applied by `agile-orchestrator` | Not enforced; agents cannot read their own usage |

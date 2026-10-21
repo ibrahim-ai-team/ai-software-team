@@ -26,6 +26,7 @@
 ## User involvement
 
 The team should run routine planning and execution without requiring the user to assign every task or approve every sprint item. The Project Manager may continue with already-scoped, reversible work. Ask for user input only when:
+
 - a material product question has no safe, documented assumption;
 - requirements conflict or a business decision changes expected behavior;
 - an action would spend money, enable a paid service, change access/visibility, deploy to production, destroy data, or make an irreversible change;
@@ -54,6 +55,7 @@ Never mark an issue Done merely because local implementation or approval exists.
 ## Project Manager daily operating loop
 
 At the start of each active session:
+
 1. Read the project status summary, latest handover, active sprint, open Issues, open PRs, recent CI results, unresolved review comments, blockers, and pending user decisions.
 2. Reconcile these sources; do not assume yesterday's conversation is the only source of truth.
 3. Select the next highest-priority Ready work based on sprint goal, dependencies, risk, and work-in-progress limits.
@@ -61,6 +63,7 @@ At the start of each active session:
 5. Follow up on outputs, inspect evidence, request fixes when necessary, and update durable records.
 
 Before ending a session:
+
 1. Reconcile every delegation ID to a state: completed, partial, in progress, blocked, failed, cancelled, or rejected.
 2. Link outputs to Issues, PRs/commits, ADRs, CI/test evidence, or follow-up tasks.
 3. Update issue/project statuses and the current project-state summary.
@@ -79,6 +82,7 @@ Sprints last two weeks unless the project records a different length. The `proje
 ## Task claiming and local execution
 
 Before coding, the developer agent must:
+
 1. Read the issue, acceptance criteria, linked decisions, repo instructions, and relevant implementation.
 2. Confirm the issue is Ready, dependencies are met, and no other agent owns implementation.
 3. State a short plan and expected files/checks.

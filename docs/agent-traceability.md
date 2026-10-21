@@ -23,6 +23,7 @@ When sources disagree, do not silently choose the optimistic status. Record the 
 Give each delegated assignment a stable ID within the project, for example TASK-142-D01. Reuse that ID when updating the same assignment; create a new suffix for a genuinely new delegation. Include the ID in the issue comment, handover, or local activity record so that outputs can be traced.
 
 A delegation record should include:
+
 - linked issue/task and agent role;
 - objective, context/inputs, expected output, acceptance checks;
 - dependencies and exclusive file ownership;
@@ -51,6 +52,7 @@ A delegation can be completed while its output is still unreviewed. A PR can be 
 ## Coordinator protocol
 
 ### Before delegation
+
 1. Read the task, repo instructions, acceptance criteria, relevant decisions, and current state.
 2. Confirm readiness, dependencies, and file ownership.
 3. Create a unique delegation ID.
@@ -58,6 +60,7 @@ A delegation can be completed while its output is still unreviewed. A PR can be 
 5. Record the delegation as queued/running in the issue or local activity log.
 
 ### After delegation
+
 1. Record the actual returned result, not an imagined result.
 2. Inspect the changed files/diff and evidence relevant to the acceptance criteria.
 3. Decide whether to accept, request changes, mark partial, or escalate.
@@ -66,6 +69,7 @@ A delegation can be completed while its output is still unreviewed. A PR can be 
 6. Ensure only one implementation owner edits a given working tree at a time. Compare `git diff --name-only` against allowed paths before accepting output; treat this as coordinator verification, not a runtime sandbox.
 
 ### At session end
+
 Reconcile every delegation from the session. No delegation may disappear from the report merely because its output was incomplete. Update the project-state summary and handover; list the next 1–3 actions.
 
 ## Meaningful activity events
@@ -77,6 +81,7 @@ Do not generate fake timestamps, fabricate tool calls, or claim that an agent wo
 ## Daily report requirements
 
 Use templates/daily-project-report-template.md. Include:
+
 - report date/time and the evidence snapshot boundary;
 - current product/sprint goal;
 - verified completed items and links;

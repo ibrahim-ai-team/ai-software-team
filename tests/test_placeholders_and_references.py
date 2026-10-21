@@ -29,8 +29,10 @@ class PlaceholderTests(unittest.TestCase):
         self.assertEqual(self.scan({"templates/sprint-plan-template.md": "- Sprint goal: TBD\n"}), [])
 
     def test_allows_tracked_deferral_prose_and_code(self):
-        content = ("- Estimate: TBD (refine in #12)\n- Dates: TBD by 2026-11-01\n"
-                   "Mark it TBD with a refinement task.\n```\nOwner: TBD\n```\n")
+        content = (
+            "- Estimate: TBD (refine in #12)\n- Dates: TBD by 2026-11-01\n"
+            "Mark it TBD with a refinement task.\n```\nOwner: TBD\n```\n"
+        )
         self.assertEqual(self.scan({"docs/plan.md": content}), [])
 
     def test_repository_has_no_unresolved_placeholders(self):
@@ -61,12 +63,21 @@ class CrossReferenceTests(unittest.TestCase):
 
     def test_rejects_name_mismatch_unknown_key_and_model(self):
         relative = ".claude/agents/business-analyst.md"
-        self.assertTrue(any("does not match file name" in e for e in
-                            self.mutated(relative, "name: business-analyst", "name: analyst")))
-        self.assertTrue(any("unknown frontmatter key 'colour'" in e for e in
-                            self.mutated(relative, "name: business-analyst", "name: business-analyst\ncolour: blue")))
-        self.assertTrue(any("model 'gpt-x'" in e for e in
-                            self.mutated(relative, "name: business-analyst", "name: business-analyst\nmodel: gpt-x")))
+        self.assertTrue(
+            any("does not match file name" in e for e in self.mutated(relative, "name: business-analyst", "name: analyst"))
+        )
+        self.assertTrue(
+            any(
+                "unknown frontmatter key 'colour'" in e
+                for e in self.mutated(relative, "name: business-analyst", "name: business-analyst\ncolour: blue")
+            )
+        )
+        self.assertTrue(
+            any(
+                "model 'gpt-x'" in e
+                for e in self.mutated(relative, "name: business-analyst", "name: business-analyst\nmodel: gpt-x")
+            )
+        )
 
     def test_accepts_documented_model_values(self):
         relative = ".claude/agents/business-analyst.md"
@@ -98,8 +109,9 @@ class OrchestrationContractTests(unittest.TestCase):
                 text = path.read_text(encoding="utf-8")
                 self.assertIn(old, text)
                 path.write_text(text.replace(old, new, 1), encoding="utf-8")
-            return subprocess.run([sys.executable, "scripts/validate_team.py"], cwd=target,
-                                  capture_output=True, text=True, check=False)
+            return subprocess.run(
+                [sys.executable, "scripts/validate_team.py"], cwd=target, capture_output=True, text=True, check=False
+            )
 
     def test_only_orchestrator_may_delegate(self):
         result = self.run_validator(".claude/agents/tech-lead.md", "tools: Read,", "tools: Agent, Read,")
@@ -119,8 +131,9 @@ class OrchestrationContractTests(unittest.TestCase):
     def test_tech_lead_cannot_regain_edit_tools(self):
         for tool in ("Edit", "Write", "Bash"):
             with self.subTest(tool=tool):
-                result = self.run_validator(".claude/agents/tech-lead.md", "tools: Read, Grep, Glob",
-                                            f"tools: Read, Grep, Glob, {tool}")
+                result = self.run_validator(
+                    ".claude/agents/tech-lead.md", "tools: Read, Grep, Glob", f"tools: Read, Grep, Glob, {tool}"
+                )
                 self.assertEqual(result.returncode, 1, result.stdout)
                 self.assertIn("tech-lead must remain read-only", result.stdout)
 
@@ -146,9 +159,14 @@ class OrchestrationContractTests(unittest.TestCase):
 
     def test_operating_model_has_no_dollar_budgets(self):
         # Pro-subscription model: usage is sessions, delegations and turn caps, never $ budgets.
-        paths = [ROOT / "standards" / "sprint-sizing.md", ROOT / "workflows" / "orchestration-contract.md",
-                 *(ROOT / "templates").glob("*.md"), *(ROOT / ".claude" / "agents").glob("*.md"),
-                 *(ROOT / ".claude" / "commands").glob("*.md"), *(ROOT / ".claude" / "skills").glob("*/SKILL.md")]
+        paths = [
+            ROOT / "standards" / "sprint-sizing.md",
+            ROOT / "workflows" / "orchestration-contract.md",
+            *(ROOT / "templates").glob("*.md"),
+            *(ROOT / ".claude" / "agents").glob("*.md"),
+            *(ROOT / ".claude" / "commands").glob("*.md"),
+            *(ROOT / ".claude" / "skills").glob("*/SKILL.md"),
+        ]
         for path in paths:
             text = path.read_text(encoding="utf-8")
             with self.subTest(path=path.relative_to(ROOT).as_posix()):
@@ -160,8 +178,9 @@ class OrchestrationContractTests(unittest.TestCase):
         self.assertIn("ANTHROPIC_API_KEY", (ROOT / "standards" / "sprint-sizing.md").read_text(encoding="utf-8"))
 
     def test_ineffective_write_path_rules_are_rejected(self):
-        result = self.run_validator(".claude/settings.json", '"Edit(./.claude/settings.json)",',
-                                    '"Edit(./.claude/settings.json)", "Write(./docs/x.md)",')
+        result = self.run_validator(
+            ".claude/settings.json", '"Edit(./.claude/settings.json)",', '"Edit(./.claude/settings.json)", "Write(./docs/x.md)",'
+        )
         self.assertEqual(result.returncode, 1, result.stdout)
         self.assertIn("ineffective path rule Write(./docs/x.md)", result.stdout)
 

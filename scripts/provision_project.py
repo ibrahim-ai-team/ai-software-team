@@ -11,6 +11,7 @@ The team produces a project plan (see templates/project-plan.example.json). This
 GitHub calls go through a client object. `GhClient` uses the authenticated `gh` CLI of the person
 running it; tests use an in-memory fake. Nothing here reads or prints tokens.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -45,7 +46,7 @@ RETRY_DELAYS = (5, 20)  # seconds; secondary rate limits need longer than a seco
 PERMISSIONS = {
     "list_repos": "read access to the organization's repositories",
     "create_repo": "permission to create repositories in the organization (org owner, or members allowed "
-                   "to create repositories); token scope `repo` (classic) or fine-grained Administration: write",
+    "to create repositories); token scope `repo` (classic) or fine-grained Administration: write",
     "topics": "repository Administration: write (or admin role) to set topics",
     "contents": "repository Contents: write to create the bootstrap branch and files",
     "pulls": "repository Pull requests: write to open the bootstrap PR",
@@ -54,7 +55,7 @@ PERMISSIONS = {
     "issues": "repository Issues: write to create and update issues",
     "protection": "repository Administration: write (admin role) to configure branch protection",
     "project": "organization Projects: read and write; token scope `project` (classic) or fine-grained "
-               "organization Projects: write",
+    "organization Projects: write",
 }
 
 
@@ -91,7 +92,7 @@ NETWORK_RE = re.compile(r"connect|timed? ?out|timeout|EOF|TLS|temporar|reset by 
 def classify(status: int | None, message: str) -> GitHubError:
     message = redact(message)
     if status == 403 and "rate limit" in message.lower():
-        return TransientError(status, message)   # secondary rate limits are reported as 403
+        return TransientError(status, message)  # secondary rate limits are reported as 403
     if status in (401, 403):
         return PermissionDenied(status, message)
     if status == 429 or (status is not None and status >= 500):
@@ -103,6 +104,7 @@ def classify(status: int | None, message: str) -> GitHubError:
 
 # ---------------------------------------------------------------- planning
 
+
 def slugify(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
@@ -113,7 +115,7 @@ def _repo_project_ids(repo) -> set[str]:
         repo = {"name": repo}
     ids = set(TAG_RE.findall(repo.get("description") or ""))
     ids |= {t for t in repo.get("topics") or [] if ID_RE.match(t)}
-    if (m := re.match(r"^(idea-\d+)-", repo.get("name", ""))):
+    if m := re.match(r"^(idea-\d+)-", repo.get("name", "")):
         ids.add(m.group(1))
     return ids
 
@@ -158,8 +160,9 @@ def validate_plan(raw: dict, existing_repos: list | None = None) -> dict:
         errors.append("project.name (the app name the sponsor proposed or confirmed, e.g. Shopinow) is required")
     project["slug"] = slug = project.get("slug") or slugify(str(project.get("name", "")))
     if not (SLUG_RE.match(slug) and len(slug) <= 40) or slug in RESERVED_SLUGS or ID_RE.match(slug):
-        errors.append(f"project.slug '{slug}' must be lowercase words joined by '-', max 40 characters, "
-                      "not reserved and not an idea-NN ID")
+        errors.append(
+            f"project.slug '{slug}' must be lowercase words joined by '-', max 40 characters, not reserved and not an idea-NN ID"
+        )
     for repo in existing_repos or []:
         name = repo if isinstance(repo, str) else repo.get("name", "")
         owners = _repo_project_ids(repo)
@@ -191,11 +194,16 @@ def validate_plan(raw: dict, existing_repos: list | None = None) -> dict:
         if not ROLE_RE.match(str(role)):
             errors.append(f"repository role '{role}' must be lowercase letters, digits or '-' (max 30)")
             continue
-        repo = {"role": role, "name": f"{slug}-{role}", "coordination": role == COORDINATION_ROLE,
-                "purpose": spec.get("purpose") or ("Project coordination: requirements, ADRs, backlog and status"
-                                                     if role == COORDINATION_ROLE else ""),
-                "stack": spec.get("stack", ""), "testing": spec.get("testing", ""),
-                "setup": spec.get("setup", "")}
+        repo = {
+            "role": role,
+            "name": f"{slug}-{role}",
+            "coordination": role == COORDINATION_ROLE,
+            "purpose": spec.get("purpose")
+            or ("Project coordination: requirements, ADRs, backlog and status" if role == COORDINATION_ROLE else ""),
+            "stack": spec.get("stack", ""),
+            "testing": spec.get("testing", ""),
+            "setup": spec.get("setup", ""),
+        }
         if not repo["coordination"]:
             for key in ("purpose", "stack", "testing"):
                 if not str(repo[key]).strip():
@@ -205,7 +213,7 @@ def validate_plan(raw: dict, existing_repos: list | None = None) -> dict:
         errors.append("repository roles must be unique")
     if not repos:
         errors.append("no repositories derived from the plan")
-    home = repos[0]["role"] if repos else ""   # coordination repo, or the only app repo
+    home = repos[0]["role"] if repos else ""  # coordination repo, or the only app repo
 
     sprint = plan.setdefault("sprint", {})
     sprint.setdefault("length_days", 14)
@@ -268,33 +276,35 @@ def _cycles(keys: dict[str, dict]) -> list[str]:
             return None
         state[k] = 1
         for d in keys[k]["depends_on"]:
-            if (cycle := visit(d, path + [k])):
+            if cycle := visit(d, path + [k]):
                 return cycle
         state[k] = 2
         return None
 
     for k in keys:
-        if (cycle := visit(k, [])):
+        if cycle := visit(k, []):
             return [f"dependency cycle: {cycle}"]
     return []
 
 
 def render_tree(plan: dict, with_files: bool = True) -> str:
     pid, org = plan["project"]["id"], plan["organization"]
-    lines = [f"{org}/  (GitHub organization; repositories cannot be nested, so the 'apps' grouping is",
-             f"        the app-name prefix + topics '{APP_TOPIC}', '{pid}' + one Project board)",
-             f"└── {plan['project']['slug']}  \"{plan['project']['name']}\" (project {pid})  "
-             f"[{plan['architecture']['style']}, {plan['visibility']}]"]
+    lines = [
+        f"{org}/  (GitHub organization; repositories cannot be nested, so the 'apps' grouping is",
+        f"        the app-name prefix + topics '{APP_TOPIC}', '{pid}' + one Project board)",
+        f'└── {plan["project"]["slug"]}  "{plan["project"]["name"]}" (project {pid})  '
+        f"[{plan['architecture']['style']}, {plan['visibility']}]",
+    ]
     for i, repo in enumerate(plan["repos"]):
         last = i == len(plan["repos"]) - 1
         lines.append(f"    {'└──' if last else '├──'} {repo['name']}  — {repo['purpose']}")
         pad = "    " if last else "│   "
-        for f in (scaffold_files(plan, repo) if with_files else []):
+        for f in scaffold_files(plan, repo) if with_files else []:
             lines.append(f"    {pad}    {f}")
     counts: dict[str, int] = {}
     for item in plan["backlog"]:
         counts[item["repo"]] = counts.get(item["repo"], 0) + 1
-    lines.append(f"    GitHub Project: \"{project_title(plan)}\" linking {len(plan['repos'])} repositories")
+    lines.append(f'    GitHub Project: "{project_title(plan)}" linking {len(plan["repos"])} repositories')
     lines.append("    Issues: " + ", ".join(f"{plan['project']['slug']}-{r}: {n}" for r, n in counts.items()))
     lines.append(f"    Milestones: {plan['sprint']['count']} x {plan['sprint']['length_days']}-day sprint(s) per repository")
     return "\n".join(lines)
@@ -310,43 +320,75 @@ def repo_tag(plan: dict) -> str:
 
 # ---------------------------------------------------------------- scaffold content
 
+
 def scaffold_files(plan: dict, repo: dict) -> dict[str, str]:
     pid, org, name = plan["project"]["id"], plan["organization"], plan["project"]["name"]
     links = "\n".join(f"| [`{r['name']}`](https://github.com/{org}/{r['name']}) | {r['purpose']} |" for r in plan["repos"])
     home = next(r for r in plan["repos"] if r["role"] == plan["home_role"])
-    readme = [f"# {repo['name']}", "", f"Part of **{name}** (project `{pid}`). {repo['purpose']}.", "",
-              "## Project repositories", "", "| Repository | Purpose |", "|---|---|", links, "",
-              f"Planning and status live in [`{home['name']}`](https://github.com/{org}/{home['name']}) and the "
-              f"GitHub Project \"{project_title(plan)}\". Issues carry the label `project:{pid}`.", ""]
+    readme = [
+        f"# {repo['name']}",
+        "",
+        f"Part of **{name}** (project `{pid}`). {repo['purpose']}.",
+        "",
+        "## Project repositories",
+        "",
+        "| Repository | Purpose |",
+        "|---|---|",
+        links,
+        "",
+        f"Planning and status live in [`{home['name']}`](https://github.com/{org}/{home['name']}) and the "
+        f'GitHub Project "{project_title(plan)}". Issues carry the label `project:{pid}`.',
+        "",
+    ]
     if not repo["coordination"]:
-        readme += ["## Development", "", f"Stack: {repo['stack']}.", "",
-                   repo["setup"] or "Setup steps are added with the first implementation story.", "",
-                   "## Testing", "", repo["testing"], ""]
+        readme += [
+            "## Development",
+            "",
+            f"Stack: {repo['stack']}.",
+            "",
+            repo["setup"] or "Setup steps are added with the first implementation story.",
+            "",
+            "## Testing",
+            "",
+            repo["testing"],
+            "",
+        ]
     files = {
         "README.md": "\n".join(readme),
-        "CONTRIBUTING.md": (f"# Contributing\n\nWork on a feature branch and open a pull request. Link the issue "
-                            f"(`Closes #n`). CI must pass. Only @{plan['owner']} merges pull requests. Agents "
-                            f"never push to `main` or merge. Sprints are {plan['sprint']['length_days']} days.\n"),
-        "SECURITY.md": (f"# Security\n\nReport vulnerabilities privately to @{plan['owner']}; do not open a public "
-                        "issue. Never commit secrets, tokens or credentials; use the platform's secret store.\n"),
+        "CONTRIBUTING.md": (
+            f"# Contributing\n\nWork on a feature branch and open a pull request. Link the issue "
+            f"(`Closes #n`). CI must pass. Only @{plan['owner']} merges pull requests. Agents "
+            f"never push to `main` or merge. Sprints are {plan['sprint']['length_days']} days.\n"
+        ),
+        "SECURITY.md": (
+            f"# Security\n\nReport vulnerabilities privately to @{plan['owner']}; do not open a public "
+            "issue. Never commit secrets, tokens or credentials; use the platform's secret store.\n"
+        ),
         ".github/CODEOWNERS": f"* @{plan['owner']}\n",
-        ".github/pull_request_template.md": ("## Summary\n\n## Linked issue\nCloses #\n\n## Tests run\n| Check | "
-                                             "Result |\n|---|---|\n\n## Human merge\n- [ ] Owner reviews and merges\n"),
+        ".github/pull_request_template.md": (
+            "## Summary\n\n## Linked issue\nCloses #\n\n## Tests run\n| Check | "
+            "Result |\n|---|---|\n\n## Human merge\n- [ ] Owner reviews and merges\n"
+        ),
     }
     if repo["role"] == plan["home_role"]:
         files["docs/requirements.md"] = "# Requirements\n\n" + "\n".join(f"- {r}" for r in plan.get("requirements", [])) + "\n"
-        files["docs/adr/0001-architecture.md"] = (f"# ADR-0001: {plan['architecture']['style']} architecture\n\n"
-                                                 f"Status: Accepted by @{plan['owner']} via plan approval\n\n"
-                                                 f"{plan['architecture']['decision']}\n")
+        files["docs/adr/0001-architecture.md"] = (
+            f"# ADR-0001: {plan['architecture']['style']} architecture\n\n"
+            f"Status: Accepted by @{plan['owner']} via plan approval\n\n"
+            f"{plan['architecture']['decision']}\n"
+        )
         files["docs/repository-plan.md"] = "# Repository plan\n\n```\n" + render_tree(plan, with_files=False) + "\n```\n"
-        files["docs/project-plan.json"] = json.dumps({k: v for k, v in plan.items() if k not in ("repos", "home_role")},
-                                                     indent=2, sort_keys=True) + "\n"
+        files["docs/project-plan.json"] = (
+            json.dumps({k: v for k, v in plan.items() if k not in ("repos", "home_role")}, indent=2, sort_keys=True) + "\n"
+        )
         files["docs/project-state.md"] = (
             f"# Project state — {name} ({pid})\n\nCurrent phase: BACKLOG_READY (workspace provisioned from the "
             f"approved plan).\nSprint length: {plan['sprint']['length_days']} days, first sprint starts "
-            f"{plan['sprint']['start']}.\n\n## Repositories\n\n" + "\n".join(f"- {r['name']}: {r['purpose']}" for r in plan["repos"])
+            f"{plan['sprint']['start']}.\n\n## Repositories\n\n"
+            + "\n".join(f"- {r['name']}: {r['purpose']}" for r in plan["repos"])
             + "\n\n## Next action\n\nOwner merges the bootstrap PRs; then `agile-orchestrator` runs `/plan-sprint`.\n"
-              "See `docs/provisioning-report.md` for created resources and manual steps.\n")
+            "See `docs/provisioning-report.md` for created resources and manual steps.\n"
+        )
     return files
 
 
@@ -354,10 +396,23 @@ def issue_body(plan: dict, item: dict, resolved: dict[str, str]) -> str:
     deps = [f"- Depends on: {resolved.get(d, d + ' (link pending)')}" for d in item["depends_on"]] or ["- None"]
     criteria = [f"- [ ] {c}" for c in item.get("acceptance_criteria", [])] or ["- Not applicable"]
     sprint = f" · Sprint: {item['sprint']}" if "sprint" in item else ""
-    return "\n".join([item.get("description", "").strip(), "", "## Acceptance criteria", *criteria, "",
-                      "## Dependencies", *deps, "",
-                      f"Project: {plan['project']['id']} · Priority: {item['priority']}{sprint}",
-                      f"<!-- ai-team-key: {plan['project']['id']}/{item['key']} -->"]).lstrip() + "\n"
+    return (
+        "\n".join(
+            [
+                item.get("description", "").strip(),
+                "",
+                "## Acceptance criteria",
+                *criteria,
+                "",
+                "## Dependencies",
+                *deps,
+                "",
+                f"Project: {plan['project']['id']} · Priority: {item['priority']}{sprint}",
+                f"<!-- ai-team-key: {plan['project']['id']}/{item['key']} -->",
+            ]
+        ).lstrip()
+        + "\n"
+    )
 
 
 KEY_RE = re.compile(r"<!-- ai-team-key: (idea-\d+)/([A-Z][A-Z0-9]*-\d+) -->")
@@ -365,13 +420,21 @@ KEY_RE = re.compile(r"<!-- ai-team-key: (idea-\d+)/([A-Z][A-Z0-9]*-\d+) -->")
 
 # ---------------------------------------------------------------- provisioning engine
 
+
 class Provisioner:
     def __init__(self, client, plan: dict, state_path: Path, sleep=time.sleep, dry_run: bool = False):
         self.gh, self.plan, self.path, self.sleep, self.dry_run = client, plan, state_path, sleep, dry_run
         self.org, self.pid, self.slug = plan["organization"], plan["project"]["id"], plan["project"]["slug"]
-        self.state = {"project_id": self.pid, "plan_digest": plan_digest(plan),
-                      "dry_run": dry_run, "phase": "PROVISIONING", "steps": {}, "resources": {},
-                      "manual_actions": [], "started_at": _now()}
+        self.state = {
+            "project_id": self.pid,
+            "plan_digest": plan_digest(plan),
+            "dry_run": dry_run,
+            "phase": "PROVISIONING",
+            "steps": {},
+            "resources": {},
+            "manual_actions": [],
+            "started_at": _now(),
+        }
         self.issues: dict[str, dict] = {}
 
     # -- bookkeeping
@@ -382,7 +445,9 @@ class Provisioner:
             self.path.write_text(json.dumps(self.state, indent=2) + "\n", encoding="utf-8")
 
     def step(self, step_id: str, op: str, fn, needs: tuple[str, ...] = ()) -> str:
-        blocked = [n for n in needs if self.state["steps"].get(n, {}).get("status") not in ("CREATED", "EXISTS", "UPDATED", "DRY_RUN")]
+        blocked = [
+            n for n in needs if self.state["steps"].get(n, {}).get("status") not in ("CREATED", "EXISTS", "UPDATED", "DRY_RUN")
+        ]
         if blocked:
             return self._record(step_id, "SKIPPED_DEPENDENCY", f"waiting on {', '.join(blocked)}")
         for attempt in range(MAX_RETRIES + 1):
@@ -397,7 +462,7 @@ class Provisioner:
                 return self._record(step_id, "PERMISSION_DENIED", f"{exc}. Needed: {PERMISSIONS[op]}")
             except GitHubError as exc:
                 return self._record(step_id, "FAILED", str(exc))
-            except Exception as exc:   # never leave the state stuck in PROVISIONING
+            except Exception as exc:  # never leave the state stuck in PROVISIONING
                 return self._record(step_id, "FAILED", redact(f"unexpected {type(exc).__name__}: {exc}"))
         return "FAILED"  # unreachable
 
@@ -429,21 +494,30 @@ class Provisioner:
             if self.plan.get("options", {}).get("branch_protection"):
                 self.step(f"protection:{repo['name']}", "protection", lambda repo=repo: self.protect(repo), (r,))
             else:
-                self.manual(f"Protect `main` in {repo['name']}: require a PR and the repository's CI checks, "
-                            "disallow bypass and force-push (plan option branch_protection was not approved).")
+                self.manual(
+                    f"Protect `main` in {repo['name']}: require a PR and the repository's CI checks, "
+                    "disallow bypass and force-push (plan option branch_protection was not approved)."
+                )
         for item in self.plan["backlog"]:
             name = self.repo_name(item["repo"])
-            self.step(f"issue:{item['key']}", "issues", lambda item=item: self.ensure_issue(item),
-                      (f"labels:{name}", f"milestones:{name}"))
+            self.step(
+                f"issue:{item['key']}",
+                "issues",
+                lambda item=item: self.ensure_issue(item),
+                (f"labels:{name}", f"milestones:{name}"),
+            )
         for item in self.plan["backlog"]:
             if item["depends_on"]:
-                self.step(f"deps:{item['key']}", "issues", lambda item=item: self.link_dependencies(item),
-                          (f"issue:{item['key']}",))
+                self.step(
+                    f"deps:{item['key']}", "issues", lambda item=item: self.link_dependencies(item), (f"issue:{item['key']}",)
+                )
         if self.plan.get("options", {}).get("project_board", True):
             self.step("project", "project", self.ensure_project, tuple(f"repo:{r['name']}" for r in self.plan["repos"]))
-        self.manual("Align the Project's Status options with workflows/project-status-transitions.md "
-                    "(Backlog, Ready, In Progress, In Review, Changes Requested, Approved — Awaiting Human Merge, "
-                    "Blocked, Done) and enable the Project workflows 'Item closed → Done' and 'Auto-add'.")
+        self.manual(
+            "Align the Project's Status options with workflows/project-status-transitions.md "
+            "(Backlog, Ready, In Progress, In Review, Changes Requested, Approved — Awaiting Human Merge, "
+            "Blocked, Done) and enable the Project workflows 'Item closed → Done' and 'Auto-add'."
+        )
         self.manual("Review and merge each bootstrap PR (branch bootstrap/initial-structure); agents do not merge.")
         self._set_phase()
         self.step("report", "contents", self.write_report, (f"scaffold:{self.repo_name(self.plan['home_role'])}",))
@@ -470,8 +544,11 @@ class Provisioner:
             if existing and repo_tag(self.plan) not in (existing.get("description") or ""):
                 foreign.append(repo["name"])
         if foreign:
-            raise GitHubError(409, f"repositories already exist but were not created for {self.pid}: "
-                                   f"{', '.join(foreign)}. Choose another project ID; nothing was changed.")
+            raise GitHubError(
+                409,
+                f"repositories already exist but were not created for {self.pid}: "
+                f"{', '.join(foreign)}. Choose another project ID; nothing was changed.",
+            )
         return "EXISTS", "no conflicting repositories"
 
     def ensure_repo(self, repo):
@@ -480,8 +557,7 @@ class Provisioner:
         if self.gh.get_repo(self.org, repo["name"]):
             return "EXISTS", url
         if not self.dry_run:
-            self.gh.create_repo(self.org, repo["name"], f"{repo['purpose']} {repo_tag(self.plan)}",
-                                self.plan["visibility"])
+            self.gh.create_repo(self.org, repo["name"], f"{repo['purpose']} {repo_tag(self.plan)}", self.plan["visibility"])
         return "CREATED", url
 
     def ensure_topics(self, repo):
@@ -495,8 +571,7 @@ class Provisioner:
 
     def labels_for(self, role):
         items = [i for i in self.plan["backlog"] if i["repo"] == role]
-        return ({f"project:{self.pid}"} | {f"type:{i['type']}" for i in items}
-                | {f"priority:{i['priority']}" for i in items})
+        return {f"project:{self.pid}"} | {f"type:{i['type']}" for i in items} | {f"priority:{i['priority']}" for i in items}
 
     def ensure_labels(self, repo):
         existing = self.gh.list_labels(self.org, repo["name"]) if self.gh.get_repo(self.org, repo["name"]) else set()
@@ -513,8 +588,7 @@ class Provisioner:
     def milestone_titles(self):
         start = dt.date.fromisoformat(self.plan["sprint"]["start"])
         days = self.plan["sprint"]["length_days"]
-        return {n: (f"Sprint {n}", start + dt.timedelta(days=days * n - 1))
-                for n in range(1, self.plan["sprint"]["count"] + 1)}
+        return {n: (f"Sprint {n}", start + dt.timedelta(days=days * n - 1)) for n in range(1, self.plan["sprint"]["count"] + 1)}
 
     def ensure_milestones(self, repo):
         existing = self.gh.list_milestones(self.org, repo["name"]) if self.gh.get_repo(self.org, repo["name"]) else {}
@@ -544,8 +618,15 @@ class Provisioner:
             if current and current[0] == text:
                 continue
             if not self.dry_run:
-                self.gh.put_file(self.org, name, path, BOOTSTRAP_BRANCH, text,
-                                 f"chore: bootstrap {path} for {self.pid}", current[1] if current else None)
+                self.gh.put_file(
+                    self.org,
+                    name,
+                    path,
+                    BOOTSTRAP_BRANCH,
+                    text,
+                    f"chore: bootstrap {path} for {self.pid}",
+                    current[1] if current else None,
+                )
             written += 1
         return ("UPDATED" if written else "EXISTS"), f"{written} file(s) written to {BOOTSTRAP_BRANCH}"
 
@@ -558,10 +639,15 @@ class Provisioner:
         if self.dry_run:
             return "CREATED", "bootstrap PR"
         base = (self.gh.get_repo(self.org, repo["name"]) or {}).get("default_branch", "main")
-        pr = self.gh.create_pr(self.org, repo["name"], BOOTSTRAP_BRANCH, base,
-                               f"Bootstrap {repo['name']} for {self.pid}",
-                               f"Initial structure generated from the approved {self.pid} plan. "
-                               f"Review and merge is reserved for @{self.plan['owner']}.")
+        pr = self.gh.create_pr(
+            self.org,
+            repo["name"],
+            BOOTSTRAP_BRANCH,
+            base,
+            f"Bootstrap {repo['name']} for {self.pid}",
+            f"Initial structure generated from the approved {self.pid} plan. "
+            f"Review and merge is reserved for @{self.plan['owner']}.",
+        )
         return "CREATED", pr["html_url"]
 
     def protect(self, repo):
@@ -595,8 +681,9 @@ class Provisioner:
         if "sprint" in item:
             milestone = self.gh.list_milestones(self.org, name).get(self.milestone_titles()[item["sprint"]][0])
         labels = [f"project:{self.pid}", f"type:{item['type']}", f"priority:{item['priority']}"]
-        issue = self.gh.create_issue(self.org, name, f"[{item['key']}] {item['title']}",
-                                     issue_body(self.plan, item, {}), labels, milestone)
+        issue = self.gh.create_issue(
+            self.org, name, f"[{item['key']}] {item['title']}", issue_body(self.plan, item, {}), labels, milestone
+        )
         self.issues[item["key"]] = issue
         return "CREATED", issue["html_url"]
 
@@ -609,7 +696,7 @@ class Provisioner:
             self.gh.update_issue_body(self.org, self.repo_name(item["repo"]), issue["number"], body)
             issue["body"] = body
         pending = [d for d in item["depends_on"] if d not in resolved]
-        if pending:   # the dependency issue does not exist yet; a rerun links it
+        if pending:  # the dependency issue does not exist yet; a rerun links it
             return "SKIPPED_DEPENDENCY", f"link pending for {', '.join(pending)}"
         return ("UPDATED" if changed else "EXISTS"), f"{len(resolved)} dependency link(s)"
 
@@ -618,8 +705,11 @@ class Provisioner:
         project = self.gh.find_project(self.org, title)
         status = "EXISTS"
         if project and repo_tag(self.plan) not in (project.get("description") or ""):
-            raise GitHubError(409, f"a Project titled '{title}' exists but was not created for {self.pid} "
-                                   f"(no {repo_tag(self.plan)} in its description); not adopting it")
+            raise GitHubError(
+                409,
+                f"a Project titled '{title}' exists but was not created for {self.pid} "
+                f"(no {repo_tag(self.plan)} in its description); not adopting it",
+            )
         if not project:
             if self.dry_run:
                 return "CREATED", f"project '{title}'"
@@ -630,22 +720,32 @@ class Provisioner:
             if repo["name"] not in project.get("repos", set()) and not self.dry_run:
                 self.gh.link_project_repo(project["id"], self.org, repo["name"])
                 status = "UPDATED" if status == "EXISTS" else status
-        for key, issue in self.issues.items():
+        for issue in self.issues.values():
             if issue.get("node_id") and issue["node_id"] not in project.get("items", set()) and not self.dry_run:
                 self.gh.add_project_item(project["id"], issue["node_id"])
                 status = "UPDATED" if status == "EXISTS" else status
         if "Sprint" not in project.get("fields", set()) and not self.dry_run:
             try:
-                self.gh.create_iteration_field(project["id"], "Sprint", self.plan["sprint"]["start"],
-                                               self.plan["sprint"]["length_days"])
+                self.gh.create_iteration_field(
+                    project["id"], "Sprint", self.plan["sprint"]["start"], self.plan["sprint"]["length_days"]
+                )
             except GitHubError as exc:
-                self.manual(f"Add an iteration field 'Sprint' ({self.plan['sprint']['length_days']} days from "
-                            f"{self.plan['sprint']['start']}) to the Project; the API call failed: {exc}")
+                self.manual(
+                    f"Add an iteration field 'Sprint' ({self.plan['sprint']['length_days']} days from "
+                    f"{self.plan['sprint']['start']}) to the Project; the API call failed: {exc}"
+                )
         return status, project.get("url", title)
 
     def write_report(self):
         home = next(r for r in self.plan["repos"] if r["role"] == self.plan["home_role"])
-        lines = [f"# Provisioning report — {self.pid}", "", f"Phase: {self.state['phase']}.", "", "| Step | Status | Detail |", "|---|---|---|"]
+        lines = [
+            f"# Provisioning report — {self.pid}",
+            "",
+            f"Phase: {self.state['phase']}.",
+            "",
+            "| Step | Status | Detail |",
+            "|---|---|---|",
+        ]
         lines += [f"| {k} | {v['status']} | {v['detail']} |" for k, v in self.state["steps"].items()]
         lines += ["", "## Manual actions", *[f"- [ ] {m}" for m in self.state["manual_actions"]], ""]
         text = "\n".join(lines)
@@ -658,16 +758,37 @@ class Provisioner:
         current = self.gh.get_file(self.org, home["name"], "docs/provisioning-report.md", BOOTSTRAP_BRANCH)
         if current and current[0] == text:
             return "EXISTS", "report unchanged"
-        self.gh.put_file(self.org, home["name"], "docs/provisioning-report.md", BOOTSTRAP_BRANCH, text,
-                         f"docs: provisioning report for {self.pid}", current[1] if current else None)
+        self.gh.put_file(
+            self.org,
+            home["name"],
+            "docs/provisioning-report.md",
+            BOOTSTRAP_BRANCH,
+            text,
+            f"docs: provisioning report for {self.pid}",
+            current[1] if current else None,
+        )
         return "UPDATED", f"{home['name']}:{BOOTSTRAP_BRANCH}/docs/provisioning-report.md"
 
 
 class DryRunClient:
     """Read-only proxy: lets `apply --dry-run` read real GitHub state while refusing every write."""
-    WRITES = {"create_repo", "set_topics", "create_ref", "put_file", "create_pr", "create_label",
-              "create_milestone", "create_issue", "update_issue_body", "protect_branch", "create_project",
-              "link_project_repo", "add_project_item", "create_iteration_field"}
+
+    WRITES = {
+        "create_repo",
+        "set_topics",
+        "create_ref",
+        "put_file",
+        "create_pr",
+        "create_label",
+        "create_milestone",
+        "create_issue",
+        "update_issue_body",
+        "protect_branch",
+        "create_project",
+        "link_project_repo",
+        "add_project_item",
+        "create_iteration_field",
+    }
 
     def __init__(self, inner):
         self.inner = inner
@@ -684,6 +805,7 @@ def _now() -> str:
 
 # ---------------------------------------------------------------- real client (gh CLI)
 
+
 class GhClient:
     """GitHub operations through the caller's authenticated `gh` CLI. Not exercised by unit tests."""
 
@@ -691,21 +813,23 @@ class GhClient:
 
     def _run(self, args: list[str], body=None):
         try:
-            proc = subprocess.run(["gh", *args], input=json.dumps(body) if body is not None else None,
-                                  capture_output=True, text=True, check=False)
+            proc = subprocess.run(
+                ["gh", *args], input=json.dumps(body) if body is not None else None, capture_output=True, text=True, check=False
+            )
         except FileNotFoundError:
             raise GitHubError(None, "the gh CLI is not installed; install it and run `gh auth login`") from None
         if proc.returncode != 0:
             m = re.search(r"HTTP (\d{3})", proc.stderr)
             status = int(m.group(1)) if m else None
             message = proc.stderr.strip()
-            try:   # GraphQL failures put the error list on stdout without an HTTP status
+            try:  # GraphQL failures put the error list on stdout without an HTTP status
                 errors = json.loads(proc.stdout).get("errors") or []
             except (ValueError, AttributeError):
                 errors = []
             if errors:
-                status = status or next((self.GRAPHQL_STATUS[e["type"]] for e in errors
-                                         if e.get("type") in self.GRAPHQL_STATUS), 422)
+                status = status or next(
+                    (self.GRAPHQL_STATUS[e["type"]] for e in errors if e.get("type") in self.GRAPHQL_STATUS), 422
+                )
                 message = "; ".join(e.get("message", "") for e in errors)
             raise classify(status, message[:300])
         return proc.stdout
@@ -729,8 +853,10 @@ class GhClient:
         return data["data"]
 
     def list_org_repos(self, org):
-        return [{"name": r["name"], "description": r.get("description") or "", "topics": r.get("topics") or []}
-                for r in self._list(f"orgs/{org}/repos?per_page=100&type=all")]
+        return [
+            {"name": r["name"], "description": r.get("description") or "", "topics": r.get("topics") or []}
+            for r in self._list(f"orgs/{org}/repos?per_page=100&type=all")
+        ]
 
     def get_repo(self, org, name):
         try:
@@ -741,8 +867,9 @@ class GhClient:
             raise
 
     def create_repo(self, org, name, description, visibility):
-        return self._api("POST", f"orgs/{org}/repos", {"name": name, "description": description,
-                                                       "visibility": visibility, "auto_init": True})
+        return self._api(
+            "POST", f"orgs/{org}/repos", {"name": name, "description": description, "visibility": visibility, "auto_init": True}
+        )
 
     def get_topics(self, org, name):
         return self._api("GET", f"repos/{org}/{name}/topics")["names"]
@@ -796,8 +923,9 @@ class GhClient:
         return self._api("POST", f"repos/{org}/{name}/milestones", {"title": title, "due_on": due_on})["number"]
 
     def list_issues(self, org, name, label):
-        return [i for i in self._list(f"repos/{org}/{name}/issues?state=all&per_page=100&labels={label}")
-                if "pull_request" not in i]
+        return [
+            i for i in self._list(f"repos/{org}/{name}/issues?state=all&per_page=100&labels={label}") if "pull_request" not in i
+        ]
 
     def create_issue(self, org, name, title, body, labels, milestone):
         payload = {"title": title, "body": body, "labels": labels}
@@ -809,48 +937,79 @@ class GhClient:
         self._api("PATCH", f"repos/{org}/{name}/issues/{number}", {"body": body})
 
     def protect_branch(self, org, name, branch):
-        self._api("PUT", f"repos/{org}/{name}/branches/{branch}/protection", {
-            "required_status_checks": None, "enforce_admins": True, "restrictions": None,
-            "required_pull_request_reviews": {"required_approving_review_count": 0},
-            "allow_force_pushes": False, "allow_deletions": False})
+        self._api(
+            "PUT",
+            f"repos/{org}/{name}/branches/{branch}/protection",
+            {
+                "required_status_checks": None,
+                "enforce_admins": True,
+                "restrictions": None,
+                "required_pull_request_reviews": {"required_approving_review_count": 0},
+                "allow_force_pushes": False,
+                "allow_deletions": False,
+            },
+        )
 
     def find_project(self, org, title):
-        q = ("query($login:String!,$q:String!){organization(login:$login){projectsV2(first:20,query:$q){nodes{"
-             "id url title shortDescription repositories(first:50){nodes{name}} fields(first:50){nodes{... on ProjectV2FieldCommon{name}}}"
-             " items(first:100){nodes{content{... on Issue{id}}}}}}}}")
+        q = (
+            "query($login:String!,$q:String!){organization(login:$login){projectsV2(first:20,query:$q){nodes{"
+            "id url title shortDescription repositories(first:50){nodes{name}} fields(first:50){nodes{... on ProjectV2FieldCommon{name}}}"
+            " items(first:100){nodes{content{... on Issue{id}}}}}}}}"
+        )
         nodes = self._graphql(q, login=org, q=title)["organization"]["projectsV2"]["nodes"]
         for p in nodes:
             if p["title"] == title:
-                return {"id": p["id"], "url": p["url"], "description": p.get("shortDescription") or "",
-                        "repos": {r["name"] for r in p["repositories"]["nodes"]},
-                        "fields": {f.get("name") for f in p["fields"]["nodes"]},
-                        "items": {(i.get("content") or {}).get("id") for i in p["items"]["nodes"]}}
+                return {
+                    "id": p["id"],
+                    "url": p["url"],
+                    "description": p.get("shortDescription") or "",
+                    "repos": {r["name"] for r in p["repositories"]["nodes"]},
+                    "fields": {f.get("name") for f in p["fields"]["nodes"]},
+                    "items": {(i.get("content") or {}).get("id") for i in p["items"]["nodes"]},
+                }
         return None
 
     def create_project(self, org, title, description):
         owner = self._graphql("query($login:String!){organization(login:$login){id}}", login=org)["organization"]["id"]
-        p = self._graphql("mutation($o:ID!,$t:String!){createProjectV2(input:{ownerId:$o,title:$t}){projectV2{id url}}}",
-                          o=owner, t=title)["createProjectV2"]["projectV2"]
-        self._graphql("mutation($p:ID!,$d:String!){updateProjectV2(input:{projectId:$p,shortDescription:$d}){projectV2{id}}}",
-                      p=p["id"], d=description)
+        p = self._graphql(
+            "mutation($o:ID!,$t:String!){createProjectV2(input:{ownerId:$o,title:$t}){projectV2{id url}}}", o=owner, t=title
+        )["createProjectV2"]["projectV2"]
+        self._graphql(
+            "mutation($p:ID!,$d:String!){updateProjectV2(input:{projectId:$p,shortDescription:$d}){projectV2{id}}}",
+            p=p["id"],
+            d=description,
+        )
         return {"id": p["id"], "url": p["url"], "description": description, "repos": set(), "fields": set(), "items": set()}
 
     def link_project_repo(self, project_id, org, name):
         repo_id = self.get_repo(org, name)["node_id"]
-        self._graphql("mutation($p:ID!,$r:ID!){linkProjectV2ToRepository(input:{projectId:$p,repositoryId:$r}){repository{id}}}",
-                      p=project_id, r=repo_id)
+        self._graphql(
+            "mutation($p:ID!,$r:ID!){linkProjectV2ToRepository(input:{projectId:$p,repositoryId:$r}){repository{id}}}",
+            p=project_id,
+            r=repo_id,
+        )
 
     def add_project_item(self, project_id, content_id):
-        self._graphql("mutation($p:ID!,$c:ID!){addProjectV2ItemById(input:{projectId:$p,contentId:$c}){item{id}}}",
-                      p=project_id, c=content_id)
+        self._graphql(
+            "mutation($p:ID!,$c:ID!){addProjectV2ItemById(input:{projectId:$p,contentId:$c}){item{id}}}",
+            p=project_id,
+            c=content_id,
+        )
 
     def create_iteration_field(self, project_id, name, start, days):
-        self._graphql("mutation($p:ID!,$n:String!,$s:Date!,$d:Int!){createProjectV2Field(input:{projectId:$p,"
-                      "dataType:ITERATION,name:$n,iterationConfiguration:{startDate:$s,duration:$d,iterations:[]}})"
-                      "{projectV2Field{... on ProjectV2IterationField{id}}}}", p=project_id, n=name, s=start, d=days)
+        self._graphql(
+            "mutation($p:ID!,$n:String!,$s:Date!,$d:Int!){createProjectV2Field(input:{projectId:$p,"
+            "dataType:ITERATION,name:$n,iterationConfiguration:{startDate:$s,duration:$d,iterations:[]}})"
+            "{projectV2Field{... on ProjectV2IterationField{id}}}}",
+            p=project_id,
+            n=name,
+            s=start,
+            d=days,
+        )
 
 
 # ---------------------------------------------------------------- CLI
+
 
 def main(argv: list[str] | None = None, client=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -867,8 +1026,11 @@ def main(argv: list[str] | None = None, client=None) -> int:
     raw = json.loads(Path(args.plan).read_text(encoding="utf-8"))
     gh = client or GhClient()
     try:
-        existing = gh.list_org_repos(raw.get("organization", "ibrahim-ai-team")) if (
-            args.command == "plan" and args.check_github) else None
+        existing = (
+            gh.list_org_repos(raw.get("organization", "ibrahim-ai-team"))
+            if (args.command == "plan" and args.check_github)
+            else None
+        )
         plan = validate_plan(raw, existing)
     except PlanError as exc:
         print("Plan is invalid:\n" + "\n".join(f"- {e}" for e in exc.errors))
@@ -883,15 +1045,28 @@ def main(argv: list[str] | None = None, client=None) -> int:
         return 0
     approval = raw.get("approval") or {}
     if not args.dry_run and not (approval.get("approved_by") and approval.get("plan_digest") == digest):
-        print(f"Refusing to provision: the plan needs sponsor approval with approval.plan_digest = {digest} "
-              "(the digest changes whenever the plan changes).")
+        print(
+            f"Refusing to provision: the plan needs sponsor approval with approval.plan_digest = {digest} "
+            "(the digest changes whenever the plan changes)."
+        )
         return 4
     state_path = Path(args.state_dir) / f"{plan['project']['id']}.json"
     state = Provisioner(DryRunClient(gh) if args.dry_run else gh, plan, state_path, dry_run=args.dry_run).run()
-    print(json.dumps({"phase": state["phase"], "steps": {k: v["status"] for k, v in state["steps"].items()},
-                      "manual_actions": state["manual_actions"]}, indent=2))
-    return 0 if state["phase"] in ("COMPLETE", "COMPLETE_WITH_MANUAL_STEPS", "DRY_RUN_COMPLETE",
-                                   "DRY_RUN_COMPLETE_WITH_MANUAL_STEPS") else 1
+    print(
+        json.dumps(
+            {
+                "phase": state["phase"],
+                "steps": {k: v["status"] for k, v in state["steps"].items()},
+                "manual_actions": state["manual_actions"],
+            },
+            indent=2,
+        )
+    )
+    return (
+        0
+        if state["phase"] in ("COMPLETE", "COMPLETE_WITH_MANUAL_STEPS", "DRY_RUN_COMPLETE", "DRY_RUN_COMPLETE_WITH_MANUAL_STEPS")
+        else 1
+    )
 
 
 if __name__ == "__main__":

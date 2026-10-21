@@ -8,9 +8,10 @@ issue (#12) or a date (2026-11-01) is an explicit, tracked deferral and passes.
 
 Usage: check_placeholders.py [path ...]   (default: the repository root)
 """
-from pathlib import Path
+
 import re
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKIP_DIRS = {".git", ".venv", "node_modules", "templates"}

@@ -11,7 +11,7 @@
 The original audit recorded these observations and follow-up work:
 
 | Finding | Follow-up change in the audit remediation branch | Still requires owner/runtime verification |
-|---|---|---|
+| --- | --- | --- |
 | Conflicting orchestration entry points | Existing orchestration contract and design remain the canonical workflow | Run the documented smoke test in Claude Code |
 | No enforced local command deny rules | Added `.claude/settings.json` with selected deny rules and validator checks | Confirm permission syntax and behavior in the installed Claude Code version; this is not a sandbox |
 | Branch protection not verified | No remote setting changed by this code PR | Owner must configure and verify GitHub rulesets/branch protection |

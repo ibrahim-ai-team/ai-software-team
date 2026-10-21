@@ -1,0 +1,12 @@
+# markdownlint rules for this repository's documentation (used by the pre-commit hook).
+config:
+  default: true
+  MD018: false          # "#26" at a line start is an issue reference, not a heading
+  MD013: false          # long lines are fine; prose is not hard-wrapped
+  MD024:
+    siblings_only: true # repeated headings are fine in different sections
+  MD033: false          # inline HTML is allowed
+  MD041: false          # agent and skill files start with YAML frontmatter, not a heading
+  MD060: false          # table pipes need not be column-aligned
+ignores:
+  - "**/node_modules/**"

@@ -7,7 +7,7 @@
 ## Status of this feature
 
 | Area | State |
-|---|---|
+| --- | --- |
 | Planning, validation, repository tree, naming | Implemented and unit-tested (mocked GitHub) |
 | Provisioning engine: idempotency, retries, partial failure, permission reporting | Implemented and unit-tested (mocked GitHub) |
 | Real GitHub calls (`GhClient`) | Read paths verified against the real API (PV-02); error classification tested with recorded `gh` outputs (mocked). Write paths (create repositories, files, PRs, issues, board, iteration field) **NOT VERIFIED**; no real repositories were created during development |
@@ -27,7 +27,7 @@ GitHub repositories cannot be nested in folders. The "apps" grouping is therefor
 Roles depend on the architecture the team chose:
 
 | `architecture.style` | Repositories |
-|---|---|
+| --- | --- |
 | single-repo, monolith | `<app>-app` (coordination docs live in its `docs/`) |
 | frontend-backend | `<app>-management`, `<app>-front`, `<app>-back` |
 | services | `<app>-management`, optional `<app>-front`, one `<app>-<service>` per service |
@@ -37,12 +37,14 @@ Roles depend on the architecture the team chose:
 ## What one run creates
 
 For each repository:
+
 - the repository (private by default) with an initial commit. Private repositories share the organization's free GitHub Actions minutes (2,000 per month on GitHub Free); public repositories run Actions on standard runners for free. The sponsor chooses `visibility` per project;
 - topics, labels and one `Sprint n` milestone per sprint (14 days by default);
 - a bootstrap/initial-structure branch with README, CONTRIBUTING, SECURITY, CODEOWNERS and a PR template, plus an open bootstrap PR for the owner to merge;
 - in the coordination repository only: requirements, ADR-0001, the repository plan, the approved plan, `docs/project-state.md` and `docs/provisioning-report.md`.
 
 Across the project:
+
 - one issue per backlog item in the repository it belongs to, with acceptance criteria, priority, sprint milestone and cross-repository dependency links;
 - the Project board, with the repositories linked, all issues added and an iteration field "Sprint".
 
@@ -55,6 +57,7 @@ Branch protection is applied only when the approved plan sets `options.branch_pr
 `.claude/settings.json` also asks a human before any command containing `provision_project.py apply` runs (verified at runtime: PV-05).
 
 **What these gates do not guarantee:**
+
 - The digest is self-attested: an agent could write it into the plan.
 - The ask rule is a text pattern: an agent could avoid it (for example by calling the module from `python -c`).
 - Agents act with the same GitHub identity as the owner, so GitHub cannot tell an agent's request from the owner's.
@@ -66,7 +69,7 @@ The gates are therefore instruction- and prompt-based safeguards, not enforced i
 Each step is recorded in `.provisioning/<idea-NN>.json` (git-ignored, local) and summarised in the coordination repository's `docs/provisioning-report.md`.
 
 | Step status | Meaning | What to do |
-|---|---|---|
+| --- | --- | --- |
 | `CREATED` / `UPDATED` | Done in this run | — |
 | `EXISTS` | Already present; nothing written | — |
 | `DRY_RUN` | Would be created; nothing written | — |
@@ -77,6 +80,7 @@ Each step is recorded in `.provisioning/<idea-NN>.json` (git-ignored, local) and
 Transient errors are retried twice, after 5 s and then 20 s: HTTP 429, 5xx, network failures, GitHub's secondary rate limit (reported as 403), and a just-created repository whose first commit is not visible yet. Other errors are not retried. GraphQL errors are classified by their type (`FORBIDDEN` and `INSUFFICIENT_SCOPES` are permission errors). A failed repository skips only the steps that depend on it; independent work continues.
 
 Overall phases:
+
 - `COMPLETE`, or `COMPLETE_WITH_MANUAL_STEPS`;
 - `PARTIAL`: some step needs action;
 - `BLOCKED`: a repository with the planned name exists but has no `[ai-team:idea-NN]` tag. Nothing is changed; choose another ID.
@@ -84,6 +88,7 @@ Overall phases:
 Reruns are idempotent. Repositories, labels, milestones, the branch, the PR, issues (found by their key) and the board are reused; the provisioning report is rewritten only when its content changed, and never to a closed bootstrap PR. Boards are adopted only if their description carries `[ai-team:idea-NN]`; a same-titled board without it fails the project step.
 
 **Known limits:**
+
 - Issues are matched by the `project:idea-NN` label plus the hidden key. Removing that label from an issue would make a rerun create a duplicate.
 - Board lookups read the first 100 items and 50 repositories or fields; re-adding an existing item is harmless.
 - Recorded error text is truncated and token-like strings are redacted, but it is still committed in the report; keep repositories private when errors may contain sensitive context.
@@ -93,7 +98,7 @@ Reruns are idempotent. Repositories, labels, milestones, the branch, the PR, iss
 Run provisioning from a local Claude Code session where `gh auth login` was done as an organization owner (or a member allowed to create repositories). Cloud sessions can only reach their configured repositories, so they cannot create repositories or organization boards.
 
 | Operation | Permission |
-|---|---|
+| --- | --- |
 | Read existing repositories | Read access to the organization's repositories |
 | Create repositories | Organization owner, or members allowed to create repositories (Organization settings → Member privileges); token scope `repo`, or fine-grained Administration: write |
 | Topics, branch protection | Repository Administration: write (admin role) |
@@ -130,6 +135,7 @@ Run provisioning from a local Claude Code session where `gh auth login` was done
 ## Testing
 
 `tests/test_provision_project.py` runs the engine against an in-memory fake GitHub (mocked; no network). It covers:
+
 - naming and next-ID assignment;
 - the repository plans for each architecture style;
 - validation errors and dependency cycles;

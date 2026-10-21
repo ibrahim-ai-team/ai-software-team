@@ -10,7 +10,7 @@ Record only observed results. Static checks do not prove runtime behavior, and o
 ### Static package checks
 
 | Check | Command | Result |
-|---|---|---|
+| --- | --- | --- |
 | Inventory and security config | `python3 scripts/validate_team.py` | PASS (16 agents, 23 skills, 11 commands, 17 templates) |
 | Discovery fixture | `python3 scripts/smoke_discovery.py` | PASS (static file check only) |
 | Regression tests | `python3 -m unittest discover -s tests` | PASS, 43 tests |
@@ -19,7 +19,7 @@ Record only observed results. Static checks do not prove runtime behavior, and o
 ### Runtime checks
 
 | ID | Case | Observed | Result |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | RT-01 | `.claude/CLAUDE.md` loaded | Project instructions were injected into the session context | PASS |
 | RT-02 | Agent discovery | All 16 project agents were offered as delegation targets | PASS |
 | RT-03 | Skill discovery | All 23 project skills were listed as invocable | PASS |
@@ -45,7 +45,7 @@ Record only observed results. Static checks do not prove runtime behavior, and o
 Workflow `.github/workflows/project-status.yml` from branch `claude/ai-team-project-readiness-td7x2s`, dispatched via `workflow_dispatch`, `PROJECTS_TOKEN` present.
 
 | ID | Case | Observed | Result |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | PS-01 | Issue not on the Project (#45) | Failed with "Issue #45 is not on Project ibrahim-ai-team/#1" ([run](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39297846952)) | PASS (clear error) |
 | PS-02 | Real update #24 → Blocked | Updated, then read back "actual Project Status 'Blocked'" ([run](https://github.com/ibrahim-ai-team/ai-software-team/actions/runs/39297917731)) | PASS |
 | PS-03 | `dry_run` on 18 issues | Reported each Status without changing it; `Done → Blocked` refused as an invalid transition | PASS |
@@ -55,7 +55,7 @@ Workflow `.github/workflows/project-status.yml` from branch `claude/ai-team-proj
 Board Status read back on 2026-10-19 before corrections (Project #1):
 
 | Status | Issues |
-|---|---|
+| --- | --- |
 | Blocked | #24, #26 |
 | In Progress | #25 (issue closed: board out of sync; the Done gate needs a merged PR that says `Closes #25`, so the owner moves it by hand or enables the Project's "Item closed → Done" workflow) |
 | Backlog | #32, #34, #36, #39, #40, #42, #43 |
@@ -65,7 +65,7 @@ Board Status read back on 2026-10-19 before corrections (Project #1):
 Board Status after corrections (each value confirmed by the workflow's read-back):
 
 | Status | Issues |
-|---|---|
+| --- | --- |
 | Blocked | #24 (owner branch rule), #45 (pilot) |
 | Backlog | #26, #36 |
 | In Progress | #25 — closed issue; owner action (see above) |
@@ -77,7 +77,7 @@ Board Status after corrections (each value confirmed by the workflow's read-back
 Fresh headless Claude Code `2.1.303` processes (`claude --agent agile-orchestrator -p …`, `--permission-mode acceptEdits`) in a throwaway local copy of the feature branch with **no git remote**. The idea was a fictional single-user CLI to-do tool. The runs did planning only: no application code, git push or GitHub.
 
 | ID | Case | Observed | Result |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | RT-13 | Settings warnings before the fix | Start-up printed six "Permission ask rule … Write(…) is not matched by file permission checks — only Edit(path) rules are" warnings | FINDING (fixed: A8 in `docs/vision-alignment-audit.md`) |
 | RT-14 | Settings warnings after the fix | No permission warnings at start-up (empty stderr) | PASS |
 | RT-15 | New agents discoverable | Running session (started before the files existed) reported `tech-lead` not found; fresh sessions loaded all 18 | PASS (agents load at session start) |
@@ -92,7 +92,7 @@ Not covered by these runs: implementation, QA and review delegations, PR creatio
 ## Run 2026-10-20 — Project provisioning (`scripts/provision_project.py`)
 
 | ID | Case | Observed | Result |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | PV-01 | Mocked engine tests (`tests/test_provision_project.py`, in-memory fake GitHub) | 39 tests: app-name repository naming (`shopinow-front`), hidden `idea-NN` IDs, name collisions, architecture-dependent repository plans, validation, full run, idempotent rerun, foreign-repo block, permission failure, partial failure and resume, retries, project isolation, dry run, approval gate | PASS (mocked) |
 | PV-02 | Real `GhClient` read paths against `ibrahim-ai-team/ai-software-team` (read-only, cloud session) | `get_repo`, `get_topics`, `get_ref_sha` (existing and missing), `get_file` (existing and missing), `find_pr`, `list_labels`, `list_milestones`, `list_issues` returned correctly parsed data | PASS (real, read-only) |
 | PV-03 | Real org-level and GraphQL calls from the cloud session | `list_org_repo_names` and `find_project` returned HTTP 403 and were classified as `PermissionDenied`; a repository outside the session scope also returned 403 | PASS (permission handling); creation NOT TESTED |
@@ -104,7 +104,7 @@ Not covered by these runs: implementation, QA and review delegations, PR creatio
 ## Run 2026-10-20 — Budget controls (#26)
 
 | ID | Case | Observed | Result |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | BUD-01 | Per-agent `maxTurns: 2` on a test agent given an 8-read task (fresh headless session, throwaway copy) | The agent made exactly 2 Read calls and returned "stopped at its 2-turn limit before finishing… Send the agent a message (SendMessage) to let it continue" | PASS (enforced) |
 | BUD-02 | `claude --help` (2.1.303) and test runs | `--max-budget-usd` is listed and "only works with --print"; `--effort` is listed; `--max-turns` is not listed but was accepted by every headless test run; no run was observed stopping at either cap | Documented / accepted; enforcement NOT VERIFIED |
 | BUD-03 | Measured API-equivalent cost of test runs | Planning run with 4 delegations USD 0.34; resume/status USD 0.05; read-only single delegation USD 0.07; permission probes USD 0.07–0.08 each | Basis for `standards/sprint-sizing.md` v1 |
@@ -114,12 +114,14 @@ Implementation-task costs are not measured yet; the sizing table marks them as e
 ## Template for future runs
 
 ### Static package checks
+
 - Agent files present:
 - Skill files present:
 - Required templates/standards present:
 - Validator output:
 
 ### Runtime checks (only after running Claude Code)
+
 - Claude Code version and environment:
 - Agents discovered:
 - Skills discovered:

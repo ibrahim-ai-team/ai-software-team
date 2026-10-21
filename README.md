@@ -5,7 +5,7 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 ## What is included
 
 | Area | Contents |
-|---|---|
+| --- | --- |
 | Agents | 18 roles under `.claude/agents/`: one `agile-orchestrator` plus specialists (see [team roles](#team-roles)) |
 | Skills | 23 reusable procedures under `.claude/skills/` (the manifest minimum is 22) |
 | Shared instructions | `.claude/CLAUDE.md` and local permission guardrails in `.claude/settings.json` |
@@ -35,7 +35,7 @@ For a fictional end-to-end illustration, see [Example Walkthrough](docs/example-
 One orchestrator coordinates; specialists do the work and return results to it. Only the orchestrator can delegate.
 
 | Role | Agent file |
-|---|---|
+| --- | --- |
 | Agile Orchestrator (entry point) | `.claude/agents/agile-orchestrator.md` |
 | Product Owner | `.claude/agents/product-owner.md` |
 | Business Analyst | `.claude/agents/business-analyst.md` |
@@ -54,7 +54,6 @@ Shared rules for every specialist: [`standards/agent-contract.md`](standards/age
 ## Agile commands
 
 A new idea becomes its own GitHub workspace named after the app you propose (for example `shopinow-management`, `shopinow-front`, `shopinow-back`) with one Project board through `/provision-project`; see [project provisioning](docs/project-provisioning.md). This repository is never copied per application.
-
 
 The available prompts include `/kickoff`, `/provision-project`, `/plan-sprint`, `/next-story`, `/review-pr`, `/status`, `/daily-report`, `/handover`, `/approve-gate`, `/sprint-review`, `/retro`, and `/release-check`. See [the command reference](docs/agile-command-reference.md). Commands run only when invoked in Claude Code; they are not background jobs.
 

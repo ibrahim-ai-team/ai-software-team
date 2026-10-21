@@ -1,16 +1,20 @@
 ## Summary
+
 What changed and why?
 
 ## Related issue
+
 Closes #
 
 ## Scope and acceptance criteria
+
 - [ ] Acceptance criterion 1:
 - [ ] Acceptance criterion 2:
 
 ## Validation evidence
+
 | Check | Command | Result |
-|---|---|---|
+| --- | --- | --- |
 | Tests | | |
 | Lint / formatting | | |
 | Build / type check | | |
@@ -19,6 +23,7 @@ Closes #
 List checks not run and why. Do not report a check as passing without evidence.
 
 ## Coordinator review disposition
+
 - `code-review-security` report link and findings:
 - Architecture / standards (consult `software-architect` where needed):
 - Security / privacy / dependencies:
@@ -28,6 +33,7 @@ List checks not run and why. Do not report a check as passing without evidence.
 - Follow-up issues:
 
 ## Developer readiness checklist
+
 - [ ] Change is limited to approved scope.
 - [ ] Tests were added or updated where appropriate.
 - [ ] Relevant checks and their actual results are documented.

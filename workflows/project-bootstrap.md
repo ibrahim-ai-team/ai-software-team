@@ -1,6 +1,7 @@
 # Project Bootstrap Workflow
 
 ## Purpose and scope
+
 Use this workflow when the user provides a software idea and asks the team to build it. The team—not the user—owns discovery, specification, backlog preparation, architecture analysis, task decomposition, and routine delivery planning. The user is the project sponsor/supervisor: they follow progress and retain final PR merge authority. This workflow applies to future application projects, not changes to this reusable AI team starter kit.
 
 ## Workflow gates
@@ -49,6 +50,7 @@ Default to the simplest architecture that meets confirmed requirements. Microser
 ## Repository setup execution checklist
 
 When target and permissions are available:
+
 1. Reconfirm target owner/organization and intended visibility.
 2. Check whether each repository already exists to avoid duplicates.
 3. Create only resources within explicit authorization and permissions.

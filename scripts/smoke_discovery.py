@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Offline inventory check only; this does not launch Claude Code."""
-from pathlib import Path
+
 import json
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / ".claude" / "manifest.json"

@@ -11,7 +11,7 @@ Assessed: 2026-10-19 against `main` `8bf343a`. Evidence for runtime results: [`v
 ## Board audit (from issues, PRs and repository evidence)
 
 | # | Finding | Correction |
-|---|---|---|
+| --- | --- | --- |
 | A1 | Status is encoded in titles (`[READY]` #24, `[IN PROGRESS]` #25, `[BLOCKED]` #26), contradicting the rule that the Project `Status` field is the only status source ([github-projects-setup.md](github-projects-setup.md)). Closed #28, #33, #37, #41 carry `[DONE]`. | Remove prefixes; set Project `Status` instead. |
 | A2 | Org issue fields `Priority` and `Effort` exist but are empty on every open issue; priority lives only in body text (P1/P2). | Set fields (P0→Urgent, P1→High, P2→Medium, P3→Low). |
 | A3 | #24 and #25 are labelled `bug`; they are verification tasks. | Remove `bug`. |
@@ -30,7 +30,7 @@ No duplicates warrant closing: #40 (status workflow) and #42 (claiming) are dist
 ### Card-by-card target state
 
 | Issue | New title | Status | Priority | Effort | Other |
-|---|---|---|---|---|---|
+| --- | --- | --- | --- | --- | --- |
 | [#24](https://github.com/ibrahim-ai-team/ai-software-team/issues/24) | IA-SEC-01 — Enforce PR + required CI on `main` and deny agent merge tools | In Progress | Urgent | Low | remove `bug`; add gaps A5 |
 | [#25](https://github.com/ibrahim-ai-team/ai-software-team/issues/25) | IA-RUN-02 — Smoke-test Claude Code discovery, delegation, and permissions | In Review | Urgent | Low | remove `bug`; link PR |
 | [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45) | IA-PILOT-01 — Run the first supervised pilot from idea to first reviewed PR | Blocked (by #24, #25) | High | Medium | created |
@@ -51,7 +51,7 @@ Views: keep the existing ones; ensure one view (e.g. "Pilot readiness") filters 
 ## Launch checklist
 
 | Criterion | Result | Evidence |
-|---|---|---|
+| --- | --- | --- |
 | Runtime discovery of agents, skills, commands | PASS (cloud) / NOT VERIFIED (local) | verification-report RT-01–04 |
 | Actual subagent delegation and handoff | PASS (one read-only delegation) | RT-05 |
 | Permission enforcement / sensitive files | PASS for tested deny rules; `ask` prompts NOT VERIFIED | RT-06–11 |
@@ -82,12 +82,12 @@ Add to `permissions.deny` in `.claude/settings.json`: `mcp__github__merge_pull_r
 
 ## Can wait until after the pilot
 
-#26 (calibrate from real data), #42 (needed only for parallel coding), #40 (board automation; update manually), #32, #43, #34, #35, #36, #39; per-agent model overrides; local/Termux runtime re-test unless the pilot runs locally.
+#26 (calibrate from real data), #42 (needed only for parallel coding), #40 (board automation; update manually), #32, #43, #34, #35, #36, #39; per-agent model overrides; local/Termux runtime re-test unless the pilot runs locally
 
 ## First pilot sprint (proposal — no application work started)
 
 | ID | Task | Owner | Depends on | Acceptance |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | P1 | Provide the idea (1–2 sentences) and application repo name/visibility | Sponsor | — | Recorded in the pilot issue |
 | P2 | Discovery via `/kickoff` | product-owner, business-analyst | P1, O3 | Brief with problem, users, MVP scope, assumptions, questions; only material decisions escalated |
 | P3 | Requirements and 3–5 stories with testable AC | business-analyst | P2 | Stories pass `workflows/backlog-quality-gates.md` Definition of Ready |
