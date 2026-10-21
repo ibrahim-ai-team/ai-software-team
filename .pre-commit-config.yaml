@@ -62,6 +62,8 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
+        # SC2016 is informational: GraphQL queries use single-quoted $variables on purpose.
+        args: [-ignore, "SC2016:"]
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.38.2
     hooks:
