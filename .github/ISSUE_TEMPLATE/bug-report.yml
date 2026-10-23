@@ -78,3 +78,22 @@ body:
       description: "State reproduction test, regression scope, and evidence required to close this bug."
     validations:
       required: true
+  - type: textarea
+    id: duplicate_check
+    attributes:
+      label: Duplicate check and justification
+      description: "Issue creation gate (workflows/backlog-quality-gates.md): the GitHub search you ran and its result (new, subtask of #n), the requirement or decision this traces to, and why it is created now."
+      placeholder: "Searched: repo:owner/repo is:issue <keywords> -> no match. Traces to: US-4 / SD-12. Why now: blocks #31."
+    validations:
+      required: true
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      description: "New work goes to the product backlog. Only an approved scope change in the sprint record puts it in the current sprint (workflows/sprint-governance.md)."
+      options:
+        - "Product backlog"
+        - "Current sprint: approved scope change (give its SC ID above)"
+        - "Exception: security incident or production defect (logged in the sprint record)"
+    validations:
+      required: true

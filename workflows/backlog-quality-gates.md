@@ -12,9 +12,25 @@ Every backlog item must be clear, prioritized, dependency-aware, and verifiable 
 - Developer: proposes implementation-level tests and reports exact commands/results.
 - Coordinator: reconciles actual issue/board state and records evidence; a role instruction is not proof of execution.
 
+## Issue creation gate
+
+Applies to every new issue, from any role. The proposing agent returns the answers; the coordinator searches GitHub, decides and writes the issue (`standards/agent-contract.md`). Log each decision in the sprint record's `## Issue creation log`.
+
+1. Problem: the user or engineering problem, and the requirement, defect, risk or decision it traces to.
+2. Duplicate search: the GitHub search used (open and closed issues, e.g. `repo:<owner>/<repo> is:issue <keywords>`) and the relevant requirement documents, with the result.
+3. Result: `new`, `subtask of #n` (create it as a sub-issue or link it from the parent), `duplicate of #n` (comment on the existing issue instead), or `rejected`.
+4. Outcome and acceptance criteria.
+5. Type, priority, dependencies and the evidence that will prove it done.
+6. Target: `backlog` by default. Only a recorded scope change puts it in the current sprint (`workflows/sprint-governance.md#scope-protection`).
+7. Why now: why it must be created now rather than noted in an existing issue or created later.
+
+Reject the issue when it has no traceable value, duplicates existing work, is outside the approved scope without authorization, or lacks the information to act on. Exceptions (a security incident, a production defect, an urgent risk) may be created first and logged in the same session, with the exception named in Why now.
+
+Keep it proportionate: a one-line fix found during a task belongs in that task's PR, not in a new issue. Create issues with the matching issue form so the fields above are present; never create a bare issue without labels.
+
 ## Required flow
 
-1. Create or update the parent story/bug/technical issue using the matching GitHub Issue Form.
+1. Create or update the parent story/bug/technical issue using the matching GitHub Issue Form, after the issue creation gate above.
 2. Review every acceptance criterion for observable outcomes and failure states.
 3. QA creates a criterion-to-test matrix with risk, test level, automation candidate, test data/environment, and evidence expected.
 4. Decide per verification activity:
