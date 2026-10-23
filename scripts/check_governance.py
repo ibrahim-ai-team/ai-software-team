@@ -73,7 +73,7 @@ def table(lines: list[tuple[int, str]]) -> list[tuple[int, dict[str, str]]]:
         if not header:
             header = [cell.lower() for cell in cells]
         elif not all(set(cell) <= set("-: ") for cell in cells):
-            rows.append((number, dict(zip(header, cells))))
+            rows.append((number, dict(zip(header, cells, strict=False))))
     return rows
 
 
@@ -164,7 +164,11 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
             if status not in CLOSE_STATUSES:
                 err("G11", f"{issue}: a Closed sprint accounts for every item as Done, Not done, Blocked or Cancelled", line)
             elif status != "done" and is_empty(row.get("next", "")):
-                err("G11", f"{issue}: incomplete or cancelled work needs a disposition in Next (backlog, candidate for next sprint, or reason)", line)
+                err(
+                    "G11",
+                    f"{issue}: incomplete or cancelled work needs a disposition in Next (backlog, candidate for next sprint, or reason)",
+                    line,
+                )
 
     capacity = record.info.get("capacity (points)", "")
     if capacity.isdigit() and points > int(capacity):
@@ -173,7 +177,9 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
         err("G15", "Capacity (points) must be a whole number")
 
     if record.status == "active" and record.end and as_of > record.end:
-        err("G10", f"sprint ended {record.end.isoformat()} and is still Active on {as_of.isoformat()}: close it, do not extend it")
+        err(
+            "G10", f"sprint ended {record.end.isoformat()} and is still Active on {as_of.isoformat()}: close it, do not extend it"
+        )
     if record.status == "closed":
         if record.review.get("goal met", "").lower() not in {"yes", "partial", "no"}:
             err("G11", "Sprint review must state 'Goal met: yes | partial | no'")
@@ -196,7 +202,11 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
             err("G12", f"{issue} needs a reason for creating it now rather than later", line)
         target = row.get("target", "").strip()
         if target == record.sprint_id and ISSUE_REF.search(issue) and issue not in committed:
-            err("G12", f"{issue} targets {target} but is not in Committed issues; record a scope change or target the backlog", line)
+            err(
+                "G12",
+                f"{issue} targets {target} but is not in Committed issues; record a scope change or target the backlog",
+                line,
+            )
     return errors
 
 
@@ -209,7 +219,7 @@ def check_sprints(paths: list[Path], as_of: dt.date) -> list[str]:
             errors.append(f"{record.path}: G01 Sprint ID {record.sprint_id} is also used by {seen[record.sprint_id]}")
         seen[record.sprint_id] = record.path
     ordered = sorted((r for r in records if SPRINT_ID.match(r.sprint_id)), key=lambda r: int(r.sprint_id[1:]))
-    for previous, current in zip(ordered, ordered[1:]):
+    for previous, current in zip(ordered, ordered[1:], strict=False):
         if current.status in {"active", "closed"} and previous.status != "closed":
             errors.append(f"{current.path}: G14 {current.sprint_id} cannot start while {previous.sprint_id} is not Closed")
         if previous.end and current.start and current.start <= previous.end:
@@ -222,9 +232,7 @@ def check_release(state: Path, repo: Path, release: bool) -> tuple[list[str], li
     parts = sections(state.read_text(encoding="utf-8"))
     criteria = table(parts.get("release criteria", []))
     conflicts = table(parts.get("requirement conflicts", []))
-    open_conflicts = {
-        row.get("criterion", "") for _, row in conflicts if row.get("status", "").lower() != "resolved"
-    }
+    open_conflicts = {row.get("criterion", "") for _, row in conflicts if row.get("status", "").lower() != "resolved"}
     errors: list[str] = []
     notes: list[str] = []
     if not criteria:

@@ -132,7 +132,9 @@ class ApiQuizScenarioTests(GovernanceCase):
         self.assertEqual(self.sprints(sprint_record(committed=[item("#9")], created=created)), [])
 
     def test_2b_urgent_work_enters_only_through_an_approved_scope_change(self):
-        change = ["| SC-1 | 2026-11-12 | #122 | add | production defect | #10 (3 points) to backlog | approved | sponsor 2026-11-12 |"]
+        change = [
+            "| SC-1 | 2026-11-12 | #122 | add | production defect | #10 (3 points) to backlog | approved | sponsor 2026-11-12 |"
+        ]
         committed = [item("#9"), item("#10", status="Not done", nxt="backlog (displaced by SC-1)"), item("#122", added="SC-1")]
         self.assertEqual(self.sprints(sprint_record(committed=committed, changes=change)), [])
         change = ["| SC-1 | 2026-11-12 | #122 | add | production defect | - | approved | sponsor 2026-11-12 |"]
@@ -143,7 +145,9 @@ class ApiQuizScenarioTests(GovernanceCase):
             with self.subTest(pr=pr, evidence=evidence):
                 errors = self.sprints(sprint_record(committed=[item("#12", status="Done", pr=pr, evidence=evidence)]))
                 self.assertCode(errors, "G08")
-        done = item("#12", status="Done", pr="#114", evidence="merged 2026-11-14 by owner; CI run 123 green; AC US-6.1-6.4 checked")
+        done = item(
+            "#12", status="Done", pr="#114", evidence="merged 2026-11-14 by owner; CI run 123 green; AC US-6.1-6.4 checked"
+        )
         self.assertEqual(self.sprints(sprint_record(committed=[done])), [])
 
     def test_5_blocked_task_does_not_extend_the_sprint(self):
@@ -194,8 +198,7 @@ class ReleaseCriteriaTests(GovernanceCase):
     """Scenario 3: the 24-question MVP decision against the older 60-question requirement."""
 
     RULES_TS = (
-        "export const RELEASE_THRESHOLDS = {\n"
-        "  minReviewedQuestions: 60,\n  minTopics: 8,\n  minPerTopic: 5,\n} as const;\n"
+        "export const RELEASE_THRESHOLDS = {\n  minReviewedQuestions: 60,\n  minTopics: 8,\n  minPerTopic: 5,\n} as const;\n"
     )
     DEPLOY = (
         "on:\n  workflow_dispatch:\n    inputs:\n"
@@ -283,7 +286,16 @@ class TemplateTests(GovernanceCase):
         text = (ROOT / "templates/sprint-plan-template.md").read_text(encoding="utf-8").lower()
         for heading in ("## sprint", "## committed issues", "## scope changes", "## issue creation log", "## sprint review"):
             self.assertIn(heading, text)
-        for field in ("sprint id:", "start:", "end:", "status:", "goal:", "approved by:", "membership source:", "capacity (points):"):
+        for field in (
+            "sprint id:",
+            "start:",
+            "end:",
+            "status:",
+            "goal:",
+            "approved by:",
+            "membership source:",
+            "capacity (points):",
+        ):
             self.assertIn(field, text)
 
     def test_project_state_template_has_release_sections(self):
