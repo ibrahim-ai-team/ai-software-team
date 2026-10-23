@@ -9,6 +9,10 @@ description: Use when designing load, stress, spike, endurance, scalability, or 
 
 Use when latency, throughput, concurrency, capacity, resource efficiency, or performance regression is part of the acceptance criteria.
 
+## Required inputs
+
+Measurable performance requirements (latency, throughput, budgets), a representative environment and data set, and the baseline to compare with. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 1. Define target journeys/endpoints, workload assumptions, concurrency, ramp-up, duration, test data, and explicit pass/fail thresholds.

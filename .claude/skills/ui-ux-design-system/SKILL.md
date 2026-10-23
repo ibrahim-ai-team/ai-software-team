@@ -9,6 +9,10 @@ description: Use when defining user flows, screen structure, interaction behavio
 
 Use for new or changed user-facing flows, navigation, forms, complex states, visual consistency, and design handoff before or alongside frontend implementation.
 
+## Required inputs
+
+The user stories and journeys, the target devices and accessibility level, and the existing design system or brand constraints. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 1. Read approved user stories and acceptance criteria; identify the user goal and critical path.

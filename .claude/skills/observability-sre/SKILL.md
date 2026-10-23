@@ -9,6 +9,10 @@ description: Use when defining service reliability objectives, telemetry, alerti
 
 Use when a service needs operational readiness, diagnosability, reliability targets, failure handling, alerting, or recovery procedures.
 
+## Required inputs
+
+The service's user journeys, the reliability objectives or the decision that none apply, the current telemetry and alerting, and the deployment model. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 1. Identify critical user journeys, dependencies, failure modes, data sensitivity, and operational owners.

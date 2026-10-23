@@ -9,6 +9,10 @@ description: Use when comparing architecture options or recording consequential 
 
 Use this skill during architecture design when boundaries, quality attributes, deployment topology, or a consequential technical choice needs evaluation.
 
+## Required inputs
+
+Requirements and quality attributes (NFRs), constraints (budget, hosting, team skills), existing ADRs, and the decision to be made. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 Start from requirements and quality attributes. Compare viable options against constraints, costs, security, operability, and reversibility. Record context, alternatives, decision, consequences, and evidence in an ADR.
