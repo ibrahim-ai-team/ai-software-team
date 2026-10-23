@@ -51,7 +51,7 @@ Labels do not enforce access control or prove an agent has claimed a task. Treat
 
 ## Sprint ceremony
 
-- **Sprint planning:** choose a goal, confirm Ready items and dependencies, estimate capacity, and report the commitment to the sponsor; seek approval only when it changes agreed scope, cost, risk or a deadline.
+- **Sprint planning:** choose a goal, confirm Ready items and dependencies, estimate capacity, and record the approval in the sprint record (`workflows/sprint-governance.md#sprint-planning`); ask the sponsor directly only when it changes agreed scope, cost, risk, release criteria or a deadline.
 - **During sprint:** keep status current, surface blockers quickly, and avoid adding major scope without explicit approval.
 - **Sprint review:** show merged outcomes and evidence; list unfinished tasks honestly.
 - **Retrospective:** record one or two actionable process improvements as backlog issues.
