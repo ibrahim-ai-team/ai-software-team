@@ -247,6 +247,9 @@ for path in skills:
     text = require_nonempty(path, "skill")
     if len(text.splitlines()) < 8:
         errors.append(f"Skill content is suspiciously short: {path.relative_to(ROOT)}")
+    for section in ("## When to use", "## Required inputs", "## Procedure", "## Expected outputs", "## Quality checks"):
+        if section not in text:
+            errors.append(f"Skill is missing the '{section[3:]}' section: {path.relative_to(ROOT)}")
     description = parse_frontmatter(path).get("description", "").strip()
     if len(description) < 20 or description.casefold() in {"skill", "todo", "tbd", "x"}:
         errors.append(f"Skill description is missing or too generic: {path.relative_to(ROOT)}")
@@ -279,6 +282,9 @@ required_files = [
     "workflows/project-bootstrap.md",
     "workflows/agile-agent-delivery.md",
     "workflows/orchestration-contract.md",
+    "workflows/sprint-governance.md",
+    "workflows/backlog-quality-gates.md",
+    "standards/agent-contract.md",
     "docs/orchestration-design.md",
     "docs/agent-traceability.md",
     "docs/verification-report.md",
@@ -302,6 +308,7 @@ if contract_path.is_file():
         "Daily report evidence rules",
         "human repository owner merges PRs",
         "atomic exclusivity",
+        "Authority and precedence",
     ):
         if marker.casefold() not in contract.casefold():
             errors.append(f"Orchestration contract missing required marker: {marker}")
