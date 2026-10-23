@@ -94,6 +94,10 @@ class SprintRecordTests(GovernanceCase):
         self.assertCode(errors, "G03")
         self.assertCode(errors, "G05")
 
+    def test_one_day_sprint_is_allowed_but_end_before_start_is_not(self):
+        self.assertEqual(self.sprints(sprint_record(start="2026-10-23", end="2026-10-23"), as_of=dt.date(2026, 10, 23)), [])
+        self.assertCode(self.sprints(sprint_record(start="2026-10-23", end="2026-10-22")), "G03", "before Start")
+
     def test_capacity_is_enforced(self):
         errors = self.sprints(sprint_record(committed=[item("#9", points=8), item("#10", points=5)]))
         self.assertCode(errors, "G15", "exceed capacity 10")

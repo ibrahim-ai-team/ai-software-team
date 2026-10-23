@@ -117,8 +117,8 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
         err("G01", f"Sprint ID must look like S1, S2, ... (got '{record.sprint_id}')")
     if record.start is None or record.end is None:
         err("G03", "Start and End must be real ISO dates (YYYY-MM-DD); do not invent or leave TBD")
-    elif record.end <= record.start:
-        err("G03", "End must be after Start")
+    elif record.end < record.start:
+        err("G03", "End must not be before Start")
     if is_empty(record.info.get("goal", "")):
         err("G04", "one measurable sprint goal is required")
     if record.status not in {"planned", "active", "closed"}:
