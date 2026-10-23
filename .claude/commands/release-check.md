@@ -8,7 +8,7 @@ Evaluate whether the requested release is ready for human approval. Delegate the
 
 ## Procedure
 
-1. Identify the release scope, target environment, and required approvals.
+1. Identify the release scope, target environment, and required approvals. Read the release criteria from the project state and run `python scripts/check_governance.py --state <state> --repo . --release`; a failure is a FAIL row (`workflows/sprint-governance.md#release-criteria`), never bypassed with a deploy-time override.
 2. Verify linked pull requests, required CI checks, test results, and known defects.
 3. Ask `release-manager` to coordinate the readiness checklist, changelog/release notes, rollback triggers, and unresolved owner decisions. Ask `sre-observability-engineer` to report telemetry/runbook/recovery readiness and `performance-engineer` to report performance evidence when relevant. Ask `code-review-security` for a read-only review of the actual diff and evidence; use `release-management`, `observability-sre`, `security-threat-modelling`, and `git-github-workflows` skills where relevant.
 4. Record each check as PASS, FAIL, BLOCKED, or NOT APPLICABLE with evidence.
