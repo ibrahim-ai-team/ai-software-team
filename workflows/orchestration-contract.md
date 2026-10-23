@@ -4,19 +4,32 @@
 
 This contract defines the repeatable control loop for a Claude Code session. It is a protocol, not a background service, distributed lock manager, or proof that Claude Code can discover or delegate to every profile. The coordinator of record is `agile-orchestrator`, started as the main session with `claude --agent agile-orchestrator`. If a session is started without it, the top-level session follows this same contract. Delegation is hub-and-spoke: only the orchestrator has the `Agent` tool; specialists return results to it and never call each other. Work stops when the session stops unless an independently configured scheduler invokes it.
 
-## Canonical state and precedence
+## Canonical state
 
 For each project, maintain a durable project state file in the project repository (recommended: `docs/project-state.md`) and task records in GitHub Issues when available. Keep sensitive values out of state files.
 
-Precedence when records disagree:
+Facts about code and checks come from the repository, commits, PR state and CI results; chat history and agent claims are context only, never proof. Task state comes from the canonical issue/Project status, then delegation records.
 
-1. Actual repository contents, commits, PR state, and CI results for code/check facts.
-2. Explicit sponsor decisions and recorded ADRs for approved decisions.
-3. Canonical task/issue status for task state.
-4. Delegation records and activity log for agent progress claims.
-5. Chat history and unverified agent claims are context only, never proof.
+Every project state snapshot must include: project ID/name, last reconciled timestamp (UTC), current phase, product goal and approved MVP scope, release criteria and open requirement conflicts, current sprint record, approved decisions and ADR links, assumptions, task IDs/status/owner/dependencies, active delegation IDs, PRs, CI/test evidence, blockers, sponsor decisions needed, next actions, and last known commit. If GitHub is unavailable, use a local state file and say that remote sync is unavailable.
 
-Every project state snapshot must include: project ID/name, last reconciled timestamp (UTC), current phase, goal/scope, approved decisions and ADR links, assumptions, task IDs/status/owner/dependencies, active delegation IDs, PRs, CI/test evidence, blockers, sponsor decisions needed, next actions, and last known commit. If GitHub is unavailable, use a local state file and say that remote sync is unavailable.
+## Authority and precedence
+
+When decisions, requirements or plans disagree, the higher source wins:
+
+1. Security constraints and repository protections (`standards/security-principles.md`, `.claude/settings.json`, rulesets).
+2. The latest explicit human (sponsor) decision, recorded with an ID and date in the project state.
+3. Approved product scope and release criteria (`## Release criteria` in the project state).
+4. The approved sprint goal and commitment (the sprint record, `workflows/sprint-governance.md`).
+5. Accepted requirements and acceptance criteria (story issues and planning documents).
+6. Repository standards and technical decisions (ADRs, `standards/`).
+7. Agent suggestions and generated plans.
+
+Rules:
+
+- A lower source never silently overrides a higher one. An agent suggestion, an older requirement or a code constant does not override an approved human decision.
+- When two sources conflict, the coordinator records the conflict (project state `## Requirement conflicts`: criterion, sources, impact, decision needed), stops work that depends on it, and asks the decision owner (see `standards/agent-contract.md#decision-authority`). It never picks the more ambitious or the more convenient option on its own.
+- A newer decision supersedes an older one only for what it states. Record which requirement it replaces, then update every copy listed as a mirror.
+- Each rule has one home: sprint rules in `workflows/sprint-governance.md`, issue creation in `workflows/backlog-quality-gates.md`, roles and decision authority in `standards/agent-contract.md`, status transitions in `workflows/project-status-transitions.md`. Commands and agent files link to them instead of copying them.
 
 ## Threat-model checkpoint
 
@@ -82,12 +95,12 @@ The team runs on the sponsor's Claude Pro subscription through Claude Code: no C
 - Permit at most two automatic retries for the same unchanged failure. Each retry must change one relevant condition or strategy; otherwise stop and report blocked. Do not loop indefinitely or burn context/tokens.
 - If an agent fails to return in the current session, mark `BLOCKED` and preserve partial work. Use `UNKNOWN` only as a reconciliation observation, not a task status. At session resume, inspect the branch/worktree and reconfirm ownership before reassignment; document the handover.
 - If CI fails, inspect the failing job and logs, reproduce when practical, and never downgrade or bypass required checks merely to make the PR green.
-- If requirements or architecture conflict, stop dependent work, record the conflict and impact, and resolve via the role owner or sponsor decision gate.
+- If requirements or architecture conflict, stop dependent work, record the conflict and impact, and resolve via the role owner or sponsor decision gate (see Authority and precedence).
 - On context/token pressure, stop starting new work, persist the checkpoint and handover, and report what remains. Never claim the overall project is complete because the budget or session ended.
 
 ## Backlog and project status integrity
 
-Follow `workflows/backlog-quality-gates.md` before a task is considered Ready. QA must map acceptance criteria to verification methods and identify distinct linked QA issues before sprint commitment. Follow `workflows/project-status-transitions.md` for the canonical GitHub Projects Status field and allowed transitions. A title prefix, issue body text, label, or agent assertion does not prove a board status changed. The coordinator must verify the actual Project V2 field after a status update. Report status-update failures without claiming success; keep the last verified state. Never set Done without a verified human-merged PR and completion evidence.
+Follow `workflows/sprint-governance.md` for sprint planning, scope changes, closure and release criteria, and the issue creation gate in `workflows/backlog-quality-gates.md` before creating any issue. Follow `workflows/backlog-quality-gates.md` before a task is considered Ready. QA must map acceptance criteria to verification methods and identify distinct linked QA issues before sprint commitment. Follow `workflows/project-status-transitions.md` for the canonical GitHub Projects Status field and allowed transitions. A title prefix, issue body text, label, or agent assertion does not prove a board status changed. The coordinator must verify the actual Project V2 field after a status update. Report status-update failures without claiming success; keep the last verified state. Never set Done without a verified human-merged PR and completion evidence.
 
 ## Quality and merge gate
 
