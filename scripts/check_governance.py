@@ -10,6 +10,7 @@ Usage:
   check_governance.py [--as-of YYYY-MM-DD] SPRINT_RECORD.md [...]
   check_governance.py --state PROJECT_STATE.md --repo DIR [--release]
   check_governance.py --pr-body PR_BODY.md
+  check_governance.py --transition KIND SRC DST
 
 Exit status: 0 when no error was found, 1 when an error was found, 2 on usage error.
 """
@@ -19,6 +20,11 @@ import datetime as dt
 import re
 import sys
 from pathlib import Path
+
+# Support direct execution as `python scripts/check_governance.py`.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from models.status import TransitionError, validate_transition
 
 SPRINT_ID = re.compile(r"^S\d+$")
 ISSUE_REF = re.compile(r"#\d+|https://github\.com/[^\s/]+/[^\s/]+/(?:pull|issues)/\d+")
@@ -405,6 +411,10 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--repo", type=Path, default=Path("."), help="repository root for release mirrors")
     parser.add_argument("--release", action="store_true", help="fail on open conflicts and release bypass inputs")
     parser.add_argument("--pr-body", type=Path, help="pull request body to check")
+    parser.add_argument(
+        "--transition", nargs=3, metavar=("KIND", "SRC", "DST"),
+        help="validate one ProjectPhase, TaskStatus, or DelegationStatus transition",
+    )
     parser.add_argument("--design-handoff", type=Path, help="design handoff record to validate")
     parser.add_argument(
         "--frontend-readiness", action="store_true", help="fail closed unless the supplied design handoff is valid"
@@ -412,11 +422,18 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     if args.as_of is None and args.sprints:
         parser.error("--as-of must be YYYY-MM-DD when validating sprint records")
-    if not (args.sprints or args.state or args.pr_body or args.design_handoff or args.frontend_readiness):
+    if not (args.sprints or args.state or args.pr_body or args.design_handoff or args.frontend_readiness or args.transition):
         parser.print_usage()
         return 2
     errors: list[str] = []
     notes: list[str] = []
+    if args.transition:
+        kind, src, dst = args.transition
+        try:
+            validate_transition(kind, src, dst)
+            print(f"Allowed transition: {kind} {src} -> {dst}")
+        except TransitionError as exc:
+            errors.append(str(exc))
     if args.sprints:
         errors += check_sprints(args.sprints, args.as_of)
     if args.state:
