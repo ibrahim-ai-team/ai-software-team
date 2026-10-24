@@ -1,44 +1,61 @@
 # EARS Specification
 
-> Use this template for every new story before backlog readiness. Replace all guidance text with story-specific content. Do not treat examples as requirements for the actual story.
+> Auteur : business-analyst. Validateur : product-owner. Approbateur humain : CP1.
+> Le BA est l'unique auteur de la spécification EARS finale. Le PO fournit et valide la valeur métier, mais ne réécrit pas la spec. Remplacer les consignes par du contenu propre à la story.
 
-## Context
+## Valeur métier (PO)
 
-- **Story ID:**
-- **Problem / user need:**
-- **Actors and environment:**
-- **Assumptions:**
-- **Dependencies:**
+- **Why — problème / valeur attendue :**
+- **For whom — utilisateur/persona cible :**
+- **Success metrics — mesure du succès :**
+- **Priorité (P0/P1/P2) :**
+- **Scope haut niveau — in scope :**
+- **Scope haut niveau — out of scope :**
 
-## Functional requirements (EARS)
+## Spécification (BA)
 
-Write each requirement as one testable EARS statement. Use the appropriate pattern:
+### Contexte
 
-- **Event-driven:** `When <trigger>, the system shall <behavior>.`
-- **State-driven:** `While <state>, the system shall <behavior>.`
-- **Unwanted behavior / condition:** `If <condition>, then the system shall <behavior>.`
+- **Story ID :**
+- **Acteurs et environnement :**
+- **Hypothèses :**
+- **Dépendances :**
+- **Glossaire :**
+- **Questions ouvertes :**
 
-### Examples
+### Exigences fonctionnelles (EARS)
 
-When a user submits valid credentials, the system shall create an authenticated session.
-If a payment is declined, then the system shall display a clear failure message and preserve the cart.
-While an account is locked, the system shall reject authentication attempts.
+Écrire chaque exigence sous forme EARS testable :
+- **Event-driven :** `When <trigger>, the system shall <behavior>.`
+- **State-driven :** `While <state>, the system shall <behavior>.`
+- **Condition :** `If <condition>, then the system shall <behavior>.`
 
-### Story requirements
+Exemples (à remplacer) :
+- When a user submits valid credentials, the system shall create an authenticated session.
+- If a payment is declined, then the system shall display a clear failure message and preserve the cart.
+- While an account is locked, the system shall reject authentication attempts.
+
+#### Exigences de la story
 
 - EARS-01:
 - EARS-02:
 
-## Non-functional constraints
+### Contraintes non fonctionnelles
 
-Record measurable constraints for performance, availability, accessibility, privacy, security, compatibility, observability, and operational limits as applicable.
+Consigner les contraintes mesurables pertinentes (performance, disponibilité, accessibilité, confidentialité, sécurité, compatibilité, observabilité et limites opérationnelles).
 
 - NFR-01:
 - NFR-02:
 
-## Acceptance criteria (Gherkin)
+### Workflows et cas limites
 
-Use observable Given/When/Then scenarios linked to requirement IDs.
+- Happy path :
+- Alternate paths :
+- Edge cases :
+
+### Critères d'acceptation (Gherkin)
+
+Utiliser des scénarios Given/When/Then observables liés aux identifiants d'exigence.
 
 ```gherkin
 Feature: <capability>
@@ -49,8 +66,14 @@ Feature: <capability>
     Then <expected result>
 ```
 
-## Out of scope
+### Matrice de traçabilité requirement → test
 
-List behaviors and changes explicitly excluded from this story.
+| Requirement ID | Critère / scénario Gherkin | Test ID |
+| --- | --- | --- |
+| EARS-01 | | |
+
+### Hors périmètre
+
+Lister les comportements et changements explicitement exclus de cette story.
 
 -
