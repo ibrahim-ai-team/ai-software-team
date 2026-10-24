@@ -3,6 +3,7 @@
 ## When the gate is required
 
 The orchestrator must require a design handoff before frontend implementation when a task introduces or materially changes any of:
+
 - a user journey, navigation path, or screen;
 - layout, visual hierarchy, or design-system behavior;
 - responsive behavior or supported viewport behavior;
@@ -13,6 +14,7 @@ For a truly minor change with no material design impact, the orchestrator may re
 ## Required handoff
 
 Create a durable handoff record using `templates/design-handoff-template.md` and link it from the User Story and frontend task. It must include:
+
 - User Story reference and the acceptance criteria covered;
 - a real Figma URL when Figma is available and appropriate, or a concrete repository artifact path/URL;
 - responsive behavior, interaction details, and applicable loading, empty, error, success, validation, accessibility and keyboard states;
@@ -24,6 +26,7 @@ Never invent a Figma URL. If Figma is unavailable or inappropriate, provide a co
 ## Stop conditions
 
 Frontend implementation must not begin while any of these is true:
+
 - the required handoff is missing;
 - the artifact is a placeholder or cannot be located;
 - acceptance criteria are not mapped to the handoff;
