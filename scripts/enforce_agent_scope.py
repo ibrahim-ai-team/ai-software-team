@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Fail-closed, read-only preflight for agent file scopes (Python 3.10+, stdlib)."""
+
 import argparse
 import fnmatch
 import json
@@ -20,7 +21,7 @@ def main() -> int:
         print("DENY: path must not be empty", file=sys.stderr)
         return 2
     pure = PurePosixPath(path)
-    if pure.is_absolute() or path.startswith("/") or "\\\\" in path or ".." in pure.parts or (len(path) >= 2 and path[1] == ":"):
+    if pure.is_absolute() or path.startswith("/") or "\\" in path or ".." in pure.parts or (len(path) >= 2 and path[1] == ":"):
         print(f"DENY: unsafe repository-relative path: {path}", file=sys.stderr)
         return 1
     normalized = pure.as_posix()

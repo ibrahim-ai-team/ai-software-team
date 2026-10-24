@@ -1,4 +1,5 @@
 """Regression tests for fail-closed agent scope checks."""
+
 import subprocess
 import sys
 import unittest
@@ -10,8 +11,7 @@ SCRIPT = ROOT / "scripts" / "enforce_agent_scope.py"
 
 def check(agent, path):
     return subprocess.run(
-        [sys.executable, str(SCRIPT), "--agent", agent, "--path", path],
-        cwd=ROOT, capture_output=True, text=True, check=False
+        [sys.executable, str(SCRIPT), "--agent", agent, "--path", path], cwd=ROOT, capture_output=True, text=True, check=False
     )
 
 
@@ -48,11 +48,17 @@ class EnforceAgentScopeTests(unittest.TestCase):
         self.assertEqual(check("backend-developer", "src/backend/../../README.md").returncode, 1)
 
     def test_checker_does_not_modify_repository_files(self):
-        before = {p.relative_to(ROOT).as_posix(): (p.stat().st_mtime_ns, p.stat().st_size)
-                  for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts}
+        before = {
+            p.relative_to(ROOT).as_posix(): (p.stat().st_mtime_ns, p.stat().st_size)
+            for p in ROOT.rglob("*")
+            if p.is_file() and ".git" not in p.parts
+        }
         check("backend-developer", "src/backend/app.py")
-        after = {p.relative_to(ROOT).as_posix(): (p.stat().st_mtime_ns, p.stat().st_size)
-                 for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts}
+        after = {
+            p.relative_to(ROOT).as_posix(): (p.stat().st_mtime_ns, p.stat().st_size)
+            for p in ROOT.rglob("*")
+            if p.is_file() and ".git" not in p.parts
+        }
         self.assertEqual(before, after)
 
 

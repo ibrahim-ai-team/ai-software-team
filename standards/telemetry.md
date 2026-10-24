@@ -44,7 +44,6 @@ Run `python scripts/analyze_telemetry.py` to summarize event counts per agent, e
 
 The log is append-only by convention and tooling, not tamper-proof. Treat it as operational evidence and review changes to the writer and its tests.
 
-
 ## Scope enforcement denials
 
 Every refused agent-scope check should emit a telemetry event with `action=error` and `details.refused_path` set to the denied repository-relative path. Do not log file contents, credentials, or other secrets.

@@ -154,4 +154,4 @@ Les scopes d'écriture sont centralisés dans `.claude/agent-scopes.json`. Avant
 python scripts/enforce_agent_scope.py --agent backend-developer --path src/backend/app.py
 ```
 
-Le code retour `0` autorise le chemin, `1` le refuse et `2` signale une erreur d'usage (par exemple un chemin vide). Un agent absent de la configuration est refusé. Ce précontrôle ne remplace pas une sandbox ou des permissions système qui empêchent effectivement une écriture non autorisée.
+Le code retour `0` autorise le chemin, `1` le refuse et `2` signale une erreur d'usage (for instance an empty path). Un agent absent de la configuration est refusé. Ce précontrôle does not replace a sandbox ou des permissions système qui empêchent effectivement une écriture non autorisée.

@@ -131,54 +131,33 @@
     ]
   },
   "performance-engineer": {
-    "allowed_paths": [
-      "tests/performance/**",
-      "docs/performance/**"
-    ],
+    "allowed_paths": [],
     "forbidden_paths": [
-      "src/**",
-      ".claude/agents/**"
+      "**"
     ]
   },
   "project-manager": {
-    "allowed_paths": [
-      "docs/project/**",
-      "docs/sprints/**"
-    ],
+    "allowed_paths": [],
     "forbidden_paths": [
-      "src/**",
-      ".claude/agents/**"
+      "**"
     ]
   },
   "release-manager": {
-    "allowed_paths": [
-      "docs/releases/**",
-      "scripts/release/**"
-    ],
+    "allowed_paths": [],
     "forbidden_paths": [
-      "src/**",
-      ".claude/agents/**"
+      "**"
     ]
   },
   "sre-observability-engineer": {
-    "allowed_paths": [
-      "infra/observability/**",
-      "docs/operations/**",
-      "tests/observability/**"
-    ],
+    "allowed_paths": [],
     "forbidden_paths": [
-      "src/frontend/**",
-      "src/backend/**",
-      ".claude/agents/**"
+      "**"
     ]
   },
   "technical-research": {
-    "allowed_paths": [
-      "docs/research/**"
-    ],
+    "allowed_paths": [],
     "forbidden_paths": [
-      "src/**",
-      ".claude/agents/**"
+      "**"
     ]
   }
 }

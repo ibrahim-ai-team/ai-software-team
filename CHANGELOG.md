@@ -4,8 +4,6 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
-### Added
-
 - Added fail-closed agent path-scope configuration, a standard-library preflight checker, regression tests, and documentation distinguishing preflight checks from runtime enforcement.
 
 ### Added
