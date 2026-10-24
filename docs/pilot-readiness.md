@@ -5,8 +5,12 @@ Assessed: 2026-10-19 against `main` `8bf343a`. Evidence for runtime results: [`v
 ## Access and what was applied
 
 - **Issues (applied and read back 2026-10-19):** titles, labels, assignee, `Priority`/`Effort` issue fields, #24 body, scope comments on #24/#25/#26/#32, and new pilot issue [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45). All 12 open issues read back with the intended Priority/Effort.
-- **GitHub Project #1 (Status field, views):** not reachable — Claude Code cloud sessions block GraphQL and organization-level Project endpoints. Status and view changes in the table below are **owner manual actions**.
+- **GitHub Project #1 (Status field, views):** board synchronization is **manual by design**. The available cloud execution/connector path cannot reliably dispatch and verify a workflow run on `main` or access organization-level Project V2 endpoints directly. The owner updates Status and views manually; no automated board-sync workflow is shipped.
 - Closed-issue `[DONE]` title prefixes were left unchanged (cosmetic; history preserved).
+
+## Project board status — manual by design
+
+GitHub Projects V2 status synchronization is **manual by design** in this repository. The available cloud execution/connector path cannot trigger and verify a workflow run on `main`, and it cannot reliably access organization-level Project V2 endpoints directly. Historical dispatches were made from a feature branch; they do not satisfy the requirement for a verified green run on `main`. Rather than keep an automation whose supported status cannot be demonstrated from this environment, the workflow was removed. Update the Project Status field and views manually, and do not assume issue changes automatically synchronize to the board.
 
 ## Board audit (from issues, PRs and repository evidence)
 
@@ -23,9 +27,9 @@ Assessed: 2026-10-19 against `main` `8bf343a`. Evidence for runtime results: [`v
 | A9 | No card for the pilot itself. | Created [#45](https://github.com/ibrahim-ai-team/ai-software-team/issues/45). |
 | A10 | Agents could not write Issues (403) until the Claude GitHub App was installed. Issues now work; Projects remain unreachable from cloud sessions. | Pilot updates board Status manually, or runs locally with `gh` for board writes. |
 | A11 | `docs/project-state.md` listed #23 as in progress and an old `main` SHA. | Updated in this branch. |
-| A12 | `project-status.yml` (board automation) has never run. | Leave as #40; update the board manually during the pilot. |
+| A12 | Automated board sync could not be verified on `main` through the available execution path. Historical dispatches were on a feature branch, not `main`. | Board sync is **manual by design**; remove the unverified workflow rather than imply it is a supported capability. |
 
-No duplicates warrant closing: #40 (status workflow) and #42 (claiming) are distinct; #34/#35/#36/#39 are distinct owner/settings items.
+No duplicates warrant closing: #40 (board-status maintenance decision) and #42 (claiming) are distinct; #34/#35/#36/#39 are distinct owner/settings items.
 
 ### Card-by-card target state
 
@@ -82,7 +86,7 @@ Add to `permissions.deny` in `.claude/settings.json`: `mcp__github__merge_pull_r
 
 ## Can wait until after the pilot
 
-#26 (calibrate from real data), #42 (needed only for parallel coding), #40 (board automation; update manually), #32, #43, #34, #35, #36, #39; per-agent model overrides; local/Termux runtime re-test unless the pilot runs locally
+#26 (calibrate from real data), #42 (needed only for parallel coding), #40 (board status is manual by design), #32, #43, #34, #35, #36, #39; per-agent model overrides; local/Termux runtime re-test unless the pilot runs locally
 
 ## First pilot sprint (proposal — no application work started)
 

@@ -4,7 +4,7 @@ Record only observed results. Static checks do not prove runtime behavior, and o
 
 ## Security hardening addition — dependency license check
 
-This change adds `.github/workflows/license-check.yml`, triggered on `push` and `pull_request` with `contents: read` only. It runs the standard-library `scripts/check_licenses.py`, which lists declared Python dependency license metadata and fails for GPL-3.0/AGPL or unverifiable/missing metadata. The existing `pre-commit.yml`, `project-status.yml`, `secret-scan.yml`, and `validate-team.yml` were audited: each already declares `permissions: contents: read`, uses SHA-pinned Actions where applicable, and does not use `write-all`. The Project status workflow uses the separate `PROJECTS_TOKEN`; its token scopes require independent owner review. These are static configuration observations; CI results for the new workflow must be recorded after it runs.
+This change adds `.github/workflows/license-check.yml`, triggered on `push` and `pull_request` with `contents: read` only. It runs the standard-library `scripts/check_licenses.py`, which lists declared Python dependency license metadata and fails for GPL-3.0/AGPL or unverifiable/missing metadata. The existing `pre-commit.yml`, `secret-scan.yml`, and `validate-team.yml` were audited: each declares `permissions: contents: read`, uses SHA-pinned Actions where applicable, and does not use `write-all`. Project V2 board status is maintained manually by design; this repository does not ship an automated board-sync workflow.
 
 ## Run 2026-10-19 — Claude Code cloud session (issue #25 / #24)
 
@@ -41,12 +41,12 @@ This change adds `.github/workflows/license-check.yml`, triggered on `push` and 
 
 - **GitHub MCP merge tools were not denied** (closed by RT-12 once merged). `.claude/settings.json` denied `gh pr merge` but not `mcp__github__merge_pull_request` / `mcp__github__enable_pr_auto_merge`. Agents act under the owner's GitHub identity, so branch protection cannot distinguish an agent merge from an owner merge. Tracked in #24.
 - **Branch protection on `main` (`GET branches/main/protection`, 2026-10-19):** PR required with 1 approval and code-owner review; force pushes and deletions blocked; **no required status checks**; `enforce_admins` off; no rulesets. Because agents act under the owner's account, merges rely on the admin bypass. Tracked in #24.
-- **GitHub Project #1:** not reachable from cloud sessions (GraphQL and org Project endpoints return 403 by design); `project-status.yml` has never run. Board state: NOT VERIFIED.
+- **GitHub Project #1:** not reliably accessible from the cloud execution path (GraphQL and organization Project endpoints returned 403). Board updates are manual by design; do not infer board state without an owner read-back.
 - **Issues:** after the Claude GitHub App install, issue create/edit/comment succeeded and were read back (#45 created).
 
-## Run 2026-10-19 — Project status workflow and board read-back (#40)
+## Historical Project V2 board-sync experiment (2026-10-19; feature branch only)
 
-Workflow `.github/workflows/project-status.yml` from branch `claude/ai-team-project-readiness-td7x2s`, dispatched via `workflow_dispatch`, `PROJECTS_TOKEN` present.
+The following historical GitHub Actions runs were dispatched from feature branch `claude/ai-team-project-readiness-td7x2s` using `PROJECTS_TOKEN`. They are historical experiment evidence only, not proof of a verified workflow on `main`; the automated workflow has since been removed and board synchronization is manual by design.
 
 | ID | Case | Observed | Result |
 | --- | --- | --- | --- |
