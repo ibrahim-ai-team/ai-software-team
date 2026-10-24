@@ -7,7 +7,7 @@ description: Use when defining user flows, screen structure, interaction behavio
 
 ## When to use
 
-Use for new or changed user-facing flows, navigation, forms, complex states, visual consistency, and design handoff before or alongside frontend implementation.
+Mandatory before frontend implementation for a new user journey, material layout/visual decision, responsive behavior, or interaction change. For genuinely minor changes with no meaningful design impact, document why the gate is not required and obtain designated approval. Follow `workflows/design-gate.md`; invoking this skill is not itself a completed design deliverable.
 
 ## Required inputs
 
@@ -15,12 +15,14 @@ The user stories and journeys, the target devices and accessibility level, and t
 
 ## Procedure
 
-1. Read approved user stories and acceptance criteria; identify the user goal and critical path.
+1. Read the approved User Story and acceptance criteria; record the story link and acceptance criteria covered in the handoff.
+2. If the gate applies, stop frontend implementation until an artifact is produced and approved. Use a real Figma URL when available and appropriate; never fabricate links. If Figma is unavailable or unnecessary, create a concrete repository artifact (for example, an annotated wireframe or design specification) and document the reason plus sponsor/design authority approval. An exception is not permission to proceed without any artifact or evidence.
+3. Identify the user goal and critical path.
 2. Map the flow and alternate/error paths. Mark assumptions and questions instead of inventing requirements.
 3. Describe screen hierarchy, component behavior, responsive breakpoints, and reusable patterns consistent with the existing design system.
 4. Specify loading, empty, error, success, validation, and destructive-action states as applicable.
 5. Include keyboard interaction, focus behavior, semantic controls, contrast/readability, and reduced-motion considerations.
-6. Hand off a concise specification to frontend and QA; review implementation against the agreed specification if requested.
+6. Hand off the artifact/specification to frontend and QA, linked to the story and acceptance criteria. Record approver and approval evidence. QA must verify applicable responsive breakpoints, interactions, accessibility, and loading/empty/error/success states against the approved artifact; report anything not applicable with a rationale.
 
 ## Expected outputs
 
