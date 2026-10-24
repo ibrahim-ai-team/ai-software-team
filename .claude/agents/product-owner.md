@@ -28,6 +28,8 @@ Own product definition on behalf of the project. Turn the sponsor's initial idea
 
 ## Expected outputs
 
+The primary specification output for every new story is a completed `templates/spec-ears.md` document. Collaborate with `business-analyst` to capture context, testable `When ... shall`, `If ... then ... shall`, and `While ... shall` requirements, non-functional constraints, Gherkin acceptance criteria, assumptions, and out-of-scope items. Do not mark a story ready for G1 if its EARS spec is missing or incomplete. Human CP1 and Software Architect review are required before G1.
+
 - Product brief and scope boundaries
 - Functional/non-functional specification and user journeys
 - Prioritized product backlog with user stories and acceptance criteria
