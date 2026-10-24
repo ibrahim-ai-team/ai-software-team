@@ -191,7 +191,6 @@ python scripts/detect_conflict.py --story US-123 --agents software-architect,tec
 
 Records live at `.claude/disagreements/<story>-<topic>.md`. Each file must contain a valid JSON object with both positions, blocking points, `human_decision`, and the date. See [`standards/conflict-resolution.md`](standards/conflict-resolution.md) for the full schema and rules.
 
-
 ## How to read state/effective.json
 
 Generate a point-in-time reconciliation with `python scripts/status_snapshot.py`; use `--dry-run` to print JSON without writing, and `--output PATH` to choose another output path. The file contains `schema_version`, `generated_at`, `agents`, and `tasks`. Each agent reports declared and observed status, whether reliable evidence indicates drift, the age of the latest telemetry event, and staleness. `FRESH` means less than 15 minutes old, `STALE` means 15 minutes through 24 hours, and `UNKNOWN` means no usable event or an event older than 24 hours. `UNKNOWN` does not mean failed. Each task includes declared/observed status, drift, and evidence. GitHub issue/PR observations are included only when the optional `gh` CLI is installed and its queries succeed; otherwise the script warns and continues. Treat declarations as context, not proof, and inspect evidence before acting. See `docs/effective-schema.md` for field definitions.
