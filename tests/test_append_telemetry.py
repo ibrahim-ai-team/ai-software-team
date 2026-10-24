@@ -159,7 +159,13 @@ class AppendTelemetryTests(unittest.TestCase):
             "action": "delegate",
             "story": "US-2",
         }
-        summary = analyze_telemetry.summarize([legacy, enriched])
+        self.log_path.write_text(
+            json.dumps(legacy) + "\\n" + json.dumps(enriched) + "\\n",
+            encoding="utf-8",
+        )
+        loaded = analyze_telemetry.load_events(self.log_path)
+        self.assertEqual(len(loaded), 2)
+        summary = analyze_telemetry.summarize(loaded)
         self.assertIn("Events: 2", summary)
         self.assertIn("Legacy events: 1", summary)
         self.assertIn("qa-automation=1", summary)
