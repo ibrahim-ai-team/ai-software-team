@@ -36,6 +36,15 @@ class ValidatorRegressionTests(unittest.TestCase):
             check=False,
         )
 
+    def test_validator_rejects_missing_license_standard(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            copy = Path(temporary) / "repo"
+            shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", "__pycache__", ".venv", "venv"))
+            (copy / "standards/license-risk.md").unlink()
+            result = self.run_validator(copy)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Missing required", result.stdout)
+
     def test_static_validator_passes(self):
         result = self.run_validator(ROOT)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

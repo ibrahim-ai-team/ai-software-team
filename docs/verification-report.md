@@ -2,6 +2,10 @@
 
 Record only observed results. Static checks do not prove runtime behavior, and one runtime does not prove another (for example, a cloud session does not prove a local Termux/desktop installation).
 
+## Security hardening addition — dependency license check
+
+This change adds `.github/workflows/license-check.yml`, triggered on `push` and `pull_request` with `contents: read` only. It runs the standard-library `scripts/check_licenses.py`, which lists declared Python dependency license metadata and fails for GPL-3.0/AGPL or unverifiable/missing metadata. The existing `pre-commit.yml`, `project-status.yml`, `secret-scan.yml`, and `validate-team.yml` were audited: each already declares `permissions: contents: read`, uses SHA-pinned Actions where applicable, and does not use `write-all`. The Project status workflow uses the separate `PROJECTS_TOKEN`; its token scopes require independent owner review. These are static configuration observations; CI results for the new workflow must be recorded after it runs.
+
 ## Run 2026-10-19 — Claude Code cloud session (issue #25 / #24)
 
 - **Runtime:** Claude Code `2.1.303`, managed cloud session (Linux container) with this repository checked out at `main` `8bf343a` plus the readiness branch. Permission mode: auto-approval with a session safety layer, so some denials below may come from the session layer rather than only from `.claude/settings.json`.

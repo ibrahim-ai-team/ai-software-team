@@ -298,10 +298,14 @@ required_files = [
     "standards/validation-gates.md",
     "templates/spec-ears.md",
     "standards/agent-isolation.md",
+    "standards/license-risk.md",
+    "standards/ci-cd-hardening.md",
     "scripts/new_worktree.sh",
     "scripts/cleanup_worktree.sh",
     "tests/test_worktree.sh",
     "scripts/roi_report.py",
+    "scripts/check_licenses.py",
+    "tests/test_license_check.py",
     ".claude/metrics/README.md",
     "tests/test_roi_report.py",
 ]
@@ -455,6 +459,29 @@ if workflow_text:
         errors.append("Validation workflow checkout must set persist-credentials: false")
     if re.search(r"(?m)^\s*uses:\s*[^\n]+@(?:v?\d+(?:\.\d+){0,2}|main|master)\s*(?:#.*)?$", workflow_text):
         errors.append("Validation workflow must pin actions to full commit SHAs")
+
+# Every workflow must declare least-privilege token permissions; write-all is prohibited.
+workflow_dir = ROOT / ".github" / "workflows"
+for candidate in sorted(workflow_dir.glob("*.yml")) + sorted(workflow_dir.glob("*.yaml")):
+    workflow = require_nonempty(candidate, "GitHub Actions workflow")
+    if not workflow:
+        continue
+    if re.search(r"(?im)^\s*permissions\s*:\s*write-all\s*$", workflow):
+        errors.append(f"Workflow must not use permissions: write-all: {candidate.relative_to(ROOT)}")
+    if not re.search(r"(?m)^permissions:\s*\n(?:^[ \t]+[^\n]+\n?)+", workflow):
+        errors.append(f"Workflow must declare explicit least-privilege permissions: {candidate.relative_to(ROOT)}")
+
+license_workflow = ROOT / ".github" / "workflows" / "license-check.yml"
+license_workflow_text = require_nonempty(license_workflow, "dependency license workflow")
+if license_workflow_text:
+    if not re.search(r"(?m)^\s*contents:\s*read\s*$", license_workflow_text):
+        errors.append("License check workflow must keep contents permission read-only")
+    if not re.search(r"(?m)^\s*push\s*:", license_workflow_text) or not re.search(
+        r"(?m)^\s*pull_request\s*:", license_workflow_text
+    ):
+        errors.append("License check workflow must run on push and pull_request")
+    if "scripts/check_licenses.py" not in license_workflow_text:
+        errors.append("License check workflow must run scripts/check_licenses.py")
 
 secret_workflow = ROOT / ".github" / "workflows" / "secret-scan.yml"
 secret_text = require_nonempty(secret_workflow, "secret scanning workflow")
