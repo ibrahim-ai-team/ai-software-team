@@ -156,5 +156,3 @@ python scripts/enforce_agent_scope.py --agent backend-developer --path src/backe
 ```
 
 Exit code `0` allows the path, `1` denies it, and `2` indicates a usage error (for instance, an empty path). An agent missing from the configuration is denied. This preflight does not replace a sandbox or operating-system permissions that actually prevent unauthorized writes.
-
-
