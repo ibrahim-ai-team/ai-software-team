@@ -1,6 +1,4 @@
 import unittest
-from enum import Enum
-
 from models.status import (
     ALLOWED_TRANSITIONS,
     DelegationStatus,
