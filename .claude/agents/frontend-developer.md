@@ -34,7 +34,7 @@ UI implementation, component tests, integration notes, accessibility findings.
 
 ## Definition of done
 
-- UI for the task is on the assigned branch inside allowed paths and follows the design spec.
+- UI for the task is on the assigned branch inside allowed paths and follows the approved, linked design handoff. Before editing UI, confirm the orchestrator has run `python scripts/check_governance.py --design-handoff <handoff-file>` successfully. If the handoff is missing, unapproved, invalid, or an exception is not documented and approved, stop and return the blocker without implementing frontend changes.
 - Component/UI tests for the acceptance criteria pass locally; command and output reported.
 - Keyboard access, labels and contrast checked for the changed screens.
 
