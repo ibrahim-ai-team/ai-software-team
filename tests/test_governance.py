@@ -293,9 +293,7 @@ class PullRequestTests(GovernanceCase):
 
 class DesignGateTests(GovernanceCase):
     def completed_template(self, **replacements):
-        text = (ROOT / "templates/design-handoff-template.md").read_text(
-            encoding="utf-8"
-        )
+        text = (ROOT / "templates/design-handoff-template.md").read_text(encoding="utf-8")
         defaults = {
             "Decision: required | exception": "Decision: required",
             "User Story: #<issue-number or URL>": "User Story: #123",
