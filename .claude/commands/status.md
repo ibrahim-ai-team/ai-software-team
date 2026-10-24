@@ -1,17 +1,19 @@
 ---
-description: Report project status from repository and durable state
+description: Display persisted effective status for humans or scripts
 ---
 
 # Status
 
-Reconcile task and delegation state using `project-manager` guidance and `docs/agent-traceability.md`. Do not infer completion from agent claims; verify branch/PR/CI evidence. Use `documentation-session-handover` when updating durable state.
+Run the status report against the persisted `state/effective.json` snapshot:
 
-Reconcile current repository, project state, backlog/task records, branches, PRs, and CI where access exists. Report:
+```bash
+python scripts/status_report.py
+```
 
-- Current phase and sprint goal
-- Done/in progress/Ready/blocked stories with IDs and owners
-- Latest commit, open PRs, and observed CI/test evidence
-- Risks, dependencies, stale tasks, and sponsor decisions needed
-- Next 1–3 actions
+Options:
 
-Distinguish verified facts from unverified notes. If a remote system is unavailable, say so and use local state; do not invent issue IDs, board updates, commits, or test results.
+- `--json`: emit the effective snapshot as JSON on stdout, suitable for pipes (for example, `python scripts/status_report.py --json | python -m json.tool`).
+- `--filter agent=AGENT_ID`: show one agent, matched against `agent_id` (case-insensitive).
+- `--filter task=TASK_ID`: show one task, matched against `task_id` (case-insensitive).
+
+The default output is a compact human-readable table. The report reads only `state/effective.json`; it does not reconstruct status from `project-state.md` or telemetry. If the snapshot is missing, unreadable, or older than one hour, the command warns and still exits successfully so callers can inspect the available state. A stale snapshot is marked explicitly with its age.

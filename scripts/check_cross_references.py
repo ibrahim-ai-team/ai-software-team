@@ -96,7 +96,10 @@ def check(root: Path) -> list[str]:
         for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             for token in CODE_SPAN.findall(line):
                 if PATH.match(token) and "*" not in token:
-                    if not (root / token).exists():
+                    # The status snapshot is a generated runtime artifact; its
+                    # absence in a clean checkout is an expected degraded state.
+                    generated_paths = {"state/effective.json"}
+                    if token not in generated_paths and not (root / token).exists():
                         errors.append(f"{shown}:{line_number}: missing referenced path '{token}'")
                 elif NAME.match(token) and token not in known_names:
                     errors.append(f"{shown}:{line_number}: unknown agent/skill/command '{token}'")
