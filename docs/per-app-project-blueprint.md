@@ -69,6 +69,6 @@ If the GitHub Project UI does not support a filter exactly as written, use the c
 
 Project creation and view configuration are not performed by this document. Until an authorized bootstrap tool is implemented and tested, create/configure Projects in GitHub's UI and verify the result manually.
 
-`.github/workflows/project-status.yml` accepts `project_owner` and `project_number`, but it only updates issues of the repository it runs in. To use it for an application board, copy it into the application repository, add a `PROJECTS_TOKEN` secret scoped to that Project, and record one real update and read-back before relying on it. Never grant broader permissions just to make a workflow pass.
+Project V2 board status synchronization is manual by design. For each application board, update the Status field directly in GitHub Projects and read it back. Do not copy or promise an unverified automation workflow, and never grant broader permissions merely to make an automation pass.
 
 GitHub Projects does not coordinate local Claude Code sessions on its own. A future orchestrator must add claim/lock handling, isolated branches or worktrees, evidence collection, and safe status updates. Do not run multiple coding agents in one shared working directory. Never merge a PR automatically.
