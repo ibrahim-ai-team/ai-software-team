@@ -29,7 +29,8 @@ class CoordinatorLockTests(unittest.TestCase):
                 set(lock),
                 {"pid", "hostname", "started_at", "ttl_seconds", "holder"},
             )
-            self.assertEqual(lock["pid"], __import__("os").getpid() if False else lock["pid"])
+            self.assertIsInstance(lock["pid"], int)
+            self.assertGreater(lock["pid"], 0)
             self.assertEqual(lock["ttl_seconds"], 3600)
             self.assertTrue(lock["hostname"])
             self.assertTrue(lock["holder"])
