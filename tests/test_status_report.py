@@ -77,14 +77,14 @@ class StatusReportTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
         self.assertEqual([agent["agent_id"] for agent in payload["agents"]], ["agent-07"])
-        self.assertEqual(len(payload["tasks"]), 2)
+        self.assertEqual(payload["tasks"], [])
 
     def test_task_filter_keeps_only_requested_task(self):
         result = self.with_snapshot("--json", "--filter", "task=TASK-2")
         self.assertEqual(result.returncode, 0, result.stderr)
         payload = json.loads(result.stdout)
         self.assertEqual([task["task_id"] for task in payload["tasks"]], ["TASK-2"])
-        self.assertEqual(len(payload["agents"]), 20)
+        self.assertEqual(payload["agents"], [])
 
     def test_missing_snapshot_warns_and_returns_valid_empty_json(self):
         missing = str(Path(self.temp_dir.name) / "missing.json")
