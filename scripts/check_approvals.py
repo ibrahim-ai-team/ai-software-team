@@ -20,9 +20,7 @@ SHA256_PATTERN = re.compile(r"^[a-fA-F0-9]{64}$")
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--story", required=True, help="Story identifier, e.g. SHOP-12")
-    parser.add_argument(
-        "--checkpoint", required=True, choices=CHECKPOINTS, help="Human checkpoint"
-    )
+    parser.add_argument("--checkpoint", required=True, choices=CHECKPOINTS, help="Human checkpoint")
     return parser.parse_args(argv)
 
 
@@ -64,9 +62,7 @@ def validate_record(story: str, checkpoint: str, path: Path) -> tuple[bool, str]
         return False, "approved_by must be a non-empty username"
     if not is_iso8601(record.get("date")):
         return False, "date must be an ISO 8601 datetime with timezone"
-    if not isinstance(record.get("artifact_hash"), str) or not SHA256_PATTERN.fullmatch(
-        record["artifact_hash"]
-    ):
+    if not isinstance(record.get("artifact_hash"), str) or not SHA256_PATTERN.fullmatch(record["artifact_hash"]):
         return False, "artifact_hash must be a 64-character SHA-256 hex digest"
 
     return True, "approval record is valid"
