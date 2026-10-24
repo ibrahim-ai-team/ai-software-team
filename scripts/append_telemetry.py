@@ -84,8 +84,9 @@ def canonical_json(obj: Any) -> str:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
-def previous_event_hash(path: Path = LOG_PATH) -> str:
+def previous_event_hash(path: Path | None = None) -> str:
     """Return the last recorded hash, or genesis for a new/empty log."""
+    path = path or LOG_PATH
     if not path.exists() or path.stat().st_size == 0:
         return "genesis"
     try:
