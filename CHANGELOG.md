@@ -5,6 +5,7 @@ Notable changes to this starter kit are recorded here.
 ## Unreleased
 
 ### Added
+
 - Agent worktree isolation policy, portable creation/cleanup scripts, and shell regression tests. Writing agents are instructed to work only inside their assigned per-story worktree and never write directly to `main`.
 
 - Added: EARS specification template and SDD standard requiring validated story specs before G1, Product Owner/Business Analyst ownership, human CP1 and Software Architect review, format tests, bootstrap workflow guidance, and README documentation.

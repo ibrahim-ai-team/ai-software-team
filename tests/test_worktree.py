@@ -1,8 +1,8 @@
 """Run the portable worktree shell regression suite from unittest discovery."""
 
-from pathlib import Path
 import subprocess
 import unittest
+from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
