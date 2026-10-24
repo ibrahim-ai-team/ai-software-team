@@ -8,6 +8,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 LOG_PATH = ROOT / ".claude" / "telemetry" / "activity.jsonl"
+IDENTITY_FIELDS = ("agent_id", "session_id", "run_id", "event_id")
 
 
 def parse_timestamp(value: Any) -> datetime:
@@ -39,10 +40,11 @@ def load_events(path: Path = LOG_PATH) -> list[dict[str, Any]]:
 
 
 def summarize(events: list[dict[str, Any]]) -> str:
-    """Return a stable, human-readable summary."""
+    """Return a stable summary, including a count of legacy events."""
     by_agent = Counter(str(event.get("agent", "unknown")) for event in events)
     errors = sum(event.get("action") == "error" for event in events)
     gates = sum(event.get("action") == "gate" for event in events)
+    legacy_events = sum(any(not event.get(field) for field in IDENTITY_FIELDS) for event in events)
     story_times: dict[str, list[datetime]] = defaultdict(list)
     for event in events:
         story = str(event.get("story", "none"))
@@ -63,7 +65,7 @@ def summarize(events: list[dict[str, Any]]) -> str:
     agents = ", ".join(f"{agent}={count}" for agent, count in sorted(by_agent.items())) or "none"
     return (
         f"Events: {len(events)} | Actions by agent: {agents}\n"
-        f"Errors: {errors} | Gates recorded: {gates}\n"
+        f"Errors: {errors} | Gates recorded: {gates} | Legacy events: {legacy_events}\n"
         f"Stories: {len(story_times)} | Average duration: {average:.2f}s"
     )
 

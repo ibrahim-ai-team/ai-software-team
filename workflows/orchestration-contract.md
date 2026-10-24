@@ -84,6 +84,10 @@ Transitions must be recorded with timestamp, previous phase, new phase, reason, 
 5. Choose the highest-priority unblocked task that fits the current phase and session budget; delegate only if the task is bounded and the environment supports the required agent/tool behavior.
 6. Before ending, persist outcomes, evidence, blockers, next action and handover. **Every session ends with a Project Manager report** (`/daily-report`, saved with the `/handover`): completed work, Issue and PR links, validation results, blockers and next steps, from reconciled state. A session stopped by a usage-limit warning still writes the report first.
 
+## Execution identity and telemetry correlation
+
+Each telemetry event must retain the existing fields and add `agent_id`, `session_id`, `run_id`, and a unique UUID4 `event_id`. Resolve `agent_id` from `--agent-id`/`AGENT_ID` (or the backward-compatible `--agent` argument) and validate it against `state/agents.json`. Set `SESSION_ID` and `RUN_ID`, or pass `--session-id` and `--run-id`, when multiple events belong to the same session/run; otherwise the writer generates a fresh UUID4 for each invocation. Never rename or remove `agent` or `trace_id`. Record `run_id` and `session_id` in every Active delegations row. Historical events missing the new identity fields remain readable and are counted as legacy by `scripts/analyze_telemetry.py`.
+
 ## Task ownership and concurrency
 
 - Give each task a stable ID and each delegation a unique ID, e.g. `STORY-12-D02`.

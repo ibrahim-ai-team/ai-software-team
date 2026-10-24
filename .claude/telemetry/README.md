@@ -18,4 +18,4 @@ Analyze the log:
 python scripts/analyze_telemetry.py
 ```
 
-The writer adds an ISO 8601 timestamp and UUID4 trace ID. It rejects invalid JSON and nested detail keys containing `token`, `password`, `api_key`, or `secret`. Never pass secret values to telemetry commands. See [the telemetry standard](../../standards/telemetry.md) for the schema, event guidance, and limitations.
+The writer adds an ISO 8601 timestamp, UUID4 `trace_id`, and UUID4 `event_id`. Each event also contains canonical `agent_id`, `session_id`, and `run_id`. Set `SESSION_ID`/`RUN_ID` or pass `--session-id`/`--run-id` to correlate multiple events; omitted IDs are generated per invocation. Unknown agent IDs are rejected against `state/agents.json`. Legacy records remain readable and are counted by the analyzer. The writer rejects invalid JSON and nested detail keys containing `token`, `password`, `api_key`, or `secret`. Never pass secret values to telemetry commands. See [the telemetry standard](../../standards/telemetry.md) for the schema, event guidance, and limitations.

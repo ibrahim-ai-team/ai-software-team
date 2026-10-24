@@ -1,0 +1,24 @@
+{
+  "agent_ids": [
+    "agile-orchestrator",
+    "product-owner",
+    "business-analyst",
+    "project-manager",
+    "software-architect",
+    "tech-lead",
+    "frontend-developer",
+    "backend-developer",
+    "qa-automation",
+    "devops-platform",
+    "code-review-security",
+    "ci-verifier",
+    "documentation-manager",
+    "github-integration",
+    "database-engineer",
+    "ui-ux-designer",
+    "technical-research",
+    "performance-engineer",
+    "sre-observability-engineer",
+    "release-manager"
+  ]
+}
