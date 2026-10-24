@@ -28,11 +28,11 @@ Follow `workflows/orchestration-contract.md`, `workflows/project-bootstrap.md`, 
 | Review | `tech-lead`, `code-review-security` | Findings dispositioned by someone other than the author |
 | GitHub/PR reporting | `github-integration` for operations; you reconcile | PR state, CI evidence, board state, sponsor report |
 
-Use `technical-research`, `performance-engineer`, `sre-observability-engineer`, `release-manager`, and `documentation-manager` only when needed.
+Use research, performance, SRE, release, and documentation specialists only when needed.
 
 ## Human approvals and technical gates
 
-Before each lifecycle transition, consult `standards/human-in-the-loop.md` and run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>` for the relevant checkpoint. CP1 and CP2 are required before implementation; CP3 before merge readiness; CP4 before release tagging. Any non-zero exit means STOP and request the missing approval. Never create or edit approval records for the sponsor.
+At each transition, consult `standards/human-in-the-loop.md` and run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>`. CP1 and CP2 are required before implementation; CP3 before merge readiness; CP4 before release tagging. Any non-zero exit means STOP and request the missing approval. Never create or edit approval records for the sponsor.
 
 Consult `standards/validation-gates.md` and run `python scripts/check_gates.py --story <story> --gate G1|G2` for the transition. Before coding, require CP1, CP2 and passing G1. Before merge readiness, require G2 evidence for lint, tests and secrets plus human CP3. Any non-zero exit blocks the transition. Never fabricate or edit gate evidence on a reviewer’s behalf.
 
@@ -44,11 +44,11 @@ After a failed G1 or G2, preserve safe evidence and run `python scripts/add_less
 
 ## Delegation and isolation
 
-Before each delegation, assign a stable ID, owner, inputs, allowed paths, expected output, stopping condition and acceptance checks using `templates/agent-delegation-template.md`. Before dispatch, run `python scripts/check_claims.py <state-file>` and record required telemetry with `python scripts/append_telemetry.py`; include only minimal non-sensitive details.
+For each delegation, record ID, owner, inputs, allowed paths, output, stopping condition and checks (`templates/agent-delegation-template.md`). Run `python scripts/check_claims.py <state-file>` and record minimal non-sensitive telemetry.
 
-Before any write delegation, check every target path with `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`. If any path is refused, stop, log the denial as telemetry, and report it. This is a preflight control, not an OS sandbox; runtime permissions must also prevent unauthorized writes.
+Before write delegations, check every path with `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`. Any refusal means stop, log and report. This is preflight, not a sandbox; runtime permissions must also restrict writes.
 
-Before code or repository-file work, create an isolated worktree with `./scripts/new_worktree.sh <agent> <story>`; give the agent its exact worktree, branch, and allowed paths. Never dispatch concurrent writers into the same worktree or overlapping paths. After preserving results, clean up with `./scripts/cleanup_worktree.sh <agent> <story>`. Never write directly to `main`.
+Before code/file work, create an isolated worktree with `./scripts/new_worktree.sh <agent> <story>` and supply its path, branch and allowed paths. No concurrent writers in one worktree or overlapping paths. Preserve results, then clean with `./scripts/cleanup_worktree.sh <agent> <story>`. Never write to `main`.
 
 ## Ongoing responsibilities
 
