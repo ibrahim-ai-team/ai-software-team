@@ -295,6 +295,36 @@ def check_pr_body(path: Path) -> list[str]:
     return errors
 
 
+def check_design_handoff(path: Path) -> list[str]:
+    """Validate a durable design-gate record before frontend implementation."""
+    parts = sections(path.read_text(encoding="utf-8"))
+    data = fields(parts.get("design gate", []))
+    errors: list[str] = []
+    required_fields = {
+        "story": "link the relevant User Story",
+        "decision": "Decision must be required or exception",
+        "artifact": "provide a real design artifact URL or repository path",
+        "acceptance criteria": "map the design to story acceptance criteria",
+        "approved by": "record the design approver",
+        "approval evidence": "link or describe durable approval evidence",
+        "qa verification": "record QA verification scope or N/A rationale",
+    }
+    for key, message in required_fields.items():
+        if is_empty(data.get(key, "")):
+            errors.append(f"{path}: D01 {message}")
+    story = data.get("story", "")
+    if not is_empty(story) and not ISSUE_REF.search(story):
+        errors.append(f"{path}: D01 Story must contain a GitHub issue reference or URL")
+    decision = data.get("decision", "").strip().lower()
+    if decision and decision not in {"required", "exception"}:
+        errors.append(f"{path}: D01 Decision must be required or exception")
+    artifact = data.get("artifact", "").strip()
+    if artifact and (artifact.lower() in {"tbd", "n/a", "none", "to be added", "-"} or not (artifact.startswith("https://") or artifact.startswith("http://") or "/" in artifact)):
+        errors.append(f"{path}: D01 Artifact must be a real URL or traceable repository path, not a placeholder")
+    if decision == "exception" and is_empty(data.get("exception rationale", "")):
+        errors.append(f"{path}: D01 an exception requires a documented rationale")
+    return errors
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("sprints", nargs="*", type=Path, help="sprint record files")
@@ -303,10 +333,11 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--repo", type=Path, default=Path("."), help="repository root for release mirrors")
     parser.add_argument("--release", action="store_true", help="fail on open conflicts and release bypass inputs")
     parser.add_argument("--pr-body", type=Path, help="pull request body to check")
+    parser.add_argument("--design-handoff", type=Path, help="design handoff record to validate")
     args = parser.parse_args(argv)
     if args.as_of is None:
         parser.error("--as-of must be YYYY-MM-DD")
-    if not (args.sprints or args.state or args.pr_body):
+    if not (args.sprints or args.state or args.pr_body or args.design_handoff):
         parser.print_usage()
         return 2
     errors: list[str] = []
@@ -318,6 +349,8 @@ def main(argv: list[str]) -> int:
         errors += release_errors
     if args.pr_body:
         errors += check_pr_body(args.pr_body)
+    if args.design_handoff:
+        errors += check_design_handoff(args.design_handoff)
     for note in notes:
         print(f"NOTE {note}")
     if errors:
