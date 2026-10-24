@@ -8,10 +8,15 @@ Use this workflow when the user provides a software idea and asks the team to bu
 
 Before backlog creation or implementation planning, the Product Owner and Business Analyst must create the story specification from `templates/spec-ears.md`. It must include context, testable EARS functional requirements, applicable non-functional constraints, Gherkin acceptance criteria, and out-of-scope boundaries. The human sponsor reviews and approves the plan/specification at CP1, and the Software Architect reviews technical feasibility and constraints. A story without a validated EARS spec must not pass G1; see `standards/spec-driven-development.md` and `standards/validation-gates.md`.
 
+## Étape 1 — créer les worktrees par agent
+
+Before delegating any task that writes repository files, the orchestrator runs `./scripts/new_worktree.sh <agent> <story>` and passes the resulting path, branch, and allowed paths to that agent. Each writing agent works only in its assigned worktree; concurrent writing tasks never share a worktree. At story completion, preserve/commit the work and run `./scripts/cleanup_worktree.sh <agent> <story>`; cleanup requires confirmation. Never write directly to `main`. See `standards/agent-isolation.md`.
+
 ## Workflow gates
 
 - **Étape 0 — Spec EARS avant backlog:** before creating or refining the backlog, `product-owner` and `business-analyst` produce a story-specific specification using `templates/spec-ears.md`. The `software-architect` validates technical feasibility and constraints, and the human sponsor approves it at CP1. A story without a validated EARS spec and recorded CP1 approval cannot pass G1; see `standards/spec-driven-development.md`.
 
+- **Gate 1 — Worktree isolation:** create a dedicated worktree for each writing agent/story with `scripts/new_worktree.sh`; no shared worktree for concurrent writers. Clean up with the confirmation-protected cleanup script after the story.
 - **Gate 0 — Activation:** A clear request such as "build an e-commerce site" activates the workflow; do not demand that the user write a complete project brief.
 - **Gate 1 — Discovery and specification:** Product Owner and Business Analyst derive the product brief, user personas/journeys, functional and non-functional requirements, scope boundaries, assumptions, risks, acceptance criteria, and unresolved questions. Ask the user only for material decisions that cannot safely be inferred. Record assumptions explicitly.
 - **Gate 2 — Architecture options:** Software Architect compares reasonable stack and system-shape options, including monorepo/multi-repo and modular monolith/microservices where relevant. Recommend the simplest architecture that meets the requirements; include trade-offs, operational burden, security, cost, and alternatives. Do not assume microservices or a framework by default.

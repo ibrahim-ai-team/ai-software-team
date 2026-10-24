@@ -47,4 +47,8 @@ Works with `software-architect`; `database-engineer`; `qa-automation`; `code-rev
 
 The task needs files outside allowed paths, an API contract or ADR is unclear or wrong, or tests cannot run in the environment.
 
+## Worktree isolation
+
+Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
+
 Follow `standards/agent-contract.md` for scope, return format and evidence rules.

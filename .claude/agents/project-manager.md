@@ -59,6 +59,10 @@ Act as Scrum Master and project manager for the AI software team. Turn the Produ
 
 Capacity cannot fit the sprint goal, an impediment needs another role or the sponsor, or records disagree with GitHub evidence.
 
+## Worktree isolation
+
+Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
+
 Follow `standards/agent-contract.md` for scope, return format and evidence rules.
 
 ## Definition of done

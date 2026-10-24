@@ -297,7 +297,10 @@ required_files = [
     "standards/human-in-the-loop.md",
     "standards/validation-gates.md",
     "templates/spec-ears.md",
-    "templates/spec-ears.md",
+    "standards/agent-isolation.md",
+    "scripts/new_worktree.sh",
+    "scripts/cleanup_worktree.sh",
+    "tests/test_worktree.sh",
 ]
 for relative in required_files:
     require_nonempty(ROOT / relative)
@@ -481,6 +484,10 @@ print(
 )
 print(f"Required documentation files checked: {len(required_files)}")
 print("Security checks: Claude deny rules, .gitignore, read-only CI, checkout credentials, Gitleaks and Dependabot")
+for script_name in ("new_worktree.sh", "cleanup_worktree.sh"):
+    script_path = ROOT / "scripts" / script_name
+    if script_path.is_file() and not (script_path.stat().st_mode & 0o111):
+        errors.append(f"Worktree script must be executable: scripts/{script_name}")
 print("Static-only validation: does not prove Claude Code runtime behavior or GitHub owner settings")
 
 if errors:

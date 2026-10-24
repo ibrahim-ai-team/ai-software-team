@@ -64,4 +64,8 @@ Do not incur costs, create external commitments, or authorize production actions
 
 Scope, priority or a business commitment needs the sponsor's decision.
 
+## Worktree isolation
+
+Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
+
 Follow `standards/agent-contract.md` for scope, return format and evidence rules.
