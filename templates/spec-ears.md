@@ -1,61 +1,61 @@
 # EARS Specification
 
-> Auteur : business-analyst. Validateur : product-owner. Approbateur humain : CP1.
-> Le BA est l'unique auteur de la spécification EARS finale. Le PO fournit et valide la valeur métier, mais ne réécrit pas la spec. Remplacer les consignes par du contenu propre à la story.
+> Author: business-analyst. Validator: product-owner. Human approver: CP1.
+> The BA is the sole author of the final EARS specification. The PO provides and validates business value but does not rewrite the specification. Replace these instructions with story-specific content.
 
-## Valeur métier (PO)
+## Business value (PO)
 
-- **Why — problème / valeur attendue :**
-- **For whom — utilisateur/persona cible :**
-- **Success metrics — mesure du succès :**
-- **Priorité (P0/P1/P2) :**
-- **Scope haut niveau — in scope :**
-- **Scope haut niveau — out of scope :**
+- **Why — problem / expected value:**
+- **For whom — target user/persona:**
+- **Success metrics — success measure:**
+- **Priority (P0/P1/P2):**
+- **High-level scope — in scope:**
+- **High-level scope — out of scope:**
 
-## Spécification (BA)
+## Specification (BA)
 
-### Contexte
+### Context
 
-- **Story ID :**
-- **Acteurs et environnement :**
-- **Hypothèses :**
-- **Dépendances :**
-- **Glossaire :**
-- **Questions ouvertes :**
+- **Story ID:**
+- **Actors and environment:**
+- **Assumptions:**
+- **Dependencies:**
+- **Glossary:**
+- **Open questions:**
 
-### Exigences fonctionnelles (EARS)
+### Functional requirements (EARS)
 
-Écrire chaque exigence sous forme EARS testable :
-- **Event-driven :** `When <trigger>, the system shall <behavior>.`
-- **State-driven :** `While <state>, the system shall <behavior>.`
-- **Condition :** `If <condition>, then the system shall <behavior>.`
+Write each requirement as a testable EARS statement:
+- **Event-driven:** `When <trigger>, the system shall <behavior>.`
+- **State-driven:** `While <state>, the system shall <behavior>.`
+- **Condition:** `If <condition>, then the system shall <behavior>.`
 
-Exemples (à remplacer) :
+Examples (replace these):
 - When a user submits valid credentials, the system shall create an authenticated session.
 - If a payment is declined, then the system shall display a clear failure message and preserve the cart.
 - While an account is locked, the system shall reject authentication attempts.
 
-#### Exigences de la story
+#### Story requirements
 
 - EARS-01:
 - EARS-02:
 
-### Contraintes non fonctionnelles
+### Non-functional constraints
 
-Consigner les contraintes mesurables pertinentes (performance, disponibilité, accessibilité, confidentialité, sécurité, compatibilité, observabilité et limites opérationnelles).
+Record relevant measurable constraints (performance, availability, accessibility, privacy, security, compatibility, observability, and operational limits).
 
 - NFR-01:
 - NFR-02:
 
-### Workflows et cas limites
+### Workflows and edge cases
 
-- Happy path :
-- Alternate paths :
-- Edge cases :
+- Happy path:
+- Alternate paths:
+- Edge cases:
 
-### Critères d'acceptation (Gherkin)
+### Acceptance criteria (Gherkin)
 
-Utiliser des scénarios Given/When/Then observables liés aux identifiants d'exigence.
+Use observable Given/When/Then scenarios linked to requirement IDs.
 
 ```gherkin
 Feature: <capability>
@@ -66,14 +66,14 @@ Feature: <capability>
     Then <expected result>
 ```
 
-### Matrice de traçabilité requirement → test
+### Requirement-to-test traceability matrix
 
-| Requirement ID | Critère / scénario Gherkin | Test ID |
+| Requirement ID | Criterion / Gherkin scenario | Test ID |
 | --- | --- | --- |
 | EARS-01 | | |
 
-### Hors périmètre
+### Out of scope
 
-Lister les comportements et changements explicitement exclus de cette story.
+List behaviors and changes explicitly excluded from this story.
 
 -
