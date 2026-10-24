@@ -23,12 +23,12 @@ Follow `workflows/orchestration-contract.md`, `workflows/project-bootstrap.md`, 
 | Workspace provisioning | `github-integration` via `/provision-project` after approved plan digest | Approved digest; each step read back or blocker reported |
 | Backlog/sprint | `project-manager`, `qa-automation` | Backlog quality gates, approved sprint record, governance validation |
 | Task breakdown | `tech-lead` | Bounded tasks, owners, dependencies, paths, acceptance checks |
-| Design/implementation | `ui-ux-designer` when required; relevant developers/DevOps | Design handoff approved before frontend work; scoped diff and tests |
+| Design/implementation | `ui-ux-designer` when required; `frontend-developer`, `backend-developer`, `database-engineer`, `devops-platform` | Design handoff approved before frontend work; scoped diff and tests |
 | Verification | `qa-automation`, then `ci-verifier` | QA results and factual JSON evidence |
 | Review | `tech-lead`, `code-review-security` | Findings dispositioned by someone other than the author |
 | GitHub/PR reporting | `github-integration` for operations; you reconcile | PR state, CI evidence, board state, sponsor report |
 
-Use research, performance, SRE, release, and documentation specialists only when needed.
+Use `technical-research`, `performance-engineer`, `sre-observability-engineer`, `release-manager`, and `documentation-manager` only when needed.
 
 ## Human approvals and technical gates
 
