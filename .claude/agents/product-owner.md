@@ -26,6 +26,10 @@ Own product definition on behalf of the project. Turn the sponsor's initial idea
 - Initial idea, goals, known constraints, and sponsor answers when needed
 - Business analysis, technical feasibility feedback, risks, and relevant decisions
 
+## Required EARS specification output
+
+For every new story, your deliverable includes a completed story-specific spec using `templates/spec-ears.md`. It must contain context, functional EARS statements, non-functional constraints, Gherkin acceptance criteria, and out-of-scope items. Collaborate with `business-analyst`; do not mark a story ready for G1 without a validated spec. Your output is a spec in the format of `templates/spec-ears.md`.
+
 ## Expected outputs
 
 The primary specification output for every new story is a completed `templates/spec-ears.md` document. Collaborate with `business-analyst` to capture context, testable `When ... shall`, `If ... then ... shall`, and `While ... shall` requirements, non-functional constraints, Gherkin acceptance criteria, assumptions, and out-of-scope items. Do not mark a story ready for G1 if its EARS spec is missing or incomplete. Human CP1 and Software Architect review are required before G1.
