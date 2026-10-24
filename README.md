@@ -55,6 +55,10 @@ Shared rules for every specialist: [`standards/agent-contract.md`](standards/age
 
 Every new story starts with a formal specification using [`templates/spec-ears.md`](templates/spec-ears.md) before it enters the backlog. The Product Owner and Business Analyst write testable EARS requirements, non-functional constraints, and Gherkin acceptance criteria. The human sponsor approves the plan at CP1 and the Software Architect reviews feasibility; a story without a validated spec cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md).
 
+## Isolation & concurrence
+
+Writing agents must use one dedicated Git worktree per agent and story. The orchestrator creates it before dispatch with `./scripts/new_worktree.sh <agent> <story>`; agents write only inside the supplied worktree and never write directly to `main`. Clean up after the story with `./scripts/cleanup_worktree.sh <agent> <story>`; the command requires explicit confirmation. See [`standards/agent-isolation.md`](standards/agent-isolation.md). Requires Git 2.5+, Bash, and standard POSIX utilities; supported on Linux, macOS, and WSL. Run `bash tests/test_worktree.sh` to exercise creation and cleanup.
+
 ## Spec-Driven Development (SDD / EARS)
 
 Every new story starts with a completed EARS specification before backlog readiness. The Product Owner and Business Analyst write it using [`templates/spec-ears.md`](templates/spec-ears.md); the Software Architect validates feasibility, and the human sponsor approves the specification at CP1. A story without a validated EARS spec and recorded CP1 approval cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md) and `tests/test_spec_ears.py` for the format guard.

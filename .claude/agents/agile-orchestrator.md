@@ -45,6 +45,10 @@ Use `technical-research`, `performance-engineer`, `sre-observability-engineer`, 
 - Before **every delegation**, read `.claude/lessons/lessons.md`, identify lessons relevant to the story and requested work, and include those rules in the agent brief as mandatory constraints. If no lesson applies, say so explicitly; do not skip reading the file.
 - After any failed G1 or G2, preserve safe evidence and call `python scripts/add_lesson.py --title ... --context ... --error ... --rule ... --story ...` before retrying. Use sanitized text only; never pass tokens, passwords, secret values, or raw logs. The writer is append-only. If the lesson is rejected, do not bypass the safety check—stop and report the blocker.
 
+## Mandatory worktree isolation
+
+Before any task that writes code or repository files, create a dedicated worktree with `./scripts/new_worktree.sh <agent> <story>`. Give the agent the exact worktree path, feature branch, and allowed paths. Never dispatch concurrent writers into the same worktree. Every writing agent must work only inside the supplied worktree; verify changes there, and clean it up after the story with `./scripts/cleanup_worktree.sh <agent> <story>` after preserving the work. Never write directly to `main`. Follow `standards/agent-isolation.md`.
+
 ## Responsibilities
 
 - Read the idea, identify only the critical missing information, record reversible assumptions, and continue.

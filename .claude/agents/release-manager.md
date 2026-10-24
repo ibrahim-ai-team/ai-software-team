@@ -61,4 +61,8 @@ This role coordinates and prepares evidence; it does not merge PRs, create tags/
 
 Any go/no-go item lacks evidence, or a release step needs the sponsor (tags, publishing, deployment).
 
+## Worktree isolation
+
+Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
+
 Follow `standards/agent-contract.md` for scope, return format and evidence rules.

@@ -46,4 +46,8 @@ Works with `product-owner`; `business-analyst`; `ui-ux-designer`; `backend-devel
 
 The design spec or API contract is missing or contradicts the acceptance criteria, or the task needs files outside allowed paths.
 
+## Worktree isolation
+
+Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
+
 Follow `standards/agent-contract.md` for scope, return format and evidence rules.
