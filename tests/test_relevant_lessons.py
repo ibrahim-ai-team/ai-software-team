@@ -11,12 +11,12 @@ from scripts import relevant_lessons
 
 def lesson(number, story="", tags="", day="2026-10-20"):
     return (
-        f"## L{number:03d} — Lesson {number}\\n\\n"
-        f"- **Context:** Example context.\\n"
-        f"- **Rule to apply:** Apply rule {number}.\\n"
-        f"- **Date:** {day}\\n"
-        f"- **Source story:** {story}\\n"
-        f"- **Tags:** {tags}\\n"
+        f"## L{number:03d} — Lesson {number}\n\n"
+        f"- **Context:** Example context.\n"
+        f"- **Rule to apply:** Apply rule {number}.\n"
+        f"- **Date:** {day}\n"
+        f"- **Source story:** {story}\n"
+        f"- **Tags:** {tags}\n"
     )
 
 
