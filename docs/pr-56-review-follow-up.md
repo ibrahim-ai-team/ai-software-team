@@ -13,6 +13,7 @@ This document separates corrections made in this PR from evidence that requires 
 ## Review finding 2 — Sprint approval authority
 
 The authority model is:
+
 1. The human sponsor approves the sprint unless a standing delegation is explicitly recorded in the project's committed state.
 2. Under that recorded delegation, the Product Owner may approve only plans within the approved MVP scope, capacity, and release criteria.
 3. A delegation must have a durable decision ID and be referenced in the sprint record's `Approved by` field with approver and date. A chat statement, agent assumption, or absence of objection is not approval.
@@ -24,6 +25,7 @@ The authority model is:
 The repository audit found the sprint template and simulated records in tests, but no committed `docs/sprints/*.md` operational sprint records at the time of this PR review. Therefore there are no known committed historical sprint records to migrate in this repository; this is not a claim about local or uncommitted files.
 
 Before enabling enforcement in another checkout:
+
 - Inventory sprint record files first.
 - Run `python scripts/check_governance.py <record paths>` against each existing record.
 - Preserve the original file/history and decisions; migrate a copy or use a dedicated PR.
@@ -35,6 +37,7 @@ Before enabling enforcement in another checkout:
 The existing Phase 9 governance tests are offline simulations. They exercise duplicate rejection, scope protection, Done evidence, sprint closure/replanning, release conflicts, and PR-body/merge-policy checks. They do **not** prove live Claude Code delegation, GitHub Project synchronization, or a real implementation-to-PR run.
 
 Minimum supervised acceptance scenario:
+
 1. Submit one small test idea and record the approved brief and acceptance criteria.
 2. Verify the design decision: attach a real design artifact or a documented, approved exception before applicable frontend work.
 3. Search for duplicates, create/link the backlog issue, and record priority, dependencies, AC and verification evidence.
