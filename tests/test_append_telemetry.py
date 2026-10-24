@@ -7,7 +7,7 @@ import sys
 import tempfile
 import unittest
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -19,24 +19,6 @@ class AppendTelemetryTests(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
         self.log_path = Path(self.temp_dir.name) / "activity.jsonl"
-        self.argv = patch.object(
-            sys,
-            "argv",
-            [
-                "append_telemetry.py",
-                "--agent",
-                "agile-orchestrator",
-                "--action",
-                "delegate",
-                "--story",
-                "US-1",
-                "--details",
-                '{"target":"qa-automation"}',
-            ],
-        )
-        self.argv.start()
-        self.addCleanup(self.argv.stop)
-
     def run_append(self, details=None):
         args = [
             "append_telemetry.py", "--agent", "agile-orchestrator",
