@@ -154,8 +154,8 @@ def main() -> int:
         event["event_hash"] = hashlib.sha256(
             (event["prev_hash"] + canonical_json(event_payload)).encode("utf-8")
         ).hexdigest()
-        with LOG_PATH.open("a", encoding="utf-8", newline="\\n") as handle:
-            handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\\n")
+        with LOG_PATH.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
     except (OSError, ValueError) as exc:
         print(f"ERROR: unable to append telemetry ({exc}).", file=sys.stderr)
         return 1
