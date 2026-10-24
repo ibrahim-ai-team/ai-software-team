@@ -18,6 +18,18 @@ Use the most authoritative available source for each fact:
 
 When sources disagree, do not silently choose the optimistic status. Record the mismatch, identify the latest verifiable source, and reconcile it.
 
+## Execution identity and event correlation
+
+Every telemetry event written by `scripts/append_telemetry.py` carries `agent_id`, `session_id`, `run_id`, and `event_id`, in addition to the existing event fields. `agent_id` must be one of the canonical IDs in `state/agents.json`; the legacy `agent` field and `trace_id` are retained for compatibility.
+
+- Resolve the agent with `--agent-id` or `AGENT_ID`; legacy `--agent` remains supported and is used as the fallback.
+- Supply the same `--session-id` or `SESSION_ID` for every event in one coordinator session. If omitted, a new UUID4 is generated for that invocation.
+- Supply the same `--run-id` or `RUN_ID` for events from one run. If omitted, a new UUID4 is generated for that invocation.
+- Each event gets its own UUID4 `event_id`. `trace_id` remains present and is not renamed.
+- `scripts/analyze_telemetry.py` continues to read historical JSONL records and reports records missing any of these identity fields as legacy events.
+
+The Active delegations table in `templates/project-state-template.md` records the corresponding `run_id` and `session_id` so the coordinator can connect a delegation to telemetry.
+
 ## Stable delegation IDs
 
 Give each delegated assignment a stable ID within the project, for example TASK-142-D01. Reuse that ID when updating the same assignment; create a new suffix for a genuinely new delegation. Include the ID in the issue comment, handover, or local activity record so that outputs can be traced.
