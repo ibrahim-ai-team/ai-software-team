@@ -10,6 +10,8 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Reject lesson sections containing sensitive-term markers (`token`, `password`, `api_key`, `secret`, `bearer`, `credential`) before selection; emit a generic stderr warning without exposing section content, with regression tests for password and token examples.
+
 - Added the read-only `ci-verifier` role and schema tests; separated factual CI verification from G2 security review.
 
 - Added the bounded `github-integration` agent and story-filtered lesson selection with regression tests.
