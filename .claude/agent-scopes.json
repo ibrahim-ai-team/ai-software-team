@@ -165,5 +165,11 @@
     "forbidden_paths": [
       "**"
     ]
+  },
+  "github-integration": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
   }
 }

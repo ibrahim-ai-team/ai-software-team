@@ -6,7 +6,7 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 
 | Area | Contents |
 | --- | --- |
-| Agents | 19 roles under `.claude/agents/`: one `agile-orchestrator` plus specialists (see [team roles](#team-roles)) |
+| Agents | 20 roles under `.claude/agents/`: one `agile-orchestrator` plus specialists (see [team roles](#team-roles)) |
 | Skills | 23 reusable procedures under `.claude/skills/` (the manifest minimum is 22) |
 | Shared instructions | `.claude/CLAUDE.md` and local permission guardrails in `.claude/settings.json` |
 | Standards | Engineering, security, Git workflow, and definition of done |
@@ -25,14 +25,15 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 
 1. Clone or download this repository.
 2. From the repository root, run `python scripts/validate_team.py`, `python scripts/smoke_discovery.py` (offline inventory check only), and `python -m unittest discover -s tests -v`.
-3. Start the team from this directory with `claude --agent agile-orchestrator`. This makes the orchestrator the main session; it delegates to the specialists.
-4. To check the setup only, ask it to report which agents and skills it discovers. To start a project, give it your idea (next section).
+3. The orchestrator filters persistent lessons before each delegation with `python scripts/relevant_lessons.py --story <story-id> --max 5`; only relevant, bounded results enter the brief.
+4. Start the team from this directory with `claude --agent agile-orchestrator`. This makes the orchestrator the main session; it delegates to the specialists.
+5. To check the setup only, ask it to report which agents and skills it discovers. To start a project, give it your idea (next section).
 
 For a fictional end-to-end illustration, see [Example Walkthrough](docs/example-walkthrough.md). The example is documentation, not runtime evidence.
 
 ## Team roles
 
-One orchestrator coordinates; specialists do the work and return results to it. Only the orchestrator can delegate.
+One orchestrator coordinates; specialists do the work and return results to it. Only the orchestrator can delegate. GitHub execution is always delegated to `github-integration`.
 
 | Role | Agent file |
 | --- | --- |
@@ -47,7 +48,7 @@ One orchestrator coordinates; specialists do the work and return results to it. 
 | DevOps Engineer | `.claude/agents/devops-platform.md` |
 | CI Verifier | `.claude/agents/ci-verifier.md` (Read + Bash only; closed verification command allowlist; no file writes) |
 | Code / Security Reviewer | `.claude/agents/code-review-security.md` (read-only) |
-| GitHub integration | `agile-orchestrator` (Issues, PRs, board status via `gh` and `.github/workflows/project-status.yml`) |
+| GitHub integration | `.claude/agents/github-integration.md` (delegated, execution-only Issues, PRs, board status and approved provisioning) |
 | Used when needed | `database-engineer`, `ui-ux-designer`, `technical-research`, `performance-engineer`, `sre-observability-engineer`, `release-manager`, `documentation-manager` |
 
 Shared rules for every specialist: [`standards/agent-contract.md`](standards/agent-contract.md).
