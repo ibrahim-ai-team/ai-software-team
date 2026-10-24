@@ -149,12 +149,8 @@ def main() -> int:
     try:
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
         event["prev_hash"] = previous_event_hash()
-        event_payload = {
-            key: value for key, value in event.items() if key not in {"prev_hash", "event_hash"}
-        }
-        event["event_hash"] = hashlib.sha256(
-            (event["prev_hash"] + canonical_json(event_payload)).encode("utf-8")
-        ).hexdigest()
+        event_payload = {key: value for key, value in event.items() if key not in {"prev_hash", "event_hash"}}
+        event["event_hash"] = hashlib.sha256((event["prev_hash"] + canonical_json(event_payload)).encode("utf-8")).hexdigest()
         with LOG_PATH.open("a", encoding="utf-8", newline="\n") as handle:
             handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
     except (OSError, ValueError) as exc:
