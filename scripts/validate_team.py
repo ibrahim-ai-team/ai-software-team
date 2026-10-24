@@ -323,8 +323,8 @@ for marker in ("$ARGUMENTS", "$CLAUDE_[A-Z0-9_]+", "<tool-name>", "<command-name
     if marker not in model_agnosticism_text:
         errors.append(f"Model agnosticism standard must document prohibited pattern: {marker}")
 agent_forbidden_patterns = (
-    (re.compile(r"\\$ARGUMENTS"), "$ARGUMENTS"),
-    (re.compile(r"\\$CLAUDE_[A-Z0-9_]+"), "$CLAUDE_[A-Z0-9_]+"),
+    (re.compile(r"\$ARGUMENTS"), "$ARGUMENTS"),
+    (re.compile(r"\$CLAUDE_[A-Z0-9_]+"), "$CLAUDE_[A-Z0-9_]+"),
     (re.compile(r"<tool-name>|<command-name>"), "Claude Code transcript/tool control marker"),
 )
 for agent_path in agents:
