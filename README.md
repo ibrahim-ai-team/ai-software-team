@@ -156,3 +156,20 @@ python scripts/enforce_agent_scope.py --agent backend-developer --path src/backe
 ```
 
 Exit code `0` allows the path, `1` denies it, and `2` indicates a usage error (for instance, an empty path). An agent missing from the configuration is denied. This preflight does not replace a sandbox or operating-system permissions that actually prevent unauthorized writes.
+
+
+## Résolution de conflits
+
+Les désaccords suivent une hiérarchie explicite : **sponsor humain > checkpoints CP1–CP4 > `software-architect` (architecture) > `tech-lead` (décisions de code) > autres agents**. Après deux tentatives infructueuses sur le même sujet, l'orchestrateur escalade automatiquement au sponsor humain, au checkpoint applicable, et bloque la transition concernée jusqu'à une décision humaine enregistrée.
+
+Avant chaque transition, l'orchestrateur exécute le détecteur en lecture seule :
+
+```bash
+python scripts/detect_conflict.py --story US-123 --agents software-architect,tech-lead
+```
+
+- Code `0` : aucun conflit pour cette story, ou tous les conflits ont une décision humaine valide.
+- Code `1` : désaccord non résolu — arrêt obligatoire et escalade.
+- Code `2` : arguments invalides, fichier illisible ou JSON invalide — arrêt obligatoire (fail-closed).
+
+Les dossiers sont conservés dans `.claude/disagreements/<story>-<topic>.md`. Leur contenu doit être un objet JSON valide comprenant les deux positions, les points de blocage, `human_decision` et la date. Le schéma et les règles complètes sont dans [`standards/conflict-resolution.md`](standards/conflict-resolution.md).
