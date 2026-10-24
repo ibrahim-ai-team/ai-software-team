@@ -12,7 +12,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.check_governance import check_pr_body, check_release, check_sprints
+from scripts.check_governance import check_design_handoff, check_pr_body, check_release, check_sprints
 
 ROOT = Path(__file__).resolve().parents[1]
 DAY = dt.date(2026, 11, 15)
@@ -284,6 +284,35 @@ class PullRequestTests(GovernanceCase):
         settings = json.loads((ROOT / ".claude/settings.json").read_text(encoding="utf-8"))
         self.assertIn("Bash(gh pr merge*)", settings["permissions"]["deny"])
 
+
+class DesignGateTests(GovernanceCase):
+    def record(self, **overrides):
+        values = {
+            "Story": "#123",
+            "Decision": "required",
+            "Artifact": "docs/designs/story-123.md",
+            "Acceptance criteria": "AC-1, AC-2",
+            "Approved by": "Product sponsor",
+            "Approval evidence": "Decision D-123 recorded in issue #123",
+            "QA verification": "Responsive, keyboard and loading/empty/error/success states",
+            "Exception rationale": "-",
+        }
+        values.update(overrides)
+        return "## Design gate\n" + "".join(f"- {key}: {value}\n" for key, value in values.items())
+
+    def test_approved_traceable_design_artifact_passes(self):
+        self.assertEqual(check_design_handoff(self.write("design.md", self.record())), [])
+
+    def test_missing_artifact_and_approval_are_rejected(self):
+        errors = check_design_handoff(self.write("missing.md", self.record(Artifact="TBD", **{"Approved by": "-"})))
+        self.assertTrue(any("Artifact" in e for e in errors), errors)
+        self.assertTrue(any("approver" in e for e in errors), errors)
+
+    def test_exception_requires_rationale(self):
+        content = self.record(Decision="exception", **{"Exception rationale": "No material UI change"})
+        self.assertEqual(check_design_handoff(self.write("exception.md", content)), [])
+        content = self.record(Decision="exception", **{"Exception rationale": "-"})
+        self.assertTrue(any("exception requires a documented rationale" in e for e in check_design_handoff(self.write("bad-exception.md", content))))
 
 class TemplateTests(GovernanceCase):
     def test_sprint_template_has_every_section_the_checker_reads(self):
