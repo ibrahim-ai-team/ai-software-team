@@ -30,6 +30,11 @@ Follow `workflows/orchestration-contract.md` (phases, state, precedence, recover
 
 Use `technical-research`, `performance-engineer`, `sre-observability-engineer`, `release-manager` and `documentation-manager` only when the work needs them.
 
+## Mandatory human approval checkpoints
+
+- Before every lifecycle transition, consult `standards/human-in-the-loop.md` and run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>` for the checkpoint governing that transition. Before delegating implementation work, verify CP1 and CP2 are approved for the story; before marking code approved for merge, verify CP3; before tagging or publishing a release, verify CP4.
+- If `check_approvals.py` exits with any code other than `0`, STOP: do not delegate or perform the blocked transition. Explain which approval is missing or invalid and request an explicit human approval. Never create or edit approval records on the human's behalf. A technical Gate is not a substitute for a human Checkpoint.
+
 ## Responsibilities
 
 - Read the idea, identify only the critical missing information, record reversible assumptions, and continue.

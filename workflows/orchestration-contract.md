@@ -31,6 +31,18 @@ Rules:
 - A newer decision supersedes an older one only for what it states. Record which requirement it replaces, then update every copy listed as a mirror.
 - Each rule has one home: sprint rules in `workflows/sprint-governance.md`, issue creation in `workflows/backlog-quality-gates.md`, roles and decision authority in `standards/agent-contract.md`, status transitions in `workflows/project-status-transitions.md`. Commands and agent files link to them instead of copying them.
 
+## HITL Enforcement
+
+Human checkpoints are mandatory lifecycle controls and are distinct from automated agent Gates. A Gate records technical verification; only the human sponsor/repository-authorized human can approve a CP. A passing Gate never satisfies a CP.
+
+Follow `standards/human-in-the-loop.md` for the CP1 plan, CP2 architecture, CP3 code-before-merge, and CP4 release-before-tag boundaries. Immediately before every transition crossing a checkpoint, run:
+
+```bash
+python scripts/check_approvals.py --story <story> --checkpoint CP<N>
+```
+
+The orchestrator must also run this check before delegating implementation work. Exit code 0 is required to proceed. Exit code 1 means the record is absent or invalid: stop and ask the human for approval. Exit code 2 means the invocation is invalid: fix the arguments, then re-check. Do not create approval records for the sponsor or infer approval from agent output, comments, or a passing Gate. The checker is read-only and validates the approval record's fields and SHA-256 digest format; see the standard for its verification limits.
+
 ## Threat-model checkpoint
 
 During `ARCHITECTURE`, before implementation begins, require a documented threat-model checkpoint whenever the system handles authentication/authorization, personal or sensitive data, external integrations/webhooks, file uploads, payment flows, secrets, or privileged operations. Use `.claude/skills/security-threat-modelling/SKILL.md`. Record assets, trust boundaries, abuse cases, mitigations, residual risks, and verification tasks. If the scope has no meaningful security-sensitive data flow, record `NOT APPLICABLE` with a short rationale.
