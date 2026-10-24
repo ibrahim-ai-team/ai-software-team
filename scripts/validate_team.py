@@ -186,15 +186,15 @@ if github_integration_text:
     required_github_markers = (
         "tools: Read, Bash, Grep, Glob", "Closed command allowlist", "Explicitly forbidden",
         "gh issue", "gh pr", "gh project", "git status", "git diff", "git log",
-        "never make product, priority, backlog, or sprint decisions",
+        "Do not make product, priority, backlog, or sprint decisions.",
         "gh pr merge", "git push", "git commit",
     )
     for marker in required_github_markers:
         if marker not in github_integration_text:
             errors.append(f"github-integration agent contract missing required marker: {marker}")
-    github_frontmatter_match = re.match(r"(?s)^---\\n(.*?)\\n---(?:\\n|$)", github_integration_text)
+    github_frontmatter_match = re.match(r"(?s)^---\n(.*?)\n---(?:\n|$)", github_integration_text)
     github_frontmatter = github_frontmatter_match.group(1) if github_frontmatter_match else ""
-    github_tools_match = re.search(r"(?m)^tools:[ \\t]*(.*?)[ \\t]*$", github_frontmatter)
+    github_tools_match = re.search(r"(?m)^tools:[ \t]*(.*?)[ \t]*$", github_frontmatter)
     if not github_tools_match or github_tools_match.group(1) != "Read, Bash, Grep, Glob":
         errors.append("github-integration must have exactly Read, Bash, Grep, Glob tools")
 
