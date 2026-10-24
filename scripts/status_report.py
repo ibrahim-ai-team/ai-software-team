@@ -110,8 +110,7 @@ def filter_snapshot(snapshot: dict[str, Any], expression: str | None) -> dict[st
     key = "agents" if kind == "agent" else "tasks"
     id_key = "agent_id" if kind == "agent" else "task_id"
     filtered[key] = [
-        item for item in snapshot.get(key, [])
-        if isinstance(item, dict) and str(item.get(id_key, "")).casefold() == value
+        item for item in snapshot.get(key, []) if isinstance(item, dict) and str(item.get(id_key, "")).casefold() == value
     ]
     other_key = "tasks" if kind == "agent" else "agents"
     filtered[other_key] = []
@@ -141,8 +140,7 @@ def render_table(headers: list[str], rows: list[list[Any]]) -> str:
     return "\n".join([header_line, separator, *body])
 
 
-def render_human(snapshot: dict[str, Any], expression: str | None, age: int | None,
-                 problems: list[str], health: str) -> str:
+def render_human(snapshot: dict[str, Any], expression: str | None, age: int | None, problems: list[str], health: str) -> str:
     """Render health warnings and requested entity rows."""
     lines: list[str] = [f"STATUS HEALTH: {health.upper()}"]
     lines.extend(f"WARNING: {problem}" for problem in problems)
@@ -157,25 +155,39 @@ def render_human(snapshot: dict[str, Any], expression: str | None, age: int | No
     if kind in (None, "agent"):
         agents = snapshot.get("agents", [])
         lines.append("Agents")
-        lines.append(render_table(
-            ["agent", "declared", "observed", "drift", "staleness", "last_event_age"],
-            [[agent.get("agent_id"), agent.get("declared"), agent.get("observed"),
-              agent.get("drift"), agent.get("staleness"),
-              f"{agent['last_event_age_seconds']}s" if agent.get("last_event_age_seconds") is not None else None]
-             for agent in agents if isinstance(agent, dict)],
-        ))
+        lines.append(
+            render_table(
+                ["agent", "declared", "observed", "drift", "staleness", "last_event_age"],
+                [
+                    [
+                        agent.get("agent_id"),
+                        agent.get("declared"),
+                        agent.get("observed"),
+                        agent.get("drift"),
+                        agent.get("staleness"),
+                        f"{agent['last_event_age_seconds']}s" if agent.get("last_event_age_seconds") is not None else None,
+                    ]
+                    for agent in agents
+                    if isinstance(agent, dict)
+                ],
+            )
+        )
         if not agents:
             lines.append("(no agents in snapshot)")
     if kind in (None, "task"):
         tasks = snapshot.get("tasks", [])
         if kind == "task" or (expression is None and tasks):
             lines.append("Tasks")
-            lines.append(render_table(
-                ["task", "declared", "observed", "drift", "staleness", "last_event_age"],
-                [[task.get("task_id"), task.get("declared"), task.get("observed"),
-                  task.get("drift"), None, None]
-                 for task in tasks if isinstance(task, dict)],
-            ))
+            lines.append(
+                render_table(
+                    ["task", "declared", "observed", "drift", "staleness", "last_event_age"],
+                    [
+                        [task.get("task_id"), task.get("declared"), task.get("observed"), task.get("drift"), None, None]
+                        for task in tasks
+                        if isinstance(task, dict)
+                    ],
+                )
+            )
             if not tasks:
                 lines.append("(no tasks in snapshot)")
     return "\n".join(lines) + "\n"
@@ -184,12 +196,11 @@ def render_human(snapshot: dict[str, Any], expression: str | None, age: int | No
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true", help="emit the snapshot JSON (backward-compatible)")
-    parser.add_argument("--health-json", action="store_true",
-                        help="emit a health envelope containing snapshot validity and age")
-    parser.add_argument("--strict", action="store_true",
-                        help="exit non-zero when snapshot is invalid, stale, or has a future timestamp")
-    parser.add_argument("--filter", metavar="agent=X|task=Y",
-                        help="show only one exact agent_id or task_id (case-insensitive)")
+    parser.add_argument("--health-json", action="store_true", help="emit a health envelope containing snapshot validity and age")
+    parser.add_argument(
+        "--strict", action="store_true", help="exit non-zero when snapshot is invalid, stale, or has a future timestamp"
+    )
+    parser.add_argument("--filter", metavar="agent=X|task=Y", help="show only one exact agent_id or task_id (case-insensitive)")
     parser.add_argument("--snapshot", type=Path, default=DEFAULT_SNAPSHOT, help=argparse.SUPPRESS)
     return parser.parse_args()
 
@@ -218,16 +229,20 @@ def main() -> int:
             print(f"WARNING: {problem}", file=sys.stderr)
 
     if args.health_json:
-        print(json.dumps({
-            "status_health": health,
-            "snapshot_valid": not any(
-                "stale" not in problem and "future" not in problem for problem in problems
-            ),
-            "snapshot_age_seconds": age,
-            "source": str(args.snapshot),
-            "problems": problems,
-            "snapshot": snapshot,
-        }, indent=2, ensure_ascii=False))
+        print(
+            json.dumps(
+                {
+                    "status_health": health,
+                    "snapshot_valid": not any("stale" not in problem and "future" not in problem for problem in problems),
+                    "snapshot_age_seconds": age,
+                    "source": str(args.snapshot),
+                    "problems": problems,
+                    "snapshot": snapshot,
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
     elif args.json:
         print(json.dumps(snapshot, indent=2, ensure_ascii=False))
     else:
