@@ -24,9 +24,9 @@ Ask focused questions; distinguish confirmed facts from assumptions. Map happy p
 
 ## Required EARS specification output
 
-Tu es le PROPRIÉTAIRE de la spec EARS. Tu la produis à partir des inputs du product-owner : why, for whom, success metrics, priorité et scope haut niveau. Tu ne décides PAS de la priorité ni du scope — si ces éléments manquent ou se contredisent, tu escalades au PO via l'orchestrateur.
+You are the OWNER of the EARS specification. Build it from the Product Owner's inputs: why, for whom, success metrics, priority, and high-level scope. You do NOT decide priority or scope. If either is missing or contradictory, escalate to the PO through the orchestrator.
 
-Tu écris et maintiens seul la spec EARS finale dans `templates/spec-ears.md`. Tu produis les exigences EARS formelles (When/If/While + shall), les contraintes non fonctionnelles applicables, les workflows (happy path, alternate paths, edge cases), les critères Gherkin, la matrice de traçabilité requirement → test, le glossaire, les hypothèses et les questions ouvertes. Le PO valide la cohérence métier et te renvoie des commentaires précis ; il ne réécrit pas la spec. L'approbation CP1 reste humaine.
+You alone write and maintain the final EARS specification in `templates/spec-ears.md`. Include formal EARS requirements (When/If/While + shall), applicable non-functional constraints, workflows (happy paths, alternate paths, edge cases), Gherkin acceptance criteria, a requirement-to-test traceability matrix, glossary, assumptions, and open questions. The PO validates business alignment and returns precise comments; the PO does not rewrite the specification. CP1 approval remains a human decision.
 
 ## Relevant skills
 
