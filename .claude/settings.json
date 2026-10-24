@@ -44,6 +44,7 @@
       "Bash(sed*.env*)",
       "Bash(awk*.env*)",
       "Read(./secrets/**)",
+      "Read(./.claude/telemetry/activity.jsonl)",
       "Edit(./.env)",
       "Edit(./.env.*)",
       "Edit(./**/*.pem)",
