@@ -26,4 +26,4 @@ Every requirement must describe observable behavior. Avoid vague statements such
 
 `Idea → Product Owner + Business Analyst → EARS spec → human CP1 + Software Architect review → G1 → implementation`
 
-The spec test in `tests/test_spec_ears.py` checks that the EARS template contains at least one line starting with `When `, `If `, or `While ` and containing `shall`. This lightweight test is a format guard, not a substitute for human review, architecture review, or complete requirements validation.
+The spec test in `tests/test_spec_ears.py` checks that the EARS template contains at least one line starting with `When`, `If`, or `While` and containing `shall`. This lightweight test is a format guard, not a substitute for human review, architecture review, or complete requirements validation.
