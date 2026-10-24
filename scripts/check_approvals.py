@@ -44,6 +44,8 @@ def validate_record(story: str, checkpoint: str, path: Path) -> tuple[bool, str]
         raw = path.read_text(encoding="utf-8")
     except FileNotFoundError:
         return False, f"approval record not found: {path.name}"
+    except UnicodeDecodeError:
+        return False, "approval record is not valid UTF-8"
     except OSError:
         return False, "approval record could not be read"
 
