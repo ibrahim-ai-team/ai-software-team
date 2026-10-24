@@ -12,7 +12,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.check_governance import check_pr_body, check_release, check_sprints
+from scripts.check_governance import (
+    check_design_handoff,
+    check_frontend_readiness,
+    check_pr_body,
+    check_release,
+    check_sprints,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 DAY = dt.date(2026, 11, 15)
@@ -283,6 +289,82 @@ class PullRequestTests(GovernanceCase):
     def test_8_merge_remains_denied_to_agents(self):
         settings = json.loads((ROOT / ".claude/settings.json").read_text(encoding="utf-8"))
         self.assertIn("Bash(gh pr merge*)", settings["permissions"]["deny"])
+
+
+class DesignGateTests(GovernanceCase):
+    def completed_template(self, **replacements):
+        text = (ROOT / "templates/design-handoff-template.md").read_text(encoding="utf-8")
+        defaults = {
+            "Decision: required | exception": "Decision: required",
+            "User Story: #<issue-number or URL>": "User Story: #123",
+            "Frontend task(s): #<issue-number(s)>": "Frontend task(s): #124",
+            "Acceptance criteria covered: <IDs or links>": "Acceptance criteria covered: AC-1, AC-2",
+            "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: docs/designs/story-123.md",
+            "Artifact type: Figma | annotated wireframe | design specification | other": "Artifact type: design specification",
+            "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): N/A",
+            "Approval status: approved | pending": "Approval status: approved",
+            "Approved by: <sponsor/designated decision authority>": "Approved by: Product sponsor",
+            "Approval evidence: <issue/PR/comment/decision record link>": "Approval evidence: https://github.com/example/repo/issues/123#issuecomment-456",
+            "Approval date (UTC): <YYYY-MM-DD>": "Approval date (UTC): 2026-10-24",
+            "Responsive viewports/states to verify:": "Responsive viewports/states to verify: Mobile and desktop",
+            "Interactions and acceptance criteria to verify:": "Interactions and acceptance criteria to verify: AC-1, AC-2",
+            "Accessibility checks:": "Accessibility checks: Keyboard and focus",
+            "Explicit N/A items and rationale:": "Explicit N/A items and rationale: None",
+            "Test evidence link(s):": "Test evidence link(s): https://github.com/example/repo/pull/124",
+            "QA verification: <scope or N/A rationale>": "QA verification: Mobile and desktop responsive states, interactions, keyboard access, and AC-1/AC-2",
+        }
+        for old, new in defaults.items():
+            text = text.replace(old, replacements.get(old, new))
+        return text
+
+    def test_completed_repository_template_passes(self):
+        handoff = self.write("design.md", self.completed_template())
+        self.assertEqual(check_design_handoff(handoff), [])
+        self.assertEqual(check_frontend_readiness(handoff), [])
+
+    def test_frontend_readiness_fails_closed_without_handoff(self):
+        errors = check_frontend_readiness(None)
+        self.assertTrue(any("frontend work is blocked" in error for error in errors), errors)
+
+    def test_template_placeholders_and_missing_approval_are_rejected(self):
+        text = self.completed_template(
+            **{
+                "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: TBD",
+                "Approved by: <sponsor/designated decision authority>": "Approved by: -",
+            }
+        )
+        errors = check_design_handoff(self.write("missing.md", text))
+        self.assertTrue(any("artifact" in error.lower() for error in errors), errors)
+        self.assertTrue(any("approver" in error for error in errors), errors)
+
+    def test_pending_approval_is_rejected(self):
+        text = self.completed_template(**{"Approval status: approved | pending": "Approval status: pending"})
+        errors = check_design_handoff(self.write("pending.md", text))
+        self.assertTrue(any("Approval status must be approved" in error for error in errors), errors)
+
+    def test_approved_minor_change_exception_may_omit_artifact(self):
+        text = self.completed_template(
+            **{
+                "Decision: required | exception": "Decision: exception",
+                "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: N/A",
+                "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): No material UI change; copy-only typo fix.",
+            }
+        )
+        self.assertEqual(
+            check_design_handoff(self.write("exception.md", text)),
+            [],
+        )
+
+    def test_exception_without_rationale_is_rejected(self):
+        text = self.completed_template(
+            **{
+                "Decision: required | exception": "Decision: exception",
+                "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: N/A",
+                "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): -",
+            }
+        )
+        errors = check_design_handoff(self.write("bad-exception.md", text))
+        self.assertTrue(any("exception requires a documented" in error for error in errors), errors)
 
 
 class TemplateTests(GovernanceCase):

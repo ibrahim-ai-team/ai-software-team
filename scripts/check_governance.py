@@ -295,6 +295,108 @@ def check_pr_body(path: Path) -> list[str]:
     return errors
 
 
+def check_design_handoff(path: Path) -> list[str]:
+    """Validate a design handoff copied from the repository template."""
+    parts = sections(path.read_text(encoding="utf-8"))
+    raw: dict[str, str] = {}
+    for section_lines in parts.values():
+        raw.update(fields(section_lines))
+
+    aliases = {
+        "story": ("story", "user story"),
+        "decision": ("decision",),
+        "artifact": ("artifact", "artifact url or repository path"),
+        "acceptance criteria": (
+            "acceptance criteria",
+            "acceptance criteria covered",
+        ),
+        "approved by": ("approved by",),
+        "approval status": ("approval status",),
+        "approval evidence": ("approval evidence",),
+        "qa verification": (
+            "qa verification",
+            "qa verification scope",
+            "test evidence link(s)",
+        ),
+        "exception rationale": (
+            "exception rationale",
+            "figma exception rationale (if applicable)",
+        ),
+    }
+    data: dict[str, str] = {}
+    for canonical, names in aliases.items():
+        for name in names:
+            if raw.get(name, "").strip():
+                data[canonical] = raw[name].strip()
+                break
+
+    errors: list[str] = []
+
+    def present(value: str) -> bool:
+        cleaned = value.strip().strip("`").lower()
+        return (
+            cleaned not in EMPTY
+            and not (cleaned.startswith("<") and cleaned.endswith(">"))
+            and not (cleaned.startswith("[") and cleaned.endswith("]"))
+        )
+
+    for key, message in {
+        "story": "link the relevant User Story",
+        "decision": "Decision must be required or exception",
+        "acceptance criteria": "map the design to story acceptance criteria",
+        "approved by": "record the design approver",
+        "approval status": "record Approval status as approved",
+        "approval evidence": "link or describe durable approval evidence",
+        "qa verification": "record QA verification scope or N/A rationale",
+    }.items():
+        if not present(data.get(key, "")):
+            errors.append(f"{path}: D01 {message}")
+
+    approval_status = data.get("approval status", "").strip().lower()
+    if present(approval_status) and approval_status != "approved":
+        errors.append(f"{path}: D01 Approval status must be approved before frontend work")
+
+    story = data.get("story", "")
+    if present(story) and not ISSUE_REF.search(story):
+        errors.append(f"{path}: D01 Story must contain a GitHub issue reference or URL")
+
+    decision = data.get("decision", "").strip().lower()
+    if present(decision) and decision not in {"required", "exception"}:
+        errors.append(f"{path}: D01 Decision must be required or exception")
+
+    artifact = data.get("artifact", "").strip()
+    if decision == "required" and not present(artifact):
+        errors.append(f"{path}: D01 a required design gate needs a design artifact")
+    if present(artifact) and (
+        artifact.lower() in {"tbd", "n/a", "none", "to be added", "-"}
+        or "<" in artifact
+        or ">" in artifact
+        or not (artifact.startswith("https://") or artifact.startswith("http://") or "/" in artifact)
+    ):
+        errors.append(f"{path}: D01 Artifact must be a real URL or traceable repository path, not a placeholder")
+
+    rationale = data.get("exception rationale", "")
+    if decision == "exception" and not present(rationale):
+        errors.append(f"{path}: D01 an exception requires a documented no-material-design-impact rationale")
+    if decision == "exception" and present(rationale):
+        normalized = rationale.lower()
+        if "no" not in normalized and "not" not in normalized and "minor" not in normalized:
+            errors.append(f"{path}: D01 exception rationale must explain why no material design artifact is needed")
+    evidence = data.get("approval evidence", "")
+    if not present(evidence):
+        errors.append(f"{path}: D01 approval evidence must not be a placeholder")
+    elif not (evidence.startswith("https://") or ISSUE_REF.search(evidence)):
+        errors.append(f"{path}: D01 approval evidence must link to a GitHub issue/PR or durable decision URL")
+    return errors
+
+
+def check_frontend_readiness(handoff: Path | None) -> list[str]:
+    """Fail closed when frontend work has no approved design handoff record."""
+    if handoff is None:
+        return ["D02 frontend work is blocked: provide an approved design handoff record"]
+    return check_design_handoff(handoff)
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("sprints", nargs="*", type=Path, help="sprint record files")
@@ -303,10 +405,14 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--repo", type=Path, default=Path("."), help="repository root for release mirrors")
     parser.add_argument("--release", action="store_true", help="fail on open conflicts and release bypass inputs")
     parser.add_argument("--pr-body", type=Path, help="pull request body to check")
+    parser.add_argument("--design-handoff", type=Path, help="design handoff record to validate")
+    parser.add_argument(
+        "--frontend-readiness", action="store_true", help="fail closed unless the supplied design handoff is valid"
+    )
     args = parser.parse_args(argv)
-    if args.as_of is None:
-        parser.error("--as-of must be YYYY-MM-DD")
-    if not (args.sprints or args.state or args.pr_body):
+    if args.as_of is None and args.sprints:
+        parser.error("--as-of must be YYYY-MM-DD when validating sprint records")
+    if not (args.sprints or args.state or args.pr_body or args.design_handoff or args.frontend_readiness):
         parser.print_usage()
         return 2
     errors: list[str] = []
@@ -318,6 +424,10 @@ def main(argv: list[str]) -> int:
         errors += release_errors
     if args.pr_body:
         errors += check_pr_body(args.pr_body)
+    if args.frontend_readiness:
+        errors += check_frontend_readiness(args.design_handoff)
+    elif args.design_handoff:
+        errors += check_design_handoff(args.design_handoff)
     for note in notes:
         print(f"NOTE {note}")
     if errors:
