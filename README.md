@@ -71,6 +71,10 @@ At the end of each sprint, the Project Manager records story-level agent minutes
 
 **Manual calculation example:** for 125,000 tokens at $0.000003/token, token cost is 125,000 × 0.000003 = $0.375. If equivalent human work is estimated at 2.5 hours and the rate is $80/hour, human cost is 2.5 × $80 = $200. The ROI ratio is $200 ÷ $0.375 = **533.33**. This is a cost comparison, not net profit; it excludes agent runtime and other infrastructure costs.
 
+## GitHub Projects status — manual by design
+
+GitHub Projects V2 board Status and views are updated **manually by design**. This repository does not ship automatic board-status synchronization: the available cloud execution path cannot reliably trigger and verify a workflow run on `main` with organization Project access. Do not assume changing an issue automatically changes its Project Status; update the board explicitly and verify the result.
+
 ## Agile commands
 
 A new idea becomes its own GitHub workspace named after the app you propose (for example `shopinow-management`, `shopinow-front`, `shopinow-back`) with one Project board through `/provision-project`; see [project provisioning](docs/project-provisioning.md). This repository is never copied per application.
