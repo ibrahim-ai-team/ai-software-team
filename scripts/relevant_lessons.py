@@ -1,6 +1,7 @@
-#!/usr/bin/env python3
 """Print a bounded set of lessons relevant to one story (standard library only)."""
+
 from __future__ import annotations
+
 import argparse
 import re
 from datetime import date
@@ -13,8 +14,9 @@ NO_LESSONS = "Aucune leçon applicable pour cette story"
 
 def _sections(text: str) -> list[str]:
     matches = list(re.finditer(r"(?m)^##\s+(L\d+)\s+—\s+(.+?)\s*$", text))
-    return [text[m.start():(matches[i + 1].start() if i + 1 < len(matches) else len(text))].strip()
-            for i, m in enumerate(matches)]
+    return [
+        text[m.start() : (matches[i + 1].start() if i + 1 < len(matches) else len(text))].strip() for i, m in enumerate(matches)
+    ]
 
 
 def _field(section: str, name: str) -> str:
