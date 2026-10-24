@@ -101,6 +101,10 @@ The team runs on the sponsor's Claude Pro subscription through Claude Code: no C
 - Never set `ANTHROPIC_API_KEY` or accept offers to buy API credits or extra usage; spending is a sponsor decision.
 - Stop starting new work when context or time pressure could prevent verification, evidence capture, or a useful handover.
 
+## Continuous learning after failed Gates
+
+At every failed Gate (G1 or G2), preserve the failing check and safe evidence, then **call `scripts/add_lesson.py` before retrying**. Record the context, observed error, and rule to apply in sanitized terms; use the originating story ID. Never copy logs or payloads that may contain credentials, tokens, passwords, or secrets into a lesson. The writer is append-only and rejects suspicious terms, but the caller remains responsible for redacting sensitive details. After appending, reread `.claude/lessons/lessons.md`, include relevant lessons in the retry brief, and change the remediation strategy before retrying. If a lesson cannot be safely recorded, stop and report the blocker rather than retrying silently.
+
 ## Retry, failure and recovery
 
 - On a failed task, preserve logs/evidence, identify the failing acceptance check, and classify as code defect, environment/tool issue, unclear requirement, dependency, or external access.
