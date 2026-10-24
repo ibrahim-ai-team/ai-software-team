@@ -160,7 +160,7 @@ class AppendTelemetryTests(unittest.TestCase):
             "story": "US-2",
         }
         self.log_path.write_text(
-            json.dumps(legacy) + "\\n" + json.dumps(enriched) + "\\n",
+            json.dumps(legacy) + "\n" + json.dumps(enriched) + "\n",
             encoding="utf-8",
         )
         loaded = analyze_telemetry.load_events(self.log_path)
