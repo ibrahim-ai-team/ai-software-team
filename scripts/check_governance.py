@@ -390,6 +390,14 @@ def check_design_handoff(path: Path) -> list[str]:
         errors.append(f"{path}: D01 approval evidence must not be a placeholder")
     return errors
 
+
+def check_frontend_readiness(handoff: Path | None) -> list[str]:
+    """Fail closed when frontend work has no approved design handoff record."""
+    if handoff is None:
+        return ["D02 frontend work is blocked: provide an approved design handoff record"]
+    return check_design_handoff(handoff)
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("sprints", nargs="*", type=Path, help="sprint record files")
@@ -399,10 +407,11 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--release", action="store_true", help="fail on open conflicts and release bypass inputs")
     parser.add_argument("--pr-body", type=Path, help="pull request body to check")
     parser.add_argument("--design-handoff", type=Path, help="design handoff record to validate")
+    parser.add_argument("--frontend-readiness", action="store_true", help="fail closed unless the supplied design handoff is valid")
     args = parser.parse_args(argv)
     if args.as_of is None and args.sprints:
         parser.error("--as-of must be YYYY-MM-DD when validating sprint records")
-    if not (args.sprints or args.state or args.pr_body or args.design_handoff):
+    if not (args.sprints or args.state or args.pr_body or args.design_handoff or args.frontend_readiness):
         parser.print_usage()
         return 2
     errors: list[str] = []
@@ -414,7 +423,9 @@ def main(argv: list[str]) -> int:
         errors += release_errors
     if args.pr_body:
         errors += check_pr_body(args.pr_body)
-    if args.design_handoff:
+    if args.frontend_readiness:
+        errors += check_frontend_readiness(args.design_handoff)
+    elif args.design_handoff:
         errors += check_design_handoff(args.design_handoff)
     for note in notes:
         print(f"NOTE {note}")
