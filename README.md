@@ -85,6 +85,18 @@ The team should perform discovery, requirements, architecture options, backlog p
 
 For the exact phases, recovery rules, evidence requirements and safety boundaries, read `workflows/orchestration-contract.md`, then `workflows/project-bootstrap.md` and `workflows/agile-agent-delivery.md`.
 
+## Canonical lifecycle state machine
+
+`models/status.py` is the executable source of truth for the `ProjectPhase`, `TaskStatus`, and `DelegationStatus` enums and their allowed transitions. Use `validate_transition(kind, src, dst)` to fail closed on invalid transitions, or `is_valid_transition(...)` for a boolean check. The Markdown contracts document the state vocabulary and workflow context; they must not introduce alternate code-level definitions.
+
+Validate a transition from the repository root:
+
+```bash
+python scripts/check_governance.py --transition TaskStatus READY CLAIMED
+```
+
+The checker exits non-zero for unknown states, unknown kinds, or transitions not explicitly allowed. See [`workflows/orchestration-contract.md`](workflows/orchestration-contract.md#state-machine), [`workflows/project-status-transitions.md`](workflows/project-status-transitions.md#allowed-transitions-and-evidence), and [`docs/agent-traceability.md`](docs/agent-traceability.md#state-model) for the documented vocabulary.
+
 ## Important security limits
 
 - `.claude/settings.json` defines client-side permission deny rules for selected dangerous commands and sensitive file paths. These are defense-in-depth, not a substitute for GitHub permissions, branch protection, or careful review. Test behavior in the installed Claude Code version.
