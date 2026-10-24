@@ -9,6 +9,10 @@ description: Use when creating small stories and testable acceptance criteria.
 
 Use this skill when converting requirements into backlog items, splitting oversized work, or preparing stories for sprint commitment.
 
+## Required inputs
+
+The requirement or problem statement, the persona, the approved scope and the decisions that bound it, and the known edge cases. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 Describe user, capability, and value. Add Given/When/Then acceptance criteria, edge cases, dependencies, and test notes. Ensure stories are independently reviewable and small enough to complete within a planned increment.

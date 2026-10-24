@@ -6,6 +6,9 @@ What changed and why?
 
 Closes #
 
+- Sprint: S<n> or none
+- Scope: in the sprint plan, or scope change SC-n
+
 ## Scope and acceptance criteria
 
 - [ ] Acceptance criteria are satisfied.

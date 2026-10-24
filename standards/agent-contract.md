@@ -29,3 +29,30 @@ Every specialist agent follows these rules in addition to its own definition. Th
 - Report only what you observed. Write "not run" or "not verified" rather than guessing.
 - Do not describe a mock, simulation or static check as a runtime test.
 - A reviewer never approves work it authored.
+
+## Decision authority
+
+Who decides, who proposes, and what no role may do on its own. Precedence between sources is in `workflows/orchestration-contract.md#authority-and-precedence`. Tools per role are in each agent's frontmatter and `docs/agent-capabilities.md`.
+
+| Decision | Decides | Proposes / prepares | Never decided by |
+| --- | --- | --- | --- |
+| Product goal, MVP scope, release criteria | Sponsor | `product-owner`, `business-analyst` | Any agent alone; a code constant or older document |
+| Backlog priority, story acceptance | `product-owner` within sponsor scope | `business-analyst`, `qa-automation` | Implementers |
+| Sprint plan, capacity, sprint closure | Sponsor approves, or `product-owner` under a recorded standing delegation; `project-manager` prepares and closes | `tech-lead` (points), `product-owner` (priority) | The orchestrator starting a sprint without an approved plan |
+| Scope change during a sprint | Sponsor, or `product-owner` within goal and capacity | Any role, as a proposal | The role that wants the work |
+| New issue | Orchestrator, after the issue creation gate | Any role | A role creating issues directly |
+| Architecture, ADRs | `software-architect` | `tech-lead`, `technical-research` | Implementers mid-task |
+| Task breakdown, technical acceptance | `tech-lead` | Implementers | The author of the change |
+| Behaviour verified against acceptance criteria | `qa-automation` | Implementers (their own test results) | The author of the change |
+| Security review disposition | `code-review-security` findings; orchestrator records disposition | — | The author of the change |
+| Release go/no-go | Sponsor | `release-manager` evidence and recommendation | Any agent; a deploy-time override |
+| Merge | Human repository owner | Orchestrator presents the PR | Any agent |
+
+The orchestrator also acts as the team's GitHub operator: it alone writes Issues, labels, milestones, Project fields, branches and PRs. There is no separate GitHub agent.
+
+## Handoffs and completion
+
+- A role's output is complete when it meets the delegation's acceptance checks and its evidence can be inspected; the orchestrator verifies it before the next role starts.
+- Independent review means a different role reviewed the actual diff or artifact. An author's own tests, review or "done" are inputs, never the approval.
+- If an input is missing or two inputs conflict, return `BLOCKED` with the conflict instead of choosing; the orchestrator records it under Requirement conflicts.
+- Proposals for new work go back to the orchestrator as proposals, with the issue creation gate answers; they are not added to the sprint by the proposing role.

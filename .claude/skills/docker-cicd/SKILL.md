@@ -9,6 +9,10 @@ description: Use when changing containers, CI pipelines, builds, or delivery wor
 
 Use this skill for Docker/container configuration, CI workflows, build pipelines, deployment automation, or environment setup.
 
+## Required inputs
+
+The current workflow/container files, the required checks, the target environment, and the permissions and secrets policy (names only, never values). If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 Use reproducible builds, minimal base images, non-root execution, pinned or controlled dependencies, health checks, caching where safe, and least-privilege CI permissions. Never expose secrets in logs or images.

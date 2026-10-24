@@ -9,6 +9,10 @@ description: Use when diagnosing a reproducible defect or unstable test.
 
 Use this skill for a bug, failing check, flaky test, unexpected behavior, or recurring incident.
 
+## Required inputs
+
+A reproduction (failing test, CI log or steps), the commit or environment where it fails, and the last known good state if any. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 Reproduce the issue, capture observable evidence, narrow hypotheses, and change one variable at a time. Distinguish root cause from symptoms. Add a regression check and document what was verified.

@@ -9,6 +9,10 @@ description: Use when implementing server-side business logic, APIs, or authoriz
 
 Use this skill for server-side behavior, endpoints, integrations, data access, and authorization-sensitive code.
 
+## Required inputs
+
+The delegation (task ID, allowed paths, acceptance checks), the approved architecture/ADRs, the API contract, and the existing test commands. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 Keep business rules testable, validate at trust boundaries, authorize every sensitive operation server-side, handle errors consistently, avoid leaking secrets, and test normal and failure paths. Do not assume a framework.

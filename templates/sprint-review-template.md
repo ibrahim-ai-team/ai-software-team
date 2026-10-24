@@ -1,5 +1,7 @@
 # Sprint Review
 
+> Optional long-form report. The closing record is `## Sprint review` in the sprint record (`templates/sprint-plan-template.md`); rules in `workflows/sprint-governance.md#sprint-closure`.
+
 - Sprint:
 - Date:
 - Facilitator:
@@ -18,8 +20,8 @@
 
 ## Incomplete work and known defects
 
-| Item | Reason | Recommended disposition |
-|---|---|---|
+| Item | Final status (Not done / Blocked / Cancelled) | Reason | Disposition (backlog / candidate next sprint) |
+|---|---|---|---|
 
 ## Demonstration and stakeholder feedback
 

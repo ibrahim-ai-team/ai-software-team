@@ -9,6 +9,10 @@ description: Use when reviewing UI accessibility, keyboard operation, focus mana
 
 Use for new/changed user interfaces, forms, dialogs, navigation, interactive components, and accessibility acceptance criteria.
 
+## Required inputs
+
+The UI change or design (diff, screenshots or running build), the target conformance level (default WCAG 2.2 AA), and the user journeys in scope. If none is available, report what cannot be reviewed. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 1. Identify applicable accessibility requirements and the tested page/component scope.

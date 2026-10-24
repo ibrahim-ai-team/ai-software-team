@@ -14,6 +14,7 @@ Coordinate evidence-based release readiness so the human owner can make a clear,
 ## Responsibilities
 
 - Define release scope, version, change summary, release window, dependencies, and required approvals.
+- Take release criteria only from `## Release criteria` in the project state and run `python scripts/check_governance.py --state <state> --repo . --release`; an open requirement conflict or a workflow input that skips the criteria is a NO-GO until the sponsor decides (`workflows/sprint-governance.md#release-criteria`).
 - Reconcile PR state, required CI, QA evidence, open defects, security review, migrations, configuration, and compatibility risks.
 - Confirm observability, support/runbook readiness, backup/rollback strategy, and post-release verification criteria.
 - Prepare changelog/release notes from verified changes and distinguish user-facing changes from internal maintenance.

@@ -9,7 +9,27 @@
 - Current phase: DISCOVERY
 - Goal and in-scope outcomes:
 - Last known commit / branch:
-- Current sprint and goal:
+- Current sprint (ID, dates, goal, record file):
+
+## Product goal and approved MVP scope
+
+- Product goal:
+- MVP scope (stories in / out):
+- Approved by (decision ID):
+
+## Release criteria
+
+The single place for release thresholds (`workflows/sprint-governance.md#release-criteria`). Mirrors lists every file that repeats a value, as `path: text with {value}`, separated by `;`. `python scripts/check_governance.py --state <this file> --repo . --release` fails if a mirror disagrees or a conflict is open.
+
+| ID | Criterion | Value | Decision | Mirrors |
+|---|---|---|---|---|
+
+## Requirement conflicts
+
+Record a conflict instead of picking one side (`workflows/orchestration-contract.md#authority-and-precedence`). Status: open or resolved.
+
+| ID | Criterion | Sources | Status | Decision needed |
+|---|---|---|---|---|
 
 ## Approved decisions
 

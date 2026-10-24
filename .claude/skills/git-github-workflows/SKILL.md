@@ -9,6 +9,10 @@ description: Use when branching, committing, opening PRs, or managing GitHub cha
 
 Use this skill for repository changes, branch/commit strategy, pull requests, CI review, or GitHub coordination.
 
+## Required inputs
+
+The target repository and branch, the linked issue, the base branch state, and the permission boundary (no merge, no push to the default branch). If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+
 ## Procedure
 
 Inspect status and diffs before changes. Use focused branches and descriptive commits, avoid committing secrets, never rewrite shared history without approval, and report checks skipped. Push only when explicitly authorized.
