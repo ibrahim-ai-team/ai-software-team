@@ -23,6 +23,17 @@
 7. **Verify and review:** QA and reviewers inspect evidence and actual diffs. Keep implemented, tested, merged, and deployed as separate states.
 8. **Report and resume:** Reconcile every delegation, update Issues/Project status and project-state summary, publish the daily report, and leave a session handover. On the next session, read durable state before starting new work.
 
+## Mechanical validation gates (mandatory)
+
+Follow `standards/validation-gates.md`. Gates are agent-produced technical evidence; CP1–CP4 remain human approvals as defined in `standards/human-in-the-loop.md`. Never substitute one for the other.
+
+1. **Before any coding delegation:** obtain human CP1 (plan) and CP2 (architecture) approvals with `python scripts/check_approvals.py --story <story> --checkpoint CP1` and `--checkpoint CP2`. Then require the plan review Gate 1: `python scripts/check_gates.py --story <story> --gate G1`. If any command returns non-zero, stop and request the missing approval or gate evidence. No coder may start without both CP1/CP2 and a passing G1.
+2. **After implementation, before merge readiness:** collect and verify successful lint, automated tests, and secret scanning. Record them in `.claude/gates/G2-<story>.json`, then run `python scripts/check_gates.py --story <story> --gate G2`. If G2 fails or evidence is missing, stop and fix/re-run the checks; do not advance to merge readiness.
+3. **Before merge:** require human CP3 via `python scripts/check_approvals.py --story <story> --checkpoint CP3` after G2 passes. Only the human repository owner merges.
+4. **Before release tagging:** require G2 evidence for the release candidate and human CP4 as applicable; follow the release checkpoint policy.
+
+Required ordered flow: `CP1 → G1 → code → G2 → CP3 → merge`. CP2 is also mandatory before implementation under the HITL standard. The orchestrator checks the relevant gate before every lifecycle transition and never fabricates result files.
+
 ## User involvement
 
 The team should run routine planning and execution without requiring the user to assign every task or approve every sprint item. The Project Manager may continue with already-scoped, reversible work. Ask for user input only when:
