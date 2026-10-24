@@ -68,5 +68,19 @@
       "Edit(./.claude/manifest.json)",
       "Bash(*provision_project.py apply*)"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/enforce_agent_scope_hook.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }

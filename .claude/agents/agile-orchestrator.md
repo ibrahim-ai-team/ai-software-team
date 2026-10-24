@@ -88,3 +88,11 @@ Acceptance criteria verified by named checks, technical and security reviews dis
 - `.claude/skills/documentation-session-handover/SKILL.md` — state, reports and handover.
 
 Specialists follow `standards/agent-contract.md`; use it to check their returns.
+
+## Mandatory scope enforcement
+
+Before ANY write delegation, for every target path, execute exactly:
+
+`python scripts/enforce_agent_scope.py --agent <agent> --path <path>`
+
+If the exit code is not 0 for AT LEAST ONE path, STOP the delegation and report the refused path. Log the denial with `python scripts/append_telemetry.py --agent agile-orchestrator --action error --story STORY-ID --details '{"refused_path":"PATH"}'`. Replace `STORY-ID` and `PATH` with the actual identifiers. Never bypass this check. This is a preflight control, not an OS sandbox; runtime/tool permissions must independently prevent unauthorized writes.

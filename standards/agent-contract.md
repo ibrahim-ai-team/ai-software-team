@@ -56,3 +56,7 @@ The orchestrator also acts as the team's GitHub operator: it alone writes Issues
 - Independent review means a different role reviewed the actual diff or artifact. An author's own tests, review or "done" are inputs, never the approval.
 - If an input is missing or two inputs conflict, return `BLOCKED` with the conflict instead of choosing; the orchestrator records it under Requirement conflicts.
 - Proposals for new work go back to the orchestrator as proposals, with the issue creation gate answers; they are not added to the sprint by the proposing role.
+
+## Scope enforcement
+
+Before any agent write, run `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`. The central `.claude/agent-scopes.json` is authoritative. Unknown agents, malformed configuration, forbidden paths, and paths outside the allowlist are denied. This preflight is not a sandbox; runtime/tool-level controls must also constrain writes. Scope denials must be reported and logged as telemetry with `action=error` and `details.refused_path`.

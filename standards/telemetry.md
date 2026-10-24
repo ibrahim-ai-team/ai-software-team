@@ -43,3 +43,7 @@ Never log secrets, credentials, tokens, passwords, API keys, private keys, sessi
 Run `python scripts/analyze_telemetry.py` to summarize event counts per agent, error count, elapsed duration per story, and gate events. Duration is calculated as the time between the first and last valid event for each story; stories with fewer than two events have a duration of zero. The analysis reports gate events as recorded, not as proof that a gate was passed. Empty or missing logs produce a valid zero-event summary.
 
 The log is append-only by convention and tooling, not tamper-proof. Treat it as operational evidence and review changes to the writer and its tests.
+
+## Scope enforcement denials
+
+Every refused agent-scope check should emit a telemetry event with `action=error` and `details.refused_path` set to the denied repository-relative path. Do not log file contents, credentials, or other secrets.

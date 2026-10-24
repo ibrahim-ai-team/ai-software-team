@@ -1,0 +1,163 @@
+{
+  "backend-developer": {
+    "allowed_paths": [
+      "src/backend/**",
+      "tests/backend/**",
+      "src/api/**"
+    ],
+    "forbidden_paths": [
+      "src/frontend/**",
+      "*.md",
+      ".claude/**",
+      ".github/**"
+    ]
+  },
+  "frontend-developer": {
+    "allowed_paths": [
+      "src/frontend/**",
+      "tests/frontend/**"
+    ],
+    "forbidden_paths": [
+      "src/backend/**",
+      "src/api/**",
+      ".claude/**",
+      ".github/**"
+    ]
+  },
+  "database-engineer": {
+    "allowed_paths": [
+      "migrations/**",
+      "src/database/**",
+      "tests/database/**"
+    ],
+    "forbidden_paths": [
+      "src/frontend/**",
+      "src/backend/**",
+      ".claude/**"
+    ]
+  },
+  "devops-platform": {
+    "allowed_paths": [
+      ".github/workflows/**",
+      "docker/**",
+      "infra/**",
+      "scripts/deploy/**"
+    ],
+    "forbidden_paths": [
+      "src/**",
+      ".claude/agents/**"
+    ]
+  },
+  "ui-ux-designer": {
+    "allowed_paths": [
+      "design/**",
+      "docs/design/**",
+      "src/frontend/styles/**"
+    ],
+    "forbidden_paths": [
+      "src/backend/**",
+      ".claude/**"
+    ]
+  },
+  "documentation-manager": {
+    "allowed_paths": [
+      "docs/**",
+      "*.md",
+      "README.md"
+    ],
+    "forbidden_paths": [
+      "src/**",
+      ".claude/agents/**",
+      "scripts/**"
+    ]
+  },
+  "business-analyst": {
+    "allowed_paths": [
+      "docs/specs/**",
+      "docs/requirements/**",
+      "templates/**"
+    ],
+    "forbidden_paths": [
+      "src/**",
+      ".claude/agents/**"
+    ]
+  },
+  "product-owner": {
+    "allowed_paths": [
+      "docs/specs/**",
+      "docs/product/**"
+    ],
+    "forbidden_paths": [
+      "src/**",
+      ".claude/agents/**"
+    ]
+  },
+  "qa-automation": {
+    "allowed_paths": [
+      "tests/**",
+      "test-data/**"
+    ],
+    "forbidden_paths": [
+      "src/**",
+      ".claude/agents/**"
+    ]
+  },
+  "tech-lead": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
+  },
+  "software-architect": {
+    "allowed_paths": [
+      "docs/adr/**",
+      "docs/architecture/**"
+    ],
+    "forbidden_paths": [
+      "src/**",
+      ".claude/agents/**"
+    ]
+  },
+  "code-review-security": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
+  },
+  "agile-orchestrator": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
+  },
+  "performance-engineer": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
+  },
+  "project-manager": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
+  },
+  "release-manager": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
+  },
+  "sre-observability-engineer": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
+  },
+  "technical-research": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
+  }
+}
