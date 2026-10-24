@@ -286,33 +286,71 @@ class PullRequestTests(GovernanceCase):
 
 
 class DesignGateTests(GovernanceCase):
-    def record(self, **overrides):
-        values = {
-            "Story": "#123",
-            "Decision": "required",
-            "Artifact": "docs/designs/story-123.md",
-            "Acceptance criteria": "AC-1, AC-2",
-            "Approved by": "Product sponsor",
-            "Approval evidence": "Decision D-123 recorded in issue #123",
-            "QA verification": "Responsive, keyboard and loading/empty/error/success states",
-            "Exception rationale": "-",
+    def completed_template(self, **replacements):
+        text = (ROOT / "templates/design-handoff-template.md").read_text(
+            encoding="utf-8"
+        )
+        defaults = {
+            "Decision: required | exception": "Decision: required",
+            "User Story: #<issue-number or URL>": "User Story: #123",
+            "Frontend task(s): #<issue-number(s)>": "Frontend task(s): #124",
+            "Acceptance criteria covered: <IDs or links>": "Acceptance criteria covered: AC-1, AC-2",
+            "Artifact URL or repository path: <real URL/path; no placeholders in an approved handoff>": "Artifact URL or repository path: docs/designs/story-123.md",
+            "Artifact type: Figma | annotated wireframe | design specification | other": "Artifact type: design specification",
+            "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): N/A",
+            "Approved by: <sponsor/designated decision authority>": "Approved by: Product sponsor",
+            "Approval evidence: <issue/PR/comment/decision record link>": "Approval evidence: https://github.com/example/repo/issues/123#issuecomment-456",
+            "Approval date (UTC): <YYYY-MM-DD>": "Approval date (UTC): 2026-10-24",
+            "Responsive viewports/states to verify:": "Responsive viewports/states to verify: Mobile and desktop",
+            "Interactions and acceptance criteria to verify:": "Interactions and acceptance criteria to verify: AC-1, AC-2",
+            "Accessibility checks:": "Accessibility checks: Keyboard and focus",
+            "Explicit N/A items and rationale:": "Explicit N/A items and rationale: None",
+            "Test evidence link(s):": "Test evidence link(s): https://github.com/example/repo/pull/124",
         }
-        values.update(overrides)
-        return "## Design gate\n" + "".join(f"- {key}: {value}\n" for key, value in values.items())
+        for old, new in defaults.items():
+            text = text.replace(old, replacements.get(old, new))
+        return text
 
-    def test_approved_traceable_design_artifact_passes(self):
-        self.assertEqual(check_design_handoff(self.write("design.md", self.record())), [])
+    def test_completed_repository_template_passes(self):
+        self.assertEqual(
+            check_design_handoff(self.write("design.md", self.completed_template())),
+            [],
+        )
 
-    def test_missing_artifact_and_approval_are_rejected(self):
-        errors = check_design_handoff(self.write("missing.md", self.record(Artifact="TBD", **{"Approved by": "-"})))
-        self.assertTrue(any("Artifact" in e for e in errors), errors)
-        self.assertTrue(any("approver" in e for e in errors), errors)
+    def test_template_placeholders_and_missing_approval_are_rejected(self):
+        text = self.completed_template(
+            **{
+                "Artifact URL or repository path: <real URL/path; no placeholders in an approved handoff>": "Artifact URL or repository path: TBD",
+                "Approved by: <sponsor/designated decision authority>": "Approved by: -",
+            }
+        )
+        errors = check_design_handoff(self.write("missing.md", text))
+        self.assertTrue(any("Artifact" in error for error in errors), errors)
+        self.assertTrue(any("approver" in error for error in errors), errors)
 
-    def test_exception_requires_rationale(self):
-        content = self.record(Decision="exception", **{"Exception rationale": "No material UI change"})
-        self.assertEqual(check_design_handoff(self.write("exception.md", content)), [])
-        content = self.record(Decision="exception", **{"Exception rationale": "-"})
-        self.assertTrue(any("exception requires a documented rationale" in e for e in check_design_handoff(self.write("bad-exception.md", content))))
+    def test_approved_minor_change_exception_may_omit_artifact(self):
+        text = self.completed_template(
+            **{
+                "Decision: required | exception": "Decision: exception",
+                "Artifact URL or repository path: <real URL/path; no placeholders in an approved handoff>": "Artifact URL or repository path: N/A",
+                "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): No material UI change; copy-only typo fix.",
+            }
+        )
+        self.assertEqual(
+            check_design_handoff(self.write("exception.md", text)),
+            [],
+        )
+
+    def test_exception_without_rationale_is_rejected(self):
+        text = self.completed_template(
+            **{
+                "Decision: required | exception": "Decision: exception",
+                "Artifact URL or repository path: <real URL/path; no placeholders in an approved handoff>": "Artifact URL or repository path: N/A",
+                "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): -",
+            }
+        )
+        errors = check_design_handoff(self.write("bad-exception.md", text))
+        self.assertTrue(any("exception requires a documented" in error for error in errors), errors)
 
 class TemplateTests(GovernanceCase):
     def test_sprint_template_has_every_section_the_checker_reads(self):
