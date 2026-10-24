@@ -174,8 +174,10 @@ if ci_verifier_text:
     for marker in required_ci_verifier_markers:
         if marker not in ci_verifier_text:
             errors.append(f"ci-verifier agent contract missing required command/policy marker: {marker}")
-    frontmatter = parse_frontmatter(ci_verifier_path, ("name", "description", "tools"))
-    if frontmatter.get("tools") != "Read, Bash":
+    frontmatter_match = re.match(r"(?s)^---\\n(.*?)\\n---(?:\\n|$)", ci_verifier_text)
+    frontmatter = frontmatter_match.group(1) if frontmatter_match else ""
+    tools_match = re.search(r"(?m)^tools:\\s*(.*?)\\s*$", frontmatter)
+    if not tools_match or tools_match.group(1) != "Read, Bash":
         errors.append("ci-verifier must have exactly Read and Bash tools")
 
 commands = inventory_paths("commands")
