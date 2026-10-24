@@ -61,9 +61,7 @@ def validate_record(story: str, gate: str, path: Path) -> tuple[bool, str]:
         return False, "date must be an ISO 8601 datetime with timezone"
 
     if gate == "G1":
-        if not isinstance(record.get("plan_hash"), str) or not SHA256_PATTERN.fullmatch(
-            record["plan_hash"]
-        ):
+        if not isinstance(record.get("plan_hash"), str) or not SHA256_PATTERN.fullmatch(record["plan_hash"]):
             return False, "plan_hash must be a 64-character SHA-256 hex digest"
     elif gate == "G2":
         checks = record.get("checks")
