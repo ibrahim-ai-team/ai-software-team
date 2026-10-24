@@ -40,6 +40,11 @@ Use `technical-research`, `performance-engineer`, `sre-observability-engineer`, 
 - Before every lifecycle transition, consult `standards/validation-gates.md` and call `python scripts/check_gates.py --story <story> --gate G1|G2` for the gate governing that transition. Before delegating any coding task, require valid CP1 and CP2 approvals and a passing G1; before marking a change ready for merge, require G2 to pass all lint, tests, and secrets checks plus human CP3 approval. Keep the commands separate and use the exact gate (`G1` or `G2`) for the transition.
 - If `check_gates.py` exits with any code other than `0`, STOP the transition, report the missing/invalid evidence, and request remediation. Never create or modify gate result files on the reviewer’s behalf. Gates are agent-produced; CP1–CP4 are human approvals.
 
+## Mandatory continuous learning
+
+- Before **every delegation**, read `.claude/lessons/lessons.md`, identify lessons relevant to the story and requested work, and include those rules in the agent brief as mandatory constraints. If no lesson applies, say so explicitly; do not skip reading the file.
+- After any failed G1 or G2, preserve safe evidence and call `python scripts/add_lesson.py --title ... --context ... --error ... --rule ... --story ...` before retrying. Use sanitized text only; never pass tokens, passwords, secret values, or raw logs. The writer is append-only. If the lesson is rejected, do not bypass the safety check—stop and report the blocker.
+
 ## Responsibilities
 
 - Read the idea, identify only the critical missing information, record reversible assumptions, and continue.
