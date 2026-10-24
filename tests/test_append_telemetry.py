@@ -19,11 +19,18 @@ class AppendTelemetryTests(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp_dir.cleanup)
         self.log_path = Path(self.temp_dir.name) / "activity.jsonl"
+
     def run_append(self, details=None):
         args = [
-            "append_telemetry.py", "--agent", "agile-orchestrator",
-            "--action", "delegate", "--story", "US-1",
-            "--details", details if details is not None else '{"target":"qa-automation"}',
+            "append_telemetry.py",
+            "--agent",
+            "agile-orchestrator",
+            "--action",
+            "delegate",
+            "--story",
+            "US-1",
+            "--details",
+            details if details is not None else '{"target":"qa-automation"}',
         ]
         with patch.object(sys, "argv", args), patch.object(append_telemetry, "LOG_PATH", self.log_path):
             return append_telemetry.main()
