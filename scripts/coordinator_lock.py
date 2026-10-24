@@ -6,13 +6,13 @@ This is a same-machine coordination aid, not a distributed lock service.
 from __future__ import annotations
 
 import argparse
-from contextlib import suppress
 import getpass
 import json
 import os
 import socket
 import sys
 import uuid
+from contextlib import suppress
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
