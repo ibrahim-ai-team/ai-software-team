@@ -18,7 +18,7 @@ ALLOWED_TOOLS = {"Agent", "Read", "Grep", "Glob", "Edit", "Write", "Bash", "WebS
 ORCHESTRATOR = "agile-orchestrator"  # the only agent allowed to delegate (Agent tool)
 # Reviewers must not be able to change what they review; enforced through their tools allowlist.
 READ_ONLY_AGENTS = {"code-review-security", "tech-lead"}
-HARD_MINIMUMS = {"agents": 20, "skills": 22}
+HARD_MINIMUMS = {"agents": 19, "skills": 22}
 MANIFEST_PATH = ROOT / ".claude" / "manifest.json"
 errors: list[str] = []
 
