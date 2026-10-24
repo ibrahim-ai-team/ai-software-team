@@ -20,7 +20,7 @@ Current phase: Ready for the first supervised pilot (team kit); no application w
 - Runtime evidence (cloud session, Claude Code 2.1.303): discovery, delegation, deny rules and MCP merge-tool denial observed — [`docs/verification-report.md`](verification-report.md). Local CLI/Termux run and `ask`-rule prompting: NOT VERIFIED.
 - `main` protection (read back): PR required with 1 approval + code-owner review; force-push and deletion blocked; **no required status checks**; admins not enforced; no rulesets.
 - GitHub secret scanning, push protection and Dependabot security updates: **disabled** (owner settings; see `docs/security-and-governance.md`).
-- Project #1 Status is updated and read back through `.github/workflows/project-status.yml` (verified runs in the verification report). Cloud sessions cannot reach Projects directly; use the workflow.
+- Project #1 Status is maintained manually by design. Cloud sessions cannot reliably access organization-level Projects V2 endpoints or verify an automated status update on `main`; update the board explicitly and read the resulting value back.
 
 ## Vision alignment (2026-10-19)
 
@@ -41,7 +41,7 @@ Always re-fetch issue/PR status before acting; the table is a dated snapshot, no
 
 ## Known workflow limitations
 
-- `.github/workflows/project-status.yml` updates one issue per run; GitHub keeps one pending run per issue, so wait for each step before dispatching the next transition for the same issue.
+- Board status updates are manual; change one issue at a time and read the Project Status field back before recording the transition as complete.
 - Use it for application Projects only after copying it into the application repository and testing it there.
 - Claims are coordination records checked by `scripts/check_claims.py`, not locks; parallel coding needs separate worktrees/branches.
 - Static CI success does not prove live Claude Code permission enforcement.
