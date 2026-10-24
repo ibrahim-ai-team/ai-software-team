@@ -1,5 +1,6 @@
 """Regression tests for fail-closed agent scope checks."""
 
+import json
 import subprocess
 import sys
 import unittest
@@ -7,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "enforce_agent_scope.py"
+HOOK = ROOT / "scripts" / "enforce_agent_scope_hook.py"
 
 
 def check(agent, path):
@@ -60,6 +62,41 @@ class EnforceAgentScopeTests(unittest.TestCase):
             if p.is_file() and ".git" not in p.parts
         }
         self.assertEqual(before, after)
+
+    def hook(self, command, agent="backend-developer"):
+        payload = json.dumps({
+            "tool_name": "Bash",
+            "agent_type": agent,
+            "tool_input": {"command": command},
+        })
+        return subprocess.run(
+            [sys.executable, str(HOOK)],
+            cwd=ROOT,
+            input=payload,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+    def test_bash_write_redirect_is_blocked(self):
+        result = self.hook('echo "x" > src/frontend/f.tsx')
+        self.assertEqual(result.returncode, 0)
+        self.assertIn('"permissionDecision": "deny"', result.stdout)
+
+    def test_bash_sed_inplace_is_blocked(self):
+        result = self.hook("sed -i 's/a/b/' src/frontend/f.tsx")
+        self.assertEqual(result.returncode, 0)
+        self.assertIn('"permissionDecision": "deny"', result.stdout)
+
+    def test_bash_cp_to_forbidden_path_is_blocked(self):
+        result = self.hook("cp a src/frontend/b")
+        self.assertEqual(result.returncode, 0)
+        self.assertIn('"permissionDecision": "deny"', result.stdout)
+
+    def test_bash_safe_command_is_allowed(self):
+        result = self.hook("git status")
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(result.stdout, "")
 
 
 if __name__ == "__main__":
