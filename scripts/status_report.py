@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Render the persisted effective status snapshot for people or programs.
 
 This command deliberately reads only state/effective.json. It never attempts
@@ -79,9 +78,7 @@ def filter_snapshot(snapshot: dict[str, Any], expression: str | None) -> dict[st
     key = "agents" if kind == "agent" else "tasks"
     id_key = "agent_id" if kind == "agent" else "task_id"
     filtered[key] = [
-        item
-        for item in snapshot.get(key, [])
-        if isinstance(item, dict) and str(item.get(id_key, "")).casefold() == value
+        item for item in snapshot.get(key, []) if isinstance(item, dict) and str(item.get(id_key, "")).casefold() == value
     ]
     # A filtered view contains only the requested entity type, while retaining
     # the top-level keys so consumers can rely on the effective.json schema.
@@ -107,13 +104,10 @@ def render_table(headers: list[str], rows: list[list[Any]]) -> str:
             widths[index] = max(widths[index], len(display(value)))
     # Cap long identifiers/evidence values to keep the standard view compact.
     widths = [min(width, cap) for width, cap in zip(widths, [24, 16, 16, 5, 10, 15], strict=False)]
-    rendered_rows = [[display(value)[:widths[index]] for index, value in enumerate(row)] for row in rows]
+    rendered_rows = [[display(value)[: widths[index]] for index, value in enumerate(row)] for row in rows]
     header_line = "  ".join(header.ljust(widths[index]) for index, header in enumerate(headers))
     separator = "  ".join("-" * width for width in widths)
-    body = [
-        "  ".join(value.ljust(widths[index]) for index, value in enumerate(row))
-        for row in rendered_rows
-    ]
+    body = ["  ".join(value.ljust(widths[index]) for index, value in enumerate(row)) for row in rendered_rows]
     return "\n".join([header_line, separator, *body])
 
 
@@ -122,9 +116,7 @@ def render_human(snapshot: dict[str, Any], expression: str | None, age: int | No
     lines: list[str] = []
     if age is None:
         lines.append("WARNING: snapshot age unavailable (generated_at missing or invalid).")
-    elif age > STALE_AFTER_SECONDS:
-        lines.append(f"STALE SNAPSHOT (age: {age}s)")
-    elif age == STALE_AFTER_SECONDS:
+    elif age > STALE_AFTER_SECONDS or age == STALE_AFTER_SECONDS:
         lines.append(f"STALE SNAPSHOT (age: {age}s)")
 
     kind = expression.partition("=")[0] if expression else None
@@ -141,11 +133,7 @@ def render_human(snapshot: dict[str, Any], expression: str | None, age: int | No
                         agent.get("observed"),
                         agent.get("drift"),
                         agent.get("staleness"),
-                        (
-                            f"{agent['last_event_age_seconds']}s"
-                            if agent.get("last_event_age_seconds") is not None
-                            else None
-                        ),
+                        (f"{agent['last_event_age_seconds']}s" if agent.get("last_event_age_seconds") is not None else None),
                     ]
                     for agent in agents
                     if isinstance(agent, dict)
