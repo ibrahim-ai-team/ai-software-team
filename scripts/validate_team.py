@@ -333,8 +333,7 @@ for agent_path in agents:
         for pattern, label in agent_forbidden_patterns:
             if pattern.search(line):
                 errors.append(
-                    f"Undocumented Claude Code-specific pattern {label!r} in "
-                    f"{agent_path.relative_to(ROOT)}:{line_number}"
+                    f"Undocumented Claude Code-specific pattern {label!r} in {agent_path.relative_to(ROOT)}:{line_number}"
                 )
 
 hitl_path = ROOT / "standards" / "human-in-the-loop.md"

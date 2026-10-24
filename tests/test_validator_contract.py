@@ -270,8 +270,6 @@ class ValidatorRegressionTests(unittest.TestCase):
             self.assertIn("Manifest root must be a JSON object", result.stdout)
             self.assertNotIn("Traceback", result.stderr)
 
-
-
     def test_agent_markdown_has_no_undocumented_runtime_patterns(self):
         import re
 
@@ -290,6 +288,5 @@ class ValidatorRegressionTests(unittest.TestCase):
             result = self.run_validator(copy)
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("Undocumented Claude Code-specific pattern", result.stdout)
-
 if __name__ == "__main__":
     unittest.main()
