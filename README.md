@@ -109,6 +109,29 @@ The checker exits non-zero for unknown states, unknown kinds, or transitions not
 - Configure and verify GitHub rulesets/branch protection and permissions separately. Do not treat the human-merge rule in documentation as technical enforcement.
 - The validation workflow uses read-only repository permissions and disables persisted checkout credentials.
 
+## Atomic task claiming via Git refs
+
+Use Git's remote ref update as the atomic test-and-set primitive for task ownership; no GitHub API, token, lock server, or broker is required. Each claim is an orphan commit containing a `claim.json` payload, published at `refs/claims/<task-id>`. The remote accepts only one first creation of a given claim ref when the caller uses the empty `--force-with-lease` expectation.
+
+From a local clone with the target remote configured:
+
+```bash
+python scripts/claim_task.py --task-id T-123 --run-id RUN-456
+python scripts/list_claims.py --remote origin
+python scripts/release_claim.py --task-id T-123 --remote origin
+```
+
+`claim_task.py` also accepts `--remote origin` (the default) and `--dry-run`. Set `AGENT_ID` and `SESSION_ID` to supply those identity values; otherwise the agent is recorded as `unknown` and a session UUID is generated. If `--run-id` is omitted, `RUN_ID` is used when set, otherwise a UUID is generated. Reuse the same run ID for retries that should be treated as the same run.
+
+Exit codes for `claim_task.py`:
+
+- `0`: claim acquired, or already held by the same `run_id` (idempotent retry).
+- `1`: another `run_id` owns the task; the message identifies the recorded holder.
+- `2`: invalid arguments or task ID.
+- `3`: remote/network Git operation failed; retry is appropriate.
+
+`release_claim.py` removes `refs/claims/<task-id>` and treats an already-absent ref as success when the remote accepts the deletion. `list_claims.py` lists remote claim refs and parses their JSON payloads. A claim remains active until explicitly released; there is no lease expiry or automatic cleanup, so release claims in a finally/cleanup path and reconcile abandoned claims manually. Claims are scoped to the remote repository and depend on the remote allowing custom Git refs. The existing `scripts/check_claims.py` remains a local pre-flight validator; the remote claim ref is the authority for atomic ownership.
+
 ## Single coordinator policy
 
 The local coordinator lock makes the documented single-coordinator rule explicit. At the **start of each coordinator session**, before reconciling state or delegating work, run:
