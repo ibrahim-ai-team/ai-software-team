@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Manage a local single-coordinator lock with a time-to-live.
 
 This is a same-machine coordination aid, not a distributed lock service.
@@ -7,6 +6,7 @@ This is a same-machine coordination aid, not a distributed lock service.
 from __future__ import annotations
 
 import argparse
+from contextlib import suppress
 import getpass
 import json
 import os
@@ -143,8 +143,7 @@ def acquire(path: Path, ttl_seconds: int) -> int:
                 return 2
             if current is not None:
                 print(
-                    f"Lock held by PID {current['pid']} on {current['hostname']} "
-                    f"(holder: {current['holder']}).",
+                    f"Lock held by PID {current['pid']} on {current['hostname']} (holder: {current['holder']}).",
                     file=sys.stderr,
                 )
             return 2
@@ -181,10 +180,8 @@ def acquire(path: Path, ttl_seconds: int) -> int:
         print(f"Lock acquired: {path}")
         return 0
     finally:
-        try:
+        with suppress(FileNotFoundError):
             stale_path.unlink()
-        except FileNotFoundError:
-            pass
 
 
 def release(path: Path) -> int:
@@ -195,7 +192,7 @@ def release(path: Path) -> int:
     except OSError as exc:
         print(f"ERROR: could not release lock {path}: {exc}", file=sys.stderr)
         return 1
-    print("Lock released." if path != DEFAULT_LOCK_PATH else "Lock released.")
+    print("Lock released.")
     return 0
 
 
