@@ -293,6 +293,7 @@ required_files = [
     "standards/security-principles.md",
     "standards/git-workflow.md",
     "standards/definition-of-done.md",
+    "standards/telemetry.md",
 ]
 for relative in required_files:
     require_nonempty(ROOT / relative)
