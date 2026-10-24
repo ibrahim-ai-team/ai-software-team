@@ -371,34 +371,22 @@ def check_design_handoff(path: Path) -> list[str]:
         artifact.lower() in {"tbd", "n/a", "none", "to be added", "-"}
         or "<" in artifact
         or ">" in artifact
-        or not (
-            artifact.startswith("https://")
-            or artifact.startswith("http://")
-            or "/" in artifact
-        )
+        or not (artifact.startswith("https://") or artifact.startswith("http://") or "/" in artifact)
     ):
-        errors.append(
-            f"{path}: D01 Artifact must be a real URL or traceable repository path, not a placeholder"
-        )
+        errors.append(f"{path}: D01 Artifact must be a real URL or traceable repository path, not a placeholder")
 
     rationale = data.get("exception rationale", "")
     if decision == "exception" and not present(rationale):
-        errors.append(
-            f"{path}: D01 an exception requires a documented no-material-design-impact rationale"
-        )
+        errors.append(f"{path}: D01 an exception requires a documented no-material-design-impact rationale")
     if decision == "exception" and present(rationale):
         normalized = rationale.lower()
         if "no" not in normalized and "not" not in normalized and "minor" not in normalized:
-            errors.append(
-                f"{path}: D01 exception rationale must explain why no material design artifact is needed"
-            )
+            errors.append(f"{path}: D01 exception rationale must explain why no material design artifact is needed")
     evidence = data.get("approval evidence", "")
     if not present(evidence):
         errors.append(f"{path}: D01 approval evidence must not be a placeholder")
     elif not (evidence.startswith("https://") or ISSUE_REF.search(evidence)):
-        errors.append(
-            f"{path}: D01 approval evidence must link to a GitHub issue/PR or durable decision URL"
-        )
+        errors.append(f"{path}: D01 approval evidence must link to a GitHub issue/PR or durable decision URL")
     return errors
 
 
@@ -418,7 +406,9 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--release", action="store_true", help="fail on open conflicts and release bypass inputs")
     parser.add_argument("--pr-body", type=Path, help="pull request body to check")
     parser.add_argument("--design-handoff", type=Path, help="design handoff record to validate")
-    parser.add_argument("--frontend-readiness", action="store_true", help="fail closed unless the supplied design handoff is valid")
+    parser.add_argument(
+        "--frontend-readiness", action="store_true", help="fail closed unless the supplied design handoff is valid"
+    )
     args = parser.parse_args(argv)
     if args.as_of is None and args.sprints:
         parser.error("--as-of must be YYYY-MM-DD when validating sprint records")
