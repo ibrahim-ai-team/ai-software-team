@@ -30,4 +30,4 @@ For every change under `.github/workflows/`, reviewers verify:
 
 ## Current workflow audit
 
-The existing `.github/workflows/pre-commit.yml`, `project-status.yml`, `secret-scan.yml`, and `validate-team.yml` were audited for this change. Each currently declares `permissions: contents: read`; none uses `write-all`. The Project status workflow uses the separately configured `PROJECTS_TOKEN` secret for GraphQL mutations, so that token's scopes must be restricted independently of the workflow's `GITHUB_TOKEN` permissions. Re-audit whenever a workflow or required API operation changes.
+The existing `.github/workflows/pre-commit.yml`, `.github/workflows/secret-scan.yml`, and `.github/workflows/validate-team.yml` were audited for this change. Each declares `permissions: contents: read`; none uses `write-all`. Project V2 board status is maintained manually by design; no automated board-sync workflow or Projects write token is required by this repository. Re-audit permissions whenever a workflow or required API operation changes.
