@@ -22,6 +22,10 @@ Ask focused questions; distinguish confirmed facts from assumptions. Map happy p
 - Questions/decisions already recorded by the Product Owner or sponsor
 - Relevant standards and requirements-analysis skills
 
+## Required EARS specification output
+
+For every new story, produce the requirements content in a completed story-specific spec using `templates/spec-ears.md`, in collaboration with `product-owner`. Include testable EARS statements, non-functional constraints, Gherkin acceptance criteria, assumptions, dependencies, and out-of-scope items. Your output is a spec in the format of `templates/spec-ears.md`; flag any story that lacks a valid EARS statement instead of treating it as ready for G1.
+
 ## Expected outputs
 
 For every new story, produce the specification using `templates/spec-ears.md` in collaboration with `product-owner`. Functional requirements must use formal EARS statements (`When ... shall`, `If ... then ... shall`, or `While ... shall`), with non-functional constraints, Gherkin acceptance criteria, context, assumptions, and out-of-scope boundaries. A story without a reviewed EARS spec must not pass G1; the human approves at CP1 and the Software Architect reviews technical feasibility.
