@@ -4,6 +4,7 @@
 This hook protects direct file-editing tools. It is not an OS sandbox: arbitrary
 shell commands and external tools must be separately restricted for full isolation.
 """
+
 import json
 import subprocess
 import sys
@@ -19,18 +20,35 @@ def deny(reason: str, agent: str, path: str) -> int:
     # Never include file contents or other potentially sensitive data in telemetry.
     details = json.dumps({"refused_path": path, "reason": reason}, separators=(",", ":"))
     subprocess.run(
-        [sys.executable, str(TELEMETRY), "--agent", agent, "--action", "error",
-         "--story", "SCOPE-ENFORCEMENT", "--details", details],
-        cwd=ROOT, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL, check=False,
+        [
+            sys.executable,
+            str(TELEMETRY),
+            "--agent",
+            agent,
+            "--action",
+            "error",
+            "--story",
+            "SCOPE-ENFORCEMENT",
+            "--details",
+            details,
+        ],
+        cwd=ROOT,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
     )
-    print(json.dumps({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "deny",
-            "permissionDecisionReason": f"Agent scope denied write: {reason}",
-        }
-    }))
+    print(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "deny",
+                    "permissionDecisionReason": f"Agent scope denied write: {reason}",
+                }
+            }
+        )
+    )
     return 0
 
 
@@ -52,7 +70,8 @@ def main() -> int:
     tool_input = payload.get("tool_input")
     path = tool_input.get("file_path") if isinstance(tool_input, dict) else None
     if not isinstance(path, str) or not path.strip():
-        return deny("missing or invalid file_path", agent if isinstance(agent, str) and agent else "unknown-agent", str(path or ""))
+        identity = agent if isinstance(agent, str) and agent else "unknown-agent"
+        return deny("missing or invalid file_path", identity, str(path or ""))
 
     # Main-session writes are not scoped by this agent-specific policy.
     # Subagent identities must be known and configured; unknown agents fail closed.
@@ -63,14 +82,29 @@ def main() -> int:
 
     candidate = Path(path)
     try:
-        resolved = candidate.resolve() if candidate.is_absolute() else (ROOT / candidate).resolve()
+        resolved = (
+            candidate.resolve()
+            if candidate.is_absolute()
+            else (ROOT / candidate).resolve()
+        )
         relative = resolved.relative_to(ROOT.resolve()).as_posix()
     except (OSError, ValueError):
         return deny("path escapes repository root", agent, path)
 
     result = subprocess.run(
-        [sys.executable, str(CHECKER), "--agent", agent, "--path", relative],
-        cwd=ROOT, stdin=subprocess.DEVNULL, capture_output=True, text=True, check=False,
+        [
+            sys.executable,
+            str(CHECKER),
+            "--agent",
+            agent,
+            "--path",
+            relative,
+        ],
+        cwd=ROOT,
+        stdin=subprocess.DEVNULL,
+        capture_output=True,
+        text=True,
+        check=False,
     )
     if result.returncode != 0:
         reason = result.stderr.strip() or result.stdout.strip() or "scope checker failed"
