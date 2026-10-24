@@ -61,9 +61,9 @@ Every new story starts with a formal specification using [`templates/spec-ears.m
 
 Writing agents must use one dedicated Git worktree per agent and story. The orchestrator creates it before dispatch with `./scripts/new_worktree.sh <agent> <story>`; agents write only inside the supplied worktree and never write directly to `main`. Clean up after the story with `./scripts/cleanup_worktree.sh <agent> <story>`; the command requires explicit confirmation. See [`standards/agent-isolation.md`](standards/agent-isolation.md). Requires Git 2.5+, Bash, and standard POSIX utilities; supported on Linux, macOS, and WSL. Run `bash tests/test_worktree.sh` to exercise creation and cleanup.
 
-## Spec-Driven Development (SDD / EARS)
+## Spec-Driven Development reference
 
-Every new story starts with a completed EARS specification before backlog readiness. The Business Analyst writes it using [`templates/spec-ears.md`](templates/spec-ears.md), based on the Product Owner's value brief; the PO validates it without rewriting it; the Software Architect validates feasibility, and the human sponsor approves the specification at CP1. A story without a validated EARS spec and recorded CP1 approval cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md) and `tests/test_spec_ears.py` for the format guard.
+The EARS specification workflow, ownership rules, and CP1/G1 gates are defined in [`standards/spec-driven-development.md`](standards/spec-driven-development.md) and [`templates/spec-ears.md`](templates/spec-ears.md). Keep those files as the canonical policy; this README summarizes the workflow above.
 
 ## Mesure du ROI
 
@@ -88,6 +88,10 @@ When ready to start an application, describe it in plain language, for example: 
 The team should perform discovery, requirements, architecture options, backlog preparation, test strategy and delivery planning, then implement incrementally through bounded tasks, isolated branches and PRs. The user supervises progress and makes material sponsor decisions; the team owns routine planning and coordination. The human owner alone merges PRs.
 
 For the exact phases, recovery rules, evidence requirements and safety boundaries, read `workflows/orchestration-contract.md`, then `workflows/project-bootstrap.md` and `workflows/agile-agent-delivery.md`.
+
+## Status report health contract
+
+Use `python scripts/status_report.py` for a human-readable diagnostic view. The backward-compatible `--json` option emits the effective snapshot itself; that output alone does **not** indicate that the snapshot is valid or fresh. For automation, use `python scripts/status_report.py --health-json`, which emits `status_health`, `snapshot_valid`, `snapshot_age_seconds`, `source`, `problems`, and the snapshot. Use `--strict` when a caller must fail closed: it exits non-zero for missing/malformed snapshots, invalid schema/IDs/timestamps, duplicate IDs, stale snapshots, or timestamps materially in the future. A successful default diagnostic invocation is not proof of healthy state.
 
 ## Canonical lifecycle state machine
 
