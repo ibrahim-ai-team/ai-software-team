@@ -119,6 +119,17 @@ def require_nonempty(path: Path, label: str | None = None) -> str:
 
 manifest_inventory = load_manifest()
 
+# Agent scopes must exist, be valid JSON, and cover every discovered agent.
+SCOPE_PATH = ROOT / ".claude" / "agent-scopes.json"
+try:
+    scope_config = json.loads(SCOPE_PATH.read_text(encoding="utf-8"))
+    if not isinstance(scope_config, dict):
+        errors.append(".claude/agent-scopes.json root must be an object")
+        scope_config = {}
+except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+    errors.append(f"Cannot load .claude/agent-scopes.json: {exc}")
+    scope_config = {}
+
 
 def inventory_paths(kind: str) -> list[Path]:
     spec = manifest_inventory.get(kind, {})
@@ -218,6 +229,15 @@ def check_agent_tools(paths: list[Path]) -> None:
 
 
 check_agent_tools(agents)
+manifest_agent_names = {path.stem for path in agents}
+for agent_name in sorted(manifest_agent_names - set(scope_config)):
+    errors.append(f"Agent missing from .claude/agent-scopes.json: {agent_name}")
+for agent_name in sorted(set(scope_config) - manifest_agent_names):
+    errors.append(f"Scope config references unknown agent: {agent_name}")
+for agent_name in ("tech-lead", "code-review-security"):
+    scope = scope_config.get(agent_name, {})
+    if not isinstance(scope, dict) or scope.get("allowed_paths") != []:
+        errors.append(f"{agent_name} must have empty allowed_paths (read-only)")
 check_unique_names(agents, "agent")
 check_unique_names(skills, "skill")
 
@@ -277,6 +297,9 @@ for path in templates:
 
 required_files = [
     "README.md",
+    ".claude/agent-scopes.json",
+    "scripts/enforce_agent_scope.py",
+    "tests/test_enforce_agent_scope.py",
     ".claude/CLAUDE.md",
     "workflows/future-project-workflow.md",
     "workflows/project-bootstrap.md",

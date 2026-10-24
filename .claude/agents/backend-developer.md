@@ -49,6 +49,8 @@ The task needs files outside allowed paths, an API contract or ADR is unclear or
 
 ## Worktree isolation
 
+Before every write, verify that the target path is authorized by `.claude/agent-scopes.json` using `python scripts/enforce_agent_scope.py --agent backend-developer --path <path>`. If unsure, ask the orchestrator to run the check. Never write to a forbidden path even if the brief requests it.
+
 Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
 
 Follow `standards/agent-contract.md` for scope, return format and evidence rules.

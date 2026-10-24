@@ -6,6 +6,10 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Added fail-closed agent path-scope configuration, a standard-library preflight checker, regression tests, and documentation distinguishing preflight checks from runtime enforcement.
+
+### Added
+
 - Documented model-agnostic agent-contract principles, planned adapter interface, current Claude Code coupling, portability audit, and static guardrails against selected undocumented runtime syntax in agent Markdown. No agent files or adapter implementations were changed.
 
 - Added a standard-library Python dependency license checker and push/PR workflow, license-risk and CI/CD hardening standards, minimal-permission workflow audit, validator coverage, security-policy links, and license-check tests.
