@@ -4,6 +4,8 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
+- Added: mandatory human-in-the-loop checkpoints (CP1 plan, CP2 architecture, CP3 code before merge, CP4 release before tag), read-only approval-record validation, orchestrator enforcement instructions, validator coverage, and regression tests.
+
 - Added: local append-only JSONL telemetry with UUID4 trace IDs, secret-key rejection, event analysis, orchestrator delegation/gate guidance, tests, and validator coverage.
 - Added: pre-commit hooks (`.pre-commit-config.yaml`, `ruff.toml`, `.markdownlint-cli2.yaml`) for branch safety, secrets, Python lint and formatting, Markdown lint, spelling, file hygiene, GitHub workflow checks, the team's own checks and tests before push, plus a **Pre-commit hooks** CI workflow. Python files are reformatted, Markdown files normalized (blank lines around headings and lists, table separators) and scripts marked executable; no content changes.
 - Changed: the operating model is Claude Pro only. `standards/sprint-sizing.md` v2 replaces dollar and API-equivalent budgets with sessions, delegations per session, enforced turn caps and usage-limit checkpoints (`/status`, `/usage`), and adds token-saving practices. One active delegation at a time by default; every session ends with a Project Manager report saved with the handover. Stack selection prefers free and open-source tools; the GitHub Actions free-minutes trade-off is documented. Never set `ANTHROPIC_API_KEY`.
