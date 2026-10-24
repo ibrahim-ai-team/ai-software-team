@@ -54,4 +54,3 @@ Use `not applicable` for untouched resource types. Report only verified actions.
 
 - `.claude/skills/git-github-workflows/SKILL.md` — repository and pull request conventions.
 - `.claude/skills/agile-planning/SKILL.md` — context only; planning authority remains with the orchestrator and product roles.
-
