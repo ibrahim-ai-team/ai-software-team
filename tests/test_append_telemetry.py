@@ -170,7 +170,6 @@ class AppendTelemetryTests(unittest.TestCase):
         self.assertIn("qa-automation=1", summary)
         self.assertIn("agile-orchestrator=1", summary)
 
-
     def verify_log(self):
         with (
             patch.object(verify_telemetry, "LOG_PATH", self.log_path),
