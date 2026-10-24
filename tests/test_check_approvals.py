@@ -42,6 +42,12 @@ class CheckApprovalsTests(unittest.TestCase):
             self.run_checker("--story", "SHOP-12", "--checkpoint", "CP1"), 1
         )
 
+    def test_invalid_json_returns_one(self):
+        self.approval_path.write_text("{", encoding="utf-8")
+        self.assertEqual(
+            self.run_checker("--story", "SHOP-12", "--checkpoint", "CP1"), 1
+        )
+
     def test_invalid_hash_returns_one(self):
         self.record["artifact_hash"] = "not-a-sha256"
         self.write_record()
