@@ -25,3 +25,6 @@ Thumbs.db
 
 # Local append-only runtime telemetry (may contain operational metadata)
 .claude/telemetry/activity.jsonl
+
+# Runtime-only local coordinator lock
+/state/coordinator.lock

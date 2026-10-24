@@ -75,9 +75,13 @@ Project phases:
 
 Transitions must be recorded with timestamp, previous phase, new phase, reason, and evidence. Do not skip gates. Routine assumptions should be recorded and progress should continue; do not repeatedly ask the sponsor to approve ordinary task breakdown or reversible implementation details.
 
+## Local single-coordinator lock
+
+Before each coordinator session starts reconciliation or delegates work, run `python scripts/coordinator_lock.py acquire`. If it exits `2`, stop and inspect `python scripts/coordinator_lock.py status`; do not coordinate concurrently while a non-expired lock is held. The default TTL is 3,600 seconds and can be raised with `--ttl` for longer sessions. After writing the handover and Project Manager report, run `python scripts/coordinator_lock.py release`. An expired lock can be taken over with a warning, so the TTL must exceed the expected session duration. The lock at `state/coordinator.lock` is a **same-machine local lock only**; it does not protect against coordinators on different machines and is not a distributed lock service.
+
 ## Session-start / resume protocol
 
-1. Read this contract, `.claude/CLAUDE.md`, the relevant workflow, project state, handover, open task records, ADRs, open PRs and recent CI results.
+1. Acquire the local coordinator lock with `python scripts/coordinator_lock.py acquire`, then read this contract, `.claude/CLAUDE.md`, the relevant workflow, project state, handover, open task records, ADRs, open PRs and recent CI results.
 2. Reconcile the state against observable GitHub/repository evidence; flag stale or contradictory records rather than silently overwriting them.
 3. Identify active, stale, blocked, duplicated, and dependency-ready tasks. Claims are session-scoped coordination records, not locks or heartbeats. At the start of each new coordinator session, any claim not reconfirmed by its owner must be marked `NEEDS_REVALIDATION`; inspect branch/worktree and artifacts before resuming or reassigning. Never infer that an agent is dead from elapsed time alone.
 4. Resume incomplete tasks from their last verified checkpoint. Do not redo completed work without a reason.
