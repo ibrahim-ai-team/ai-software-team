@@ -423,7 +423,9 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--release", action="store_true", help="fail on open conflicts and release bypass inputs")
     parser.add_argument("--pr-body", type=Path, help="pull request body to check")
     parser.add_argument(
-        "--transition", nargs=3, metavar=("KIND", "SRC", "DST"),
+        "--transition",
+        nargs=3,
+        metavar=("KIND", "SRC", "DST"),
         help="validate one ProjectPhase, TaskStatus, or DelegationStatus transition",
     )
     parser.add_argument("--design-handoff", type=Path, help="design handoff record to validate")
