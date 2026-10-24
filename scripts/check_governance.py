@@ -10,6 +10,7 @@ Usage:
   check_governance.py [--as-of YYYY-MM-DD] SPRINT_RECORD.md [...]
   check_governance.py --state PROJECT_STATE.md --repo DIR [--release]
   check_governance.py --pr-body PR_BODY.md
+  check_governance.py --transition KIND SRC DST
 
 Exit status: 0 when no error was found, 1 when an error was found, 2 on usage error.
 """
@@ -20,11 +21,27 @@ import re
 import sys
 from pathlib import Path
 
+# Support direct execution as `python scripts/check_governance.py`.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from models.status import TaskStatus, TransitionError, validate_transition
+
 SPRINT_ID = re.compile(r"^S\d+$")
 ISSUE_REF = re.compile(r"#\d+|https://github\.com/[^\s/]+/[^\s/]+/(?:pull|issues)/\d+")
-OPEN_STATUSES = {"ready", "in progress", "in review", "blocked"}
-CLOSE_STATUSES = {"done", "not done", "blocked", "cancelled"}
-ALL_STATUSES = OPEN_STATUSES | CLOSE_STATUSES
+SPRINT_OPEN_STATUSES = {
+    TaskStatus.READY.value.lower(),
+    TaskStatus.IN_PROGRESS.value.lower().replace("_", " "),
+    TaskStatus.IN_REVIEW.value.lower().replace("_", " "),
+    TaskStatus.BLOCKED.value.lower(),
+}
+# "Not done" is a sprint-review disposition, not a task lifecycle status.
+SPRINT_CLOSE_STATUSES = {
+    TaskStatus.DONE.value.lower(),
+    "not done",
+    TaskStatus.BLOCKED.value.lower(),
+    TaskStatus.CANCELLED.value.lower(),
+}
+SPRINT_STATUSES = SPRINT_OPEN_STATUSES | SPRINT_CLOSE_STATUSES
 WEAK_EVIDENCE = {"", "-", "tbd", "n/a", "agent reported", "reported by agent", "claimed", "pr opened", "pr open"}
 CREATION_RESULTS = re.compile(r"^(new|subtask of #\d+|duplicate of #\d+|rejected)$")
 EMPTY = {"", "-", "none", "tbd", "n/a"}
@@ -139,7 +156,7 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
         issue, status = row.get("issue", ""), row.get("status", "").lower()
         if not ISSUE_REF.search(issue):
             err("G02", f"committed item '{issue}' must reference a GitHub issue (#n)", line)
-        if status not in ALL_STATUSES:
+        if status not in SPRINT_STATUSES:
             err("G08", f"{issue}: unknown status '{row.get('status', '')}'", line)
         added = row.get("added by", "").strip()
         if added.lower() != "plan":
@@ -152,18 +169,18 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
             points += int(row.get("points", "0") or 0)
         except ValueError:
             err("G15", f"{issue}: Points must be a whole number", line)
-        if status == "done":
+        if status == TaskStatus.DONE.value.lower():
             evidence = row.get("evidence", "")
             if not ISSUE_REF.search(row.get("pr", "")) or "merged" not in evidence.lower():
                 err("G08", f"{issue}: Done needs the merged PR and evidence that says 'merged' (an opened PR is not Done)", line)
             elif evidence.strip().lower() in WEAK_EVIDENCE:
                 err("G08", f"{issue}: '{evidence}' is not completion evidence", line)
-        if status == "blocked" and is_empty(row.get("next", "")):
+        if status == TaskStatus.BLOCKED.value.lower() and is_empty(row.get("next", "")):
             err("G09", f"{issue}: a Blocked item needs a next action and owner in Next", line)
         if record.status == "closed":
-            if status not in CLOSE_STATUSES:
+            if status not in SPRINT_CLOSE_STATUSES:
                 err("G11", f"{issue}: a Closed sprint accounts for every item as Done, Not done, Blocked or Cancelled", line)
-            elif status != "done" and is_empty(row.get("next", "")):
+            elif status != TaskStatus.DONE.value.lower() and is_empty(row.get("next", "")):
                 err(
                     "G11",
                     f"{issue}: incomplete or cancelled work needs a disposition in Next (backlog, candidate for next sprint, or reason)",
@@ -405,6 +422,12 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--repo", type=Path, default=Path("."), help="repository root for release mirrors")
     parser.add_argument("--release", action="store_true", help="fail on open conflicts and release bypass inputs")
     parser.add_argument("--pr-body", type=Path, help="pull request body to check")
+    parser.add_argument(
+        "--transition",
+        nargs=3,
+        metavar=("KIND", "SRC", "DST"),
+        help="validate one ProjectPhase, TaskStatus, or DelegationStatus transition",
+    )
     parser.add_argument("--design-handoff", type=Path, help="design handoff record to validate")
     parser.add_argument(
         "--frontend-readiness", action="store_true", help="fail closed unless the supplied design handoff is valid"
@@ -412,11 +435,18 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     if args.as_of is None and args.sprints:
         parser.error("--as-of must be YYYY-MM-DD when validating sprint records")
-    if not (args.sprints or args.state or args.pr_body or args.design_handoff or args.frontend_readiness):
+    if not (args.sprints or args.state or args.pr_body or args.design_handoff or args.frontend_readiness or args.transition):
         parser.print_usage()
         return 2
     errors: list[str] = []
     notes: list[str] = []
+    if args.transition:
+        kind, src, dst = args.transition
+        try:
+            validate_transition(kind, src, dst)
+            print(f"Allowed transition: {kind} {src} -> {dst}")
+        except TransitionError as exc:
+            errors.append(str(exc))
     if args.sprints:
         errors += check_sprints(args.sprints, args.as_of)
     if args.state:
