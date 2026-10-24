@@ -4,6 +4,7 @@ The default view is diagnostic and backward-compatible. Consumers that make
 workflow decisions should use --health-json or --strict so an absent, malformed,
 or stale snapshot cannot be mistaken for verified empty state.
 """
+
 from __future__ import annotations
 
 import argparse
