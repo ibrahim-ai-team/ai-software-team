@@ -8,7 +8,7 @@ The orchestrator must require a design handoff before frontend implementation wh
 - responsive behavior or supported viewport behavior;
 - user interactions, forms, validation, or meaningful UI states.
 
-For a truly minor change with no material design impact, the orchestrator may record an exception only when the designated decision authority approves it. A skill invocation, verbal claim, or generic note is not a design artifact.
+For a truly minor change with no material design impact, the orchestrator may record an exception only when the designated decision authority approves it. The durable handoff record is still required, including the rationale, approver and approval evidence; the artifact itself may be N/A only for this approved exception. A skill invocation, verbal claim, or generic note is not a design artifact.
 
 ## Required handoff
 
