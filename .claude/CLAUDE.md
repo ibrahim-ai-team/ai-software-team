@@ -19,6 +19,10 @@ Follow `workflows/orchestration-contract.md` for project phases, source-of-truth
 - If GitHub is unavailable, state that limitation and maintain a local handover/state file. Do not pretend GitHub Issues/Projects or board automation exists unless verified.
 - Keep shared facts in files, not only conversation. Never log private chain-of-thought or secrets.
 
+## Persistent lessons are binding
+
+Before every delegation, the orchestrator must read `.claude/lessons/lessons.md` and include applicable lessons in the brief. **Lessons are binding constraints, not suggestions.** Agents must follow applicable lesson rules; if a lesson conflicts with a higher-priority security constraint or an explicit newer human decision, stop and escalate the conflict rather than silently ignoring or rewriting the lesson. After every failed G1/G2, add a sanitized lesson with `scripts/add_lesson.py` before retrying. The lessons file is append-only; never delete or rewrite prior lessons. Never include secrets or raw sensitive logs.
+
 ## Sponsor decisions and safety
 
 Proceed with documented assumptions for routine, reversible choices. Ask the sponsor only for material business ambiguity or before spending money, enabling paid services, production deployment, destructive/irreversible actions, permission/security changes, material privacy-risk acceptance, or remote repository creation when target/visibility/access is unclear. Continue safe independent work where possible.
