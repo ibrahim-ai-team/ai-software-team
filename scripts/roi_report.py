@@ -66,10 +66,11 @@ def build_report(
             human_hours = float(story["human_hours_estimated"])
             agent_cost = tokens * token_cost
             human_cost = human_hours * rate_hourly
-            if agent_cost == 0:
-                ratio = "∞" if human_cost > 0 else "0.00"
-            else:
-                ratio = f"{human_cost / agent_cost:.2f}"
+            ratio = (
+                ("∞" if human_cost > 0 else "0.00")
+                if agent_cost == 0
+                else f"{human_cost / agent_cost:.2f}"
+            )
             lines.append(
                 f"| {story['story_id'].strip()} | {minutes:g} | {tokens:g} | "
                 f"{agent_cost:.6f} | {human_hours:g} | {human_cost:.2f} | {ratio} |"

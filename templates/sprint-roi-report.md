@@ -4,7 +4,7 @@
 
 | Story ID | Agent time (min) | Tokens | Token cost ($) | Estimated human hours | Estimated human cost ($) | ROI ratio |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-{{rows}}
+| {{story-id}} | {{agent-minutes}} | {{tokens}} | {{token-cost}} | {{human-hours}} | {{human-cost}} | {{roi-ratio}} |
 
 ## Method
 
