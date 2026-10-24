@@ -26,11 +26,13 @@
 ### Functional requirements (EARS)
 
 Write each requirement as a testable EARS statement:
+
 - **Event-driven:** `When <trigger>, the system shall <behavior>.`
 - **State-driven:** `While <state>, the system shall <behavior>.`
 - **Condition:** `If <condition>, then the system shall <behavior>.`
 
 Examples (replace these):
+
 - When a user submits valid credentials, the system shall create an authenticated session.
 - If a payment is declined, then the system shall display a clear failure message and preserve the cart.
 - While an account is locked, the system shall reject authentication attempts.
