@@ -72,4 +72,3 @@ Before each lifecycle transition, the orchestrator checks the relevant gate with
 ## Checker contract and limitations
 
 `scripts/check_gates.py` is standard-library-only and read-only. It returns 0 for a valid passing record, 1 when the record is absent or invalid (including a failed check), and 2 for a missing or invalid `--gate` argument. It validates schema and digest format; it does not recompute `plan_hash` against the plan because no plan path is supplied, and the JSON record does not prove reviewer identity. Preserve the underlying CI logs/review evidence and repository access controls.
-
