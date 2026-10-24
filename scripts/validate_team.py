@@ -300,6 +300,10 @@ required_files = [
     "standards/agent-isolation.md",
     "standards/license-risk.md",
     "standards/ci-cd-hardening.md",
+    "standards/model-agnosticism.md",
+    "adapters/README.md",
+    "adapters/claude-code/README.md",
+    "docs/portability-audit.md",
     "scripts/new_worktree.sh",
     "scripts/cleanup_worktree.sh",
     "tests/test_worktree.sh",
@@ -311,6 +315,27 @@ required_files = [
 ]
 for relative in required_files:
     require_nonempty(ROOT / relative)
+
+# Shared agent Markdown must not embed undocumented Claude Code runtime markers.
+model_agnosticism_path = ROOT / "standards" / "model-agnosticism.md"
+model_agnosticism_text = require_nonempty(model_agnosticism_path, "model agnosticism standard")
+for marker in ("$ARGUMENTS", "$CLAUDE_[A-Z0-9_]+", "<tool-name>", "<command-name>"):
+    if marker not in model_agnosticism_text:
+        errors.append(f"Model agnosticism standard must document prohibited pattern: {marker}")
+agent_forbidden_patterns = (
+    (re.compile(r"\\$ARGUMENTS"), "$ARGUMENTS"),
+    (re.compile(r"\\$CLAUDE_[A-Z0-9_]+"), "$CLAUDE_[A-Z0-9_]+"),
+    (re.compile(r"<tool-name>|<command-name>"), "Claude Code transcript/tool control marker"),
+)
+for agent_path in agents:
+    agent_text = read_text(agent_path)
+    for line_number, line in enumerate(agent_text.splitlines(), start=1):
+        for pattern, label in agent_forbidden_patterns:
+            if pattern.search(line):
+                errors.append(
+                    f"Undocumented Claude Code-specific pattern {label!r} in "
+                    f"{agent_path.relative_to(ROOT)}:{line_number}"
+                )
 
 hitl_path = ROOT / "standards" / "human-in-the-loop.md"
 hitl_text = require_nonempty(hitl_path, "HITL standard")

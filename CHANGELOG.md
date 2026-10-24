@@ -6,6 +6,8 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Documented model-agnostic agent-contract principles, planned adapter interface, current Claude Code coupling, portability audit, and static guardrails against selected undocumented runtime syntax in agent Markdown. No agent files or adapter implementations were changed.
+
 - Added a standard-library Python dependency license checker and push/PR workflow, license-risk and CI/CD hardening standards, minimal-permission workflow audit, validator coverage, security-policy links, and license-check tests.
 
 - Added local sprint ROI reporting: JSON metrics input schema, standard-library Markdown report generator, sprint workflow/Project Manager instructions, worked calculation example, and regression tests.

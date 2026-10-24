@@ -1,5 +1,9 @@
 # Team-wide instructions
 
+## Model-agnostic agent contracts
+
+Les fichiers `.claude/agents/*.md` sont les contrats de rôle faisant autorité. Ils ne doivent pas contenir de syntaxe propriétaire Claude Code non documentée. Les conventions propres au runtime doivent être documentées dans les standards/adaptateurs ; le validateur signale les patterns interdits définis dans `standards/model-agnosticism.md`. Ne réécris pas le contrat commun pour un seul orchestrateur.
+
 ## Scope and activation
 
 This repository configures a reusable AI software team; it is not itself the future application. If the user asks to inspect/improve the team kit, work only on this repository. A clear request to build an application idea activates `workflows/project-bootstrap.md` immediately; do not require the user to write a complete brief first.
