@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
-import status_snapshot
+import status_snapshot  # noqa: E402
 
 STATE = """# Project State
 ## Backlog and task ownership
@@ -23,7 +23,20 @@ STATE = """# Project State
 """
 
 def write_event(path, stamp, details):
-    path.write_text(json.dumps({"ts": stamp.isoformat(), "agent_id": "qa-automation", "story": "TASK-1", "action": "tool_call", "details": details, "event_id": "e1"}) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(
+            {
+                "ts": stamp.isoformat(),
+                "agent_id": "qa-automation",
+                "story": "TASK-1",
+                "action": "tool_call",
+                "details": details,
+                "event_id": "e1",
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
 class SnapshotTests(unittest.TestCase):
     def setup_files(self, directory):
@@ -80,7 +93,22 @@ class SnapshotTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             state, log = self.setup_files(d)
             output = Path(d) / "snapshot.json"
-            result = subprocess.run([sys.executable, str(ROOT / "scripts/status_snapshot.py"), "--state", str(state), "--activity", str(log), "--output", str(output), "--dry-run"], capture_output=True, text=True, check=False)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(ROOT / "scripts/status_snapshot.py"),
+                    "--state",
+                    str(state),
+                    "--activity",
+                    str(log),
+                    "--output",
+                    str(output),
+                    "--dry-run",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(json.loads(result.stdout)["schema_version"], 1)
             self.assertFalse(output.exists())
