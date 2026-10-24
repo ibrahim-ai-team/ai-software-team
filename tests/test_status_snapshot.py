@@ -22,6 +22,7 @@ STATE = """# Project State
 | D1 | TASK-1 | qa-automation | feature/test | tests/ | result | In Progress | r1 | s1 | — |
 """
 
+
 def write_event(path, stamp, details):
     path.write_text(
         json.dumps(
@@ -37,6 +38,7 @@ def write_event(path, stamp, details):
         + "\n",
         encoding="utf-8",
     )
+
 
 class SnapshotTests(unittest.TestCase):
     def setup_files(self, directory):
@@ -112,6 +114,7 @@ class SnapshotTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(json.loads(result.stdout)["schema_version"], 1)
             self.assertFalse(output.exists())
+
 
 if __name__ == "__main__":
     unittest.main()
