@@ -24,7 +24,7 @@ Follow `workflows/orchestration-contract.md` (phases, state, precedence, recover
 | Backlog and sprint | `project-manager` (Scrum Master) with `qa-automation` | Issues meet `workflows/backlog-quality-gates.md`; sprint record approved (`workflows/sprint-governance.md#sprint-planning`) and `scripts/check_governance.py` passes |
 | Task breakdown | `tech-lead` (read-only; you write its breakdown to the project task list) | Small tasks with owner, allowed paths, dependencies, acceptance checks |
 | Design gate and implementation | `ui-ux-designer` whenever the mandatory design gate applies; `backend-developer`, `frontend-developer`, `database-engineer`, `devops-platform` as required after the gate | Before frontend work, require a completed design handoff per `workflows/design-gate.md`; run `python scripts/check_governance.py --frontend-readiness --design-handoff <handoff-file>` and confirm exit code 0. Missing handoff, pending approval, or failed validation means STOP. Then verify bounded diff and tests |
-| Verification | `qa-automation` | Tested and not-tested scope, defects linked |
+| Verification | `qa-automation`, then `ci-verifier` | QA scope and defects; ci-verifier JSON facts for applicable lint, tests, secrets and build checks |
 | Review | `tech-lead` (technical), `code-review-security` (independent security) | Findings dispositioned; reviewer did not author the change |
 | PR and report | you | CI observed; PR open for the sponsor; report sent |
 

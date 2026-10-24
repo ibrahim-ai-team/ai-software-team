@@ -10,7 +10,7 @@
 - GitHub Projects is the planning board for the sprint. Keep status, priority, iteration, estimate, and owner visible when configured.
 - GitHub does not automatically know which local subagent was called, what it returned, or whether a local test ran unless that is recorded.
 - Every implementation task uses an isolated branch. Use a separate Git worktree per concurrently running coding agent where practical.
-- `tech-lead` (technical quality) and `code-review-security` (security, read-only) review supplied diffs and evidence independently and return findings; `qa-automation` validates behaviour. The coordinator records review disposition; the reviewer does not approve its own implementation. The repository owner/user alone performs the final merge; agents must never merge PRs or configure automation to merge on the user's behalf.
+- `ci-verifier` executes only its closed allowlist of read-only verification commands and returns factual JSON; `code-review-security` (read-only, no shell) judges that evidence against the diff. `tech-lead` reviews technical quality and `qa-automation` validates behaviour. The coordinator records review disposition; the reviewer does not approve its own implementation. The repository owner/user alone performs the final merge; agents must never merge PRs or configure automation to merge on the user's behalf.
 
 ## End-to-end workflow from an idea
 
@@ -28,7 +28,7 @@
 Follow `standards/validation-gates.md`. Gates are agent-produced technical evidence; CP1–CP4 remain human approvals as defined in `standards/human-in-the-loop.md`. Never substitute one for the other.
 
 1. **Before any coding delegation:** obtain human CP1 (plan) and CP2 (architecture) approvals with `python scripts/check_approvals.py --story <story> --checkpoint CP1` and `--checkpoint CP2`. Then require the plan review Gate 1: `python scripts/check_gates.py --story <story> --gate G1`. If any command returns non-zero, stop and request the missing approval or gate evidence. No coder may start without both CP1/CP2 and a passing G1.
-2. **After implementation, before merge readiness:** collect and verify successful lint, automated tests, and secret scanning. Record them in `.claude/gates/G2-<story>.json`, then run `python scripts/check_gates.py --story <story> --gate G2`. If G2 fails or evidence is missing, stop and fix/re-run the checks; do not advance to merge readiness.
+2. **After implementation, before merge readiness:** (1) delegate to `ci-verifier` for factual JSON evidence; (2) pass the JSON and actual diff to `code-review-security` for judgment; (3) persist G2 only if the reviewer approves, then run `python scripts/check_gates.py --story <story> --gate G2`. A skipped, failed, missing, or disputed mandatory check blocks G2. If verifier and reviewer diverge, escalate to the human sponsor at CP3. The verifier never persists to `.claude/gates/`; the orchestrator persists only after review.
 3. **Before merge:** require human CP3 via `python scripts/check_approvals.py --story <story> --checkpoint CP3` after G2 passes. Only the human repository owner merges.
 4. **Before release tagging:** require G2 evidence for the release candidate and human CP4 as applicable; follow the release checkpoint policy.
 

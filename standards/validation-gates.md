@@ -29,7 +29,7 @@ Check with: `python scripts/check_gates.py --story <story> --gate G1`.
 
 ## Gate 2 (G2) — Post-execution verification
 
-After implementation and before the change can be approved for merge, the reviewer/coordinator gathers verifiable results for all three mandatory checks:
+After implementation and before the change can be approved for merge, `ci-verifier` executes applicable allowlisted checks and returns factual JSON. `code-review-security` (read-only, without Bash) judges that evidence against the actual diff. **G2 is an objective fact from ci-verifier plus an independent judgment from code-review-security; both must agree for G2 to pass.** A skipped, missing, malformed, failed, or disputed mandatory check blocks G2. The verifier never persists to `.claude/gates/`; only the orchestrator persists after reviewer approval. If verifier and reviewer diverge, escalate to the human sponsor at CP3. The required evidence covers:
 
 1. **Lint:** the required lint/format checks completed successfully.
 2. **Tests:** the applicable automated test suite completed successfully.
@@ -58,7 +58,7 @@ Check with: `python scripts/check_gates.py --story <story> --gate G2`.
 
 ## Required ordered flow
 
-`CP1 → G1 → code → G2 → CP3 → merge`
+`CP1 → G1 → code → ci-verifier facts → code-review-security judgment → persist G2 → CP3 → merge`
 
 - **CP1:** human approves the plan.
 - **G1:** `code-review-security` validates the plan mechanically and records the result.

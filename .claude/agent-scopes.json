@@ -159,5 +159,11 @@
     "forbidden_paths": [
       "**"
     ]
+  },
+  "ci-verifier": {
+    "allowed_paths": [],
+    "forbidden_paths": [
+      "**"
+    ]
   }
 }

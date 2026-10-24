@@ -6,7 +6,7 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 
 | Area | Contents |
 | --- | --- |
-| Agents | 18 roles under `.claude/agents/`: one `agile-orchestrator` plus specialists (see [team roles](#team-roles)) |
+| Agents | 19 roles under `.claude/agents/`: one `agile-orchestrator` plus specialists (see [team roles](#team-roles)) |
 | Skills | 23 reusable procedures under `.claude/skills/` (the manifest minimum is 22) |
 | Shared instructions | `.claude/CLAUDE.md` and local permission guardrails in `.claude/settings.json` |
 | Standards | Engineering, security, Git workflow, and definition of done |
@@ -45,6 +45,7 @@ One orchestrator coordinates; specialists do the work and return results to it. 
 | Frontend / Backend Developer | `.claude/agents/frontend-developer.md`, `.claude/agents/backend-developer.md` |
 | QA Engineer | `.claude/agents/qa-automation.md` |
 | DevOps Engineer | `.claude/agents/devops-platform.md` |
+| CI Verifier | `.claude/agents/ci-verifier.md` (Read + Bash only; closed verification command allowlist; no file writes) |
 | Code / Security Reviewer | `.claude/agents/code-review-security.md` (read-only) |
 | GitHub integration | `agile-orchestrator` (Issues, PRs, board status via `gh` and `.github/workflows/project-status.yml`) |
 | Used when needed | `database-engineer`, `ui-ux-designer`, `technical-research`, `performance-engineer`, `sre-observability-engineer`, `release-manager`, `documentation-manager` |
