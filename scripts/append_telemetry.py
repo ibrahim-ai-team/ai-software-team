@@ -14,7 +14,6 @@ LOG_PATH = ROOT / ".claude" / "telemetry" / "activity.jsonl"
 AGENTS_PATH = ROOT / "state" / "agents.json"
 ALLOWED_ACTIONS = {"delegate", "gate", "approve", "tool_call", "error"}
 FORBIDDEN_KEY_PARTS = ("token", "password", "api_key", "secret")
-IDENTITY_FIELDS = ("agent_id", "session_id", "run_id", "event_id")
 
 
 def contains_forbidden_key(value: Any) -> str | None:
