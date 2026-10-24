@@ -51,6 +51,10 @@ One orchestrator coordinates; specialists do the work and return results to it. 
 
 Shared rules for every specialist: [`standards/agent-contract.md`](standards/agent-contract.md).
 
+## Spec-Driven Development (SDD/EARS)
+
+Every new story starts with a formal specification using [`templates/spec-ears.md`](templates/spec-ears.md) before it enters the backlog. The Product Owner and Business Analyst write testable EARS requirements, non-functional constraints, and Gherkin acceptance criteria. The human sponsor approves the plan at CP1 and the Software Architect reviews feasibility; a story without a validated spec cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md).
+
 ## Agile commands
 
 A new idea becomes its own GitHub workspace named after the app you propose (for example `shopinow-management`, `shopinow-front`, `shopinow-back`) with one Project board through `/provision-project`; see [project provisioning](docs/project-provisioning.md). This repository is never copied per application.
