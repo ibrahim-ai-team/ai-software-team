@@ -293,9 +293,7 @@ class PullRequestTests(GovernanceCase):
 
 class DesignGateTests(GovernanceCase):
     def completed_template(self, **replacements):
-        text = (ROOT / "templates/design-handoff-template.md").read_text(
-            encoding="utf-8"
-        )
+        text = (ROOT / "templates/design-handoff-template.md").read_text(encoding="utf-8")
         defaults = {
             "Decision: required | exception": "Decision: required",
             "User Story: #<issue-number or URL>": "User Story: #123",
@@ -340,13 +338,9 @@ class DesignGateTests(GovernanceCase):
         self.assertTrue(any("approver" in error for error in errors), errors)
 
     def test_pending_approval_is_rejected(self):
-        text = self.completed_template(
-            **{"Approval status: approved | pending": "Approval status: pending"}
-        )
+        text = self.completed_template(**{"Approval status: approved | pending": "Approval status: pending"})
         errors = check_design_handoff(self.write("pending.md", text))
-        self.assertTrue(
-            any("Approval status must be approved" in error for error in errors), errors
-        )
+        self.assertTrue(any("Approval status must be approved" in error for error in errors), errors)
 
     def test_approved_minor_change_exception_may_omit_artifact(self):
         text = self.completed_template(
@@ -370,9 +364,8 @@ class DesignGateTests(GovernanceCase):
             }
         )
         errors = check_design_handoff(self.write("bad-exception.md", text))
-        self.assertTrue(
-            any("exception requires a documented" in error for error in errors), errors
-        )
+        self.assertTrue(any("exception requires a documented" in error for error in errors), errors)
+
 
 class TemplateTests(GovernanceCase):
     def test_sprint_template_has_every_section_the_checker_reads(self):
