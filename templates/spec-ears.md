@@ -20,9 +20,9 @@ Write each requirement as one testable EARS statement. Use the appropriate patte
 
 ### Examples
 
-- When a user submits valid credentials, the system shall create an authenticated session.
-- If a payment is declined, then the system shall display a clear failure message and preserve the cart.
-- While an account is locked, the system shall reject authentication attempts.
+When a user submits valid credentials, the system shall create an authenticated session.
+If a payment is declined, then the system shall display a clear failure message and preserve the cart.
+While an account is locked, the system shall reject authentication attempts.
 
 ### Story requirements
 
