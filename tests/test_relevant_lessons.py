@@ -58,11 +58,10 @@ class RelevantLessonsTests(unittest.TestCase):
             path.write_text(lesson(1, story="OTHER-1", tags="database"), encoding="utf-8")
             self.assertEqual(relevant_lessons.select_lessons("SHOP-12", 5, path), [])
 
-
     def test_lesson_with_secret_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "lessons.md"
-            path.write_text(lesson(1, story="SHOP-12") + "- **Note:** password: abc123\\n", encoding="utf-8")
+            path.write_text(lesson(1, story="SHOP-12") + "- **Note:** password: abc123\n", encoding="utf-8")
             stderr = io.StringIO()
             with contextlib.redirect_stderr(stderr):
                 result = relevant_lessons.select_lessons("SHOP-12", 5, path)
@@ -72,7 +71,7 @@ class RelevantLessonsTests(unittest.TestCase):
     def test_lesson_with_token_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "lessons.md"
-            path.write_text(lesson(1, story="SHOP-12") + "- **Note:** token: xyz\\n", encoding="utf-8")
+            path.write_text(lesson(1, story="SHOP-12") + "- **Note:** token: xyz\n", encoding="utf-8")
             stderr = io.StringIO()
             with contextlib.redirect_stderr(stderr):
                 result = relevant_lessons.select_lessons("SHOP-12", 5, path)
