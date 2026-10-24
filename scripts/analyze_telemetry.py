@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Summarize the local append-only JSONL telemetry log."""
 
 import json
