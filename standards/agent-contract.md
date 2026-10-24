@@ -44,6 +44,8 @@ Who decides, who proposes, and what no role may do on its own. Precedence betwee
 | Architecture, ADRs | `software-architect` | `tech-lead`, `technical-research` | Implementers mid-task |
 | Task breakdown, technical acceptance | `tech-lead` | Implementers | The author of the change |
 | Behaviour verified against acceptance criteria | `qa-automation` | Implementers (their own test results) | The author of the change |
+| CI verification facts for G2 | `ci-verifier` executes only its closed read-only command allowlist and returns JSON evidence | `agile-orchestrator` supplies story context | Any agent inventing results or writing gate records from the verifier role |
+| G2 approval judgment | `code-review-security` judges ci-verifier JSON against the actual diff; orchestrator persists only after approval | `ci-verifier` supplies factual execution results | `ci-verifier` alone or any agent with missing/skipped mandatory evidence |
 | Security review disposition | `code-review-security` findings; orchestrator records disposition | — | The author of the change |
 | Release go/no-go | Sponsor | `release-manager` evidence and recommendation | Any agent; a deploy-time override |
 | Merge | Human repository owner | Orchestrator presents the PR | Any agent |
