@@ -83,6 +83,10 @@ def filter_snapshot(snapshot: dict[str, Any], expression: str | None) -> dict[st
         for item in snapshot.get(key, [])
         if isinstance(item, dict) and str(item.get(id_key, "")).casefold() == value
     ]
+    # A filtered view contains only the requested entity type, while retaining
+    # the top-level keys so consumers can rely on the effective.json schema.
+    other_key = "tasks" if kind == "agent" else "agents"
+    filtered[other_key] = []
     return filtered
 
 
