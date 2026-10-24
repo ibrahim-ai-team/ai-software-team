@@ -16,13 +16,12 @@ The user stories and journeys, the target devices and accessibility level, and t
 ## Procedure
 
 1. Read the approved User Story and acceptance criteria; record the story link and acceptance criteria covered in the handoff.
-2. If the gate applies, stop frontend implementation until an artifact is produced and approved. Use a real Figma URL when available and appropriate; never fabricate links. If Figma is unavailable or unnecessary, create a concrete repository artifact (for example, an annotated wireframe or design specification) and document the reason plus sponsor/design authority approval. An exception is not permission to proceed without any artifact or evidence.
-3. Identify the user goal and critical path.
-2. Map the flow and alternate/error paths. Mark assumptions and questions instead of inventing requirements.
-3. Describe screen hierarchy, component behavior, responsive breakpoints, and reusable patterns consistent with the existing design system.
-4. Specify loading, empty, error, success, validation, and destructive-action states as applicable.
-5. Include keyboard interaction, focus behavior, semantic controls, contrast/readability, and reduced-motion considerations.
-6. Hand off the artifact/specification to frontend and QA, linked to the story and acceptance criteria. Record approver and approval evidence. QA must verify applicable responsive breakpoints, interactions, accessibility, and loading/empty/error/success states against the approved artifact; report anything not applicable with a rationale.
+2. Identify the user goal and critical path.
+3. Map the flow and alternate/error paths. Mark assumptions and questions instead of inventing requirements.
+4. Describe screen hierarchy, component behavior, responsive breakpoints, and reusable patterns consistent with the existing design system.
+5. Specify loading, empty, error, success, validation, and destructive-action states as applicable.
+6. Include keyboard interaction, focus behavior, semantic controls, contrast/readability, and reduced-motion considerations.
+7. Hand off the artifact/specification to frontend and QA, linked to the story and acceptance criteria. Record approver and approval evidence. QA must verify applicable responsive breakpoints, interactions, accessibility, and loading/empty/error/success states against the approved artifact; report anything not applicable with a rationale.
 
 ## Expected outputs
 
