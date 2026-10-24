@@ -48,7 +48,7 @@ For `/provision-project`, follow the approved plan-digest and human-approval con
 - **Evidence:** read-back command and observed result
 - **Decision required:** only when human approval/business decision is needed
 
-Use `N/A` for untouched resource types. Report only verified actions.
+Use `not applicable` for untouched resource types. Report only verified actions.
 
 ## Relevant skills
 
