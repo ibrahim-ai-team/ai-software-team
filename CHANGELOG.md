@@ -4,8 +4,13 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Clarified Product Owner vs Business Analyst authority: PO owns business value, priority and high-level scope; BA alone authors the final EARS specification and traceability; PO validates without rewriting; human CP1 approval remains mandatory.
+
 ### Added
 
+- Added PO/BA boundary regression tests covering role ownership and ambiguous collaboration wording.
 - Added fail-closed agent path-scope configuration, a standard-library preflight checker, regression tests, and documentation distinguishing preflight checks from runtime enforcement.
 
 - Documented model-agnostic agent-contract principles, planned adapter interface, current Claude Code coupling, portability audit, and static guardrails against selected undocumented runtime syntax in agent Markdown. No agent files or adapter implementations were changed.

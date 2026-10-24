@@ -60,3 +60,40 @@ The orchestrator also acts as the team's GitHub operator: it alone writes Issues
 ## Scope enforcement
 
 Before any agent write, run `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`. The central `.claude/agent-scopes.json` is authoritative. Unknown agents, malformed configuration, forbidden paths, and paths outside the allowlist are denied. This preflight is not a sandbox; runtime/tool-level controls must also constrain writes. Scope denials must be reported and logged as telemetry with `action=error` and `details.refused_path`.
+
+## Product Owner vs Business Analyst: responsibility boundary
+
+The two roles collaborate through orchestrated handoffs, but they own different artifacts. The **Product Owner (PO) owns business value**; the **Business Analyst (BA) is the sole author of the final EARS specification**.
+
+### Product Owner — business value
+
+The PO decides and documents:
+
+- **Why:** why the story is needed and which problem it solves.
+- **For whom:** target user or persona.
+- **Success metrics:** measurable outcomes that define success.
+- **Priority:** P0/P1/P2.
+- **High-level scope:** what is in scope and out of scope.
+
+The PO does not write the formal EARS specification, Gherkin scenarios, technical edge cases, or traceability matrix. The PO never rewrites the BA's specification; they validate it against the business brief and return precise comments when it does not reflect the agreed value.
+
+### Business Analyst — requirements traceability
+
+The BA is the sole author of the final EARS specification and produces:
+
+- Formal EARS requirements using **When/If/While + shall** patterns.
+- Workflows, happy paths, alternate paths, and edge cases.
+- Gherkin acceptance criteria.
+- A requirement-to-test traceability matrix.
+- A glossary, assumptions, and open questions.
+
+The BA does not decide business priority or scope and does not contact the sponsor directly. If the brief, priority, or scope is missing or contradictory, the BA escalates to the orchestrator, which obtains a decision from the PO or sponsor according to the authority rules.
+
+### Assembly and approval rule
+
+1. The PO provides the business-value brief (why, for whom, success metrics, priority, and high-level scope).
+2. The BA uses that brief to write and maintain the final EARS specification in `templates/spec-ears.md`.
+3. The PO validates the specification against the brief and returns precise comments; the BA makes specification changes.
+4. A human approves at **CP1**. Agent validation never replaces human approval.
+
+Any PO/BA disagreement is escalated to the orchestrator; neither agent may assume the other's decision authority.

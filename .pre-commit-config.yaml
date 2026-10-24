@@ -56,7 +56,7 @@ repos:
     rev: v2.4.3
     hooks:
       - id: codespell
-        args: [--ignore-words-list=mesure]  # French heading used in README
+        args: [--ignore-words-list=mesure]
 
   # GitHub Actions workflows and Dependabot config.
   - repo: https://github.com/rhysd/actionlint
