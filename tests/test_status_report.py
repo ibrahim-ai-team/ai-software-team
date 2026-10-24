@@ -23,7 +23,7 @@ class StatusReportTests(unittest.TestCase):
         self.snapshot_path = Path(self.temp_dir.name) / "effective.json"
         self.snapshot = {
             "schema_version": 1,
-            "generated_at": "2026-10-24T08:00:00Z",
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "agents": [
                 {"agent_id": f"agent-{index:02d}", "declared": "running", "observed": "running",
                  "drift": False, "last_event_age_seconds": 30 + index, "staleness": "FRESH"}
