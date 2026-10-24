@@ -6,6 +6,8 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Added the read-only `ci-verifier` role and schema tests; separated factual CI command execution from `code-review-security` G2 judgment, with orchestrator-only persistence after approval.
+
 - Added fail-closed agent path-scope configuration, a standard-library preflight checker, regression tests, and documentation distinguishing preflight checks from runtime enforcement.
 
 - Documented model-agnostic agent-contract principles, planned adapter interface, current Claude Code coupling, portability audit, and static guardrails against selected undocumented runtime syntax in agent Markdown. No agent files or adapter implementations were changed.
