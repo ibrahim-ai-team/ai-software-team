@@ -8,6 +8,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 LOG_PATH = ROOT / ".claude" / "telemetry" / "activity.jsonl"
+IDENTITY_FIELDS = ("agent_id", "session_id", "run_id", "event_id")
 
 
 def parse_timestamp(value: Any) -> datetime:
@@ -43,6 +44,7 @@ def summarize(events: list[dict[str, Any]]) -> str:
     by_agent = Counter(str(event.get("agent", "unknown")) for event in events)
     errors = sum(event.get("action") == "error" for event in events)
     gates = sum(event.get("action") == "gate" for event in events)
+    legacy_events = sum(any(not event.get(field) for field in IDENTITY_FIELDS) for event in events)
     story_times: dict[str, list[datetime]] = defaultdict(list)
     for event in events:
         story = str(event.get("story", "none"))
