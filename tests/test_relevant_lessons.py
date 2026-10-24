@@ -1,7 +1,9 @@
 """Regression tests for bounded and fail-safe lesson selection."""
 
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stderr
 from pathlib import Path
 
 from scripts import relevant_lessons
@@ -61,6 +63,28 @@ class RelevantLessonsTests(unittest.TestCase):
             path = Path(directory) / "lessons.md"
             path.write_text("".join(lesson(i, story="SHOP-12") for i in range(1, 8)), encoding="utf-8")
             self.assertEqual(len(relevant_lessons.select_lessons("SHOP-12", 2, path)), 2)
+
+    def test_lesson_with_secret_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lessons.md"
+            path.write_text(lesson(7, story="SHOP-12").replace("Example context.", "password: abc123"), encoding="utf-8")
+            stderr = io.StringIO()
+            with redirect_stderr(stderr):
+                result = relevant_lessons.select_lessons("SHOP-12", 5, path)
+        self.assertEqual(result, [])
+        self.assertIn("WARN: lesson L007 rejected — contains potential secret", stderr.getvalue())
+        self.assertNotIn("abc123", stderr.getvalue())
+
+    def test_lesson_with_token_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "lessons.md"
+            path.write_text(lesson(8, story="SHOP-12").replace("Example context.", "token: xyz"), encoding="utf-8")
+            stderr = io.StringIO()
+            with redirect_stderr(stderr):
+                result = relevant_lessons.select_lessons("SHOP-12", 5, path)
+        self.assertEqual(result, [])
+        self.assertIn("WARN: lesson L008 rejected — contains potential secret", stderr.getvalue())
+        self.assertNotIn("xyz", stderr.getvalue())
 
 
 if __name__ == "__main__":

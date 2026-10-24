@@ -4,12 +4,19 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LESSONS_PATH = ROOT / ".claude" / "lessons" / "lessons.md"
 NO_LESSONS = "Aucune leçon applicable pour cette story"
+_SECRET_PATTERN = re.compile(r"(?i)\b(token|password|api[_-]?key|secret|bearer|credential)\b")
+
+
+def _contains_secret(section: str) -> bool:
+    """Return whether a lesson may contain a secret or credential."""
+    return bool(_SECRET_PATTERN.search(section))
 
 
 def _sections(text: str) -> list[str]:
@@ -53,6 +60,14 @@ def select_lessons(story: str, maximum: int = 5, lessons_path: Path | None = Non
     folded = story.casefold()
     story_tokens = _tokens(story)
     for section in _sections(text):
+        if _contains_secret(section):
+            match = re.match(r"##\s+(L\d+)", section)
+            lesson_id = match.group(1) if match else "unknown"
+            print(
+                f"WARN: lesson {lesson_id} rejected — contains potential secret",
+                file=sys.stderr,
+            )
+            continue
         source, tags = _field(section, "Source story").casefold(), _field(section, "Tags").casefold()
         title = section.splitlines()[0].casefold()
         if folded in source or folded in tags or folded in title or story_tokens & _tokens(tags):
