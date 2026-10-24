@@ -105,6 +105,22 @@ The checker exits non-zero for unknown states, unknown kinds, or transitions not
 - Configure and verify GitHub rulesets/branch protection and permissions separately. Do not treat the human-merge rule in documentation as technical enforcement.
 - The validation workflow uses read-only repository permissions and disables persisted checkout credentials.
 
+## Single coordinator policy
+
+The local coordinator lock makes the documented single-coordinator rule explicit. At the **start of each coordinator session**, before reconciling state or delegating work, run:
+
+```bash
+python scripts/coordinator_lock.py acquire
+```
+
+The default TTL is 3,600 seconds (one hour); choose a longer TTL for a longer session with `python scripts/coordinator_lock.py acquire --ttl 7200`. Inspect the current holder with `python scripts/coordinator_lock.py status`. If `acquire` exits with code `2`, stop coordinating while another non-expired holder owns the lock. At the **end of the session**, after saving the handover and Project Manager report, run:
+
+```bash
+python scripts/coordinator_lock.py release
+```
+
+The lock file is `state/coordinator.lock` and is local to one machine. An expired lock is reported with a warning and may be taken over; pick a TTL longer than the expected session because this is not a heartbeat. **This is not a distributed lock:** two coordinators running on different machines are not mutually excluded, and this mechanism does not protect shared remote resources.
+
 ## Important limits
 
 - This repository does not itself run a background agent team when Claude Code is closed.
