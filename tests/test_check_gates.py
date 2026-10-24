@@ -71,9 +71,7 @@ class CheckGatesTests(unittest.TestCase):
             with self.subTest(key=key):
                 self.g2["checks"].pop(key)
                 self.write(self.g2_path, self.g2)
-                self.assertEqual(
-                    self.run_checker("--story", "SHOP-12", "--gate", "G2"), 1
-                )
+                self.assertEqual(self.run_checker("--story", "SHOP-12", "--gate", "G2"), 1)
                 self.g2["checks"][key] = "pass"
 
     def test_checker_never_modifies_gate_files(self):
