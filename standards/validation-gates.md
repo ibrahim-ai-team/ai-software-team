@@ -29,7 +29,7 @@ Check with: `python scripts/check_gates.py --story <story> --gate G1`.
 
 ## Gate 2 (G2) — Post-execution verification
 
-After implementation and before the change can be approved for merge, the reviewer/coordinator gathers verifiable results for all three mandatory checks:
+After implementation and before the change can be approved for merge, `ci-verifier` executes applicable allowlisted checks and returns factual JSON. `code-review-security` (read-only, without Bash) judges that evidence against the actual diff. **G2 is an objective fact from ci-verifier plus an independent judgment from code-review-security; both must agree for G2 to pass.** A skipped, missing, malformed, failed, or disputed mandatory check blocks G2. The verifier never persists to `.claude/gates/`; only the orchestrator persists after reviewer approval. If verifier and reviewer diverge, escalate to the human sponsor at CP3. The required evidence covers:
 
 1. **Lint:** the required lint/format checks completed successfully.
 2. **Tests:** the applicable automated test suite completed successfully.
@@ -58,7 +58,7 @@ Check with: `python scripts/check_gates.py --story <story> --gate G2`.
 
 ## Required ordered flow
 
-`CP1 → G1 → code → G2 → CP3 → merge`
+`CP1 → G1 → code → ci-verifier facts → code-review-security judgment → persist G2 → CP3 → merge`
 
 - **CP1:** human approves the plan.
 - **G1:** `code-review-security` validates the plan mechanically and records the result.
@@ -72,3 +72,4 @@ Before each lifecycle transition, the orchestrator checks the relevant gate with
 ## Checker contract and limitations
 
 `scripts/check_gates.py` is standard-library-only and read-only. It returns 0 for a valid passing record, 1 when the record is absent or invalid (including a failed check), and 2 for a missing or invalid `--gate` argument. It validates schema and digest format; it does not recompute `plan_hash` against the plan because no plan path is supplied, and the JSON record does not prove reviewer identity. Preserve the underlying CI logs/review evidence and repository access controls.
+
