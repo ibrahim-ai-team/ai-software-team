@@ -1,12 +1,13 @@
 """Tests for the human/programmatic status report."""
+
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,7 +15,12 @@ SCRIPT = ROOT / "scripts" / "status_report.py"
 
 
 def run_report(*args: str) -> subprocess.CompletedProcess[str]:
-    return subprocess.run([sys.executable, str(SCRIPT), *args], capture_output=True, text=True, check=False)
+    return subprocess.run(
+        [sys.executable, str(SCRIPT), *args],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
 
 
 class StatusReportTests(unittest.TestCase):
@@ -26,13 +32,18 @@ class StatusReportTests(unittest.TestCase):
             "schema_version": 1,
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "agents": [
-                {"agent_id": f"agent-{index:02d}", "declared": "running", "observed": "running",
-                 "drift": False, "last_event_age_seconds": 30 + index, "staleness": "FRESH"}
+                {
+                    "agent_id": f"agent-{index:02d}",
+                    "declared": "running",
+                    "observed": "running",
+                    "drift": False,
+                    "last_event_age_seconds": 30 + index,
+                    "staleness": "FRESH",
+                }
                 for index in range(20)
             ],
             "tasks": [
-                {"task_id": "TASK-1", "declared": "READY", "observed": "IN_PROGRESS",
-                 "drift": True, "evidence": []},
+                {"task_id": "TASK-1", "declared": "READY", "observed": "IN_PROGRESS", "drift": True, "evidence": []},
                 {"task_id": "TASK-2", "declared": "DONE", "observed": "DONE", "drift": False, "evidence": []},
             ],
             "github": {"available": True, "issues_count": 2, "pull_requests_count": 1},
