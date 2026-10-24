@@ -144,3 +144,14 @@ Les contrats d'agents Markdown sont la source de vérité ; les intégrations d'
 ## Verification
 
 Run `python scripts/validate_team.py`, `python scripts/check_markdown_links.py`, `python scripts/check_cross_references.py`, `python scripts/check_placeholders.py` and `python -m unittest discover -s tests -v` locally, then inspect the actual CI result on the pull request. Use `docs/verification-report.md` to record a real Claude Code smoke test; do not mark runtime verification complete without evidence.
+
+
+## Permissions mécaniques
+
+Les scopes d'écriture sont centralisés dans `.claude/agent-scopes.json`. Avant une écriture, exécutez le contrôle fail-closed :
+
+```bash
+python scripts/enforce_agent_scope.py --agent backend-developer --path src/backend/app.py
+```
+
+Le code retour `0` autorise le chemin, `1` le refuse et `2` signale une erreur d'usage (par exemple un chemin vide). Un agent absent de la configuration est refusé. Ce précontrôle ne remplace pas une sandbox ou des permissions système qui empêchent effectivement une écriture non autorisée.
