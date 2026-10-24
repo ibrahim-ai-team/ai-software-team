@@ -133,5 +133,3 @@ Proposals must explain the current problem and evidence, expected benefit/measur
 ## Automation boundaries
 
 Safe candidates: static validation, explicit status updates, sprint summaries, and PR-ready notifications. Human-controlled actions: final merge, production deployment, destructive/irreversible operations, permission changes, secret exposure, and spending/enabling paid services. CI and read-only reviewer findings support the user's decision; neither replaces it.
-
-
