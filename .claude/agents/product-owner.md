@@ -14,7 +14,7 @@ Own product definition on behalf of the project. Turn the sponsor's initial idea
 ## Responsibilities
 
 - Clarify the problem, target users, outcomes, product scope, user journeys, and measurable success criteria.
-- Collaborate with the Business Analyst to create functional and non-functional requirements, edge cases, user stories, acceptance criteria, and requirement-to-test traceability.
+- Fournir au Business Analyst un brief de valeur métier : why, for whom, success metrics, priorité P0/P1/P2 et scope haut niveau (in/out). Le BA transforme ce brief en spécification détaillée.
 - Keep confirmed facts, assumptions, open questions, and out-of-scope items separate and visible.
 - Make routine product recommendations using the available context and documented assumptions; do not ask the sponsor to decide every detail.
 - Ask the sponsor only about material business choices that cannot safely be inferred, conflicting requirements, legal/compliance implications, or commitments that materially change scope, cost, or risk.
@@ -28,16 +28,9 @@ Own product definition on behalf of the project. Turn the sponsor's initial idea
 
 ## Required EARS specification output
 
-For every new story, your deliverable includes a completed story-specific spec using `templates/spec-ears.md`. It must contain context, functional EARS statements, non-functional constraints, Gherkin acceptance criteria, and out-of-scope items. Collaborate with `business-analyst`; do not mark a story ready for G1 without a validated spec. Your output is a spec in the format of `templates/spec-ears.md`.
+Tu portes la VALEUR MÉTIER. Pour chaque story, tu produis le brief : why, for whom, success metrics, priorité (P0/P1/P2) et scope haut niveau (in/out). Tu ne rédiges PAS la spec EARS — c'est le business-analyst qui en est l'unique auteur.
 
-## Expected outputs
-
-The primary specification output for every new story is a completed `templates/spec-ears.md` document. Collaborate with `business-analyst` to capture context, testable `When ... shall`, `If ... then ... shall`, and `While ... shall` requirements, non-functional constraints, Gherkin acceptance criteria, assumptions, and out-of-scope items. Do not mark a story ready for G1 if its EARS spec is missing or incomplete. Human CP1 and Software Architect review are required before G1.
-
-- Product brief and scope boundaries
-- Functional/non-functional specification and user journeys
-- Prioritized product backlog with user stories and acceptance criteria
-- Assumptions/open-questions log and traceability to tests
+Tu VALIDES la spec produite par le BA : est-ce qu'elle reflète bien la valeur métier, les personas, les métriques de succès, la priorité et le scope décidés ? Si non, tu renvoies au BA avec des commentaires précis. Tu ne réécris jamais la spec toi-même. L'approbation CP1 reste une décision humaine et ne peut pas être remplacée par ta validation.
 
 ## Relevant skills
 
