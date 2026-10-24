@@ -24,13 +24,24 @@ from pathlib import Path
 # Support direct execution as `python scripts/check_governance.py`.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from models.status import TransitionError, validate_transition
+from models.status import TaskStatus, TransitionError, validate_transition
 
 SPRINT_ID = re.compile(r"^S\d+$")
 ISSUE_REF = re.compile(r"#\d+|https://github\.com/[^\s/]+/[^\s/]+/(?:pull|issues)/\d+")
-OPEN_STATUSES = {"ready", "in progress", "in review", "blocked"}
-CLOSE_STATUSES = {"done", "not done", "blocked", "cancelled"}
-ALL_STATUSES = OPEN_STATUSES | CLOSE_STATUSES
+SPRINT_OPEN_STATUSES = {
+    TaskStatus.READY.value.lower(),
+    TaskStatus.IN_PROGRESS.value.lower().replace("_", " "),
+    TaskStatus.IN_REVIEW.value.lower().replace("_", " "),
+    TaskStatus.BLOCKED.value.lower(),
+}
+# "Not done" is a sprint-review disposition, not a task lifecycle status.
+SPRINT_CLOSE_STATUSES = {
+    TaskStatus.DONE.value.lower(),
+    "not done",
+    TaskStatus.BLOCKED.value.lower(),
+    TaskStatus.CANCELLED.value.lower(),
+}
+SPRINT_STATUSES = SPRINT_OPEN_STATUSES | SPRINT_CLOSE_STATUSES
 WEAK_EVIDENCE = {"", "-", "tbd", "n/a", "agent reported", "reported by agent", "claimed", "pr opened", "pr open"}
 CREATION_RESULTS = re.compile(r"^(new|subtask of #\d+|duplicate of #\d+|rejected)$")
 EMPTY = {"", "-", "none", "tbd", "n/a"}
@@ -145,7 +156,7 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
         issue, status = row.get("issue", ""), row.get("status", "").lower()
         if not ISSUE_REF.search(issue):
             err("G02", f"committed item '{issue}' must reference a GitHub issue (#n)", line)
-        if status not in ALL_STATUSES:
+        if status not in SPRINT_STATUSES:
             err("G08", f"{issue}: unknown status '{row.get('status', '')}'", line)
         added = row.get("added by", "").strip()
         if added.lower() != "plan":
@@ -167,9 +178,9 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
         if status == "blocked" and is_empty(row.get("next", "")):
             err("G09", f"{issue}: a Blocked item needs a next action and owner in Next", line)
         if record.status == "closed":
-            if status not in CLOSE_STATUSES:
+            if status not in SPRINT_CLOSE_STATUSES:
                 err("G11", f"{issue}: a Closed sprint accounts for every item as Done, Not done, Blocked or Cancelled", line)
-            elif status != "done" and is_empty(row.get("next", "")):
+            elif status != TaskStatus.DONE.value.lower() and is_empty(row.get("next", "")):
                 err(
                     "G11",
                     f"{issue}: incomplete or cancelled work needs a disposition in Next (backlog, candidate for next sprint, or reason)",
