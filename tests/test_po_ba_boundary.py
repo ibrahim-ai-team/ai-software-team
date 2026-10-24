@@ -14,43 +14,43 @@ class PoBaBoundaryTests(unittest.TestCase):
 
     def test_business_analyst_is_spec_owner(self) -> None:
         content = self.read(".claude/agents/business-analyst.md")
-        self.assertIn("Tu es le PROPRIÉTAIRE de la spec EARS", content)
-        self.assertIn("Tu ne décides PAS de la priorité ni du scope", content)
+        self.assertIn("You are the OWNER of the EARS specification", content)
+        self.assertIn("You do NOT decide priority or scope", content)
 
     def test_product_owner_validates_but_does_not_write_spec(self) -> None:
         content = self.read(".claude/agents/product-owner.md")
-        self.assertIn("Tu ne rédiges PAS la spec EARS", content)
-        self.assertIn("Tu VALIDES la spec produite par le BA", content)
-        self.assertIn("Tu ne réécris jamais la spec toi-même", content)
+        self.assertIn("You do NOT write the EARS specification", content)
+        self.assertIn("You VALIDATE the specification produced by the BA", content)
+        self.assertIn("Never rewrite the specification yourself", content)
 
     def test_contract_names_boundary_and_both_role_limits(self) -> None:
         content = self.read("standards/agent-contract.md")
-        self.assertIn("PO vs BA : séparation des responsabilités", content)
-        self.assertIn("Le PO ne rédige pas la spécification EARS", content)
-        self.assertIn("Le BA ne décide ni de la priorité ni du scope métier", content)
-        self.assertIn("L'humain approuve à **CP1**", content)
+        self.assertIn("Product Owner vs Business Analyst: responsibility boundary", content)
+        self.assertIn("The PO does not write the formal EARS specification", content)
+        self.assertIn("The BA does not decide business priority or scope", content)
+        self.assertIn("A human approves at **CP1**", content)
 
     def test_bootstrap_order_is_explicit(self) -> None:
         content = self.read("workflows/project-bootstrap.md")
-        self.assertIn("Product Owner — brief de valeur métier", content)
-        self.assertIn("Business Analyst — spec EARS", content)
-        self.assertIn("Product Owner — validation métier", content)
-        self.assertIn("Humain — CP1", content)
+        self.assertIn("Product Owner — business-value brief", content)
+        self.assertIn("Business Analyst — EARS specification", content)
+        self.assertIn("Product Owner — business validation", content)
+        self.assertIn("Human — CP1", content)
 
     def test_template_separates_business_value_and_specification(self) -> None:
         content = self.read("templates/spec-ears.md")
-        self.assertIn("Auteur : business-analyst. Validateur : product-owner. Approbateur humain : CP1.", content)
-        self.assertIn("## Valeur métier (PO)", content)
-        self.assertIn("## Spécification (BA)", content)
+        self.assertIn("Author: business-analyst. Validator: product-owner. Human approver: CP1.", content)
+        self.assertIn("## Business value (PO)", content)
+        self.assertIn("## Specification (BA)", content)
 
     def test_ambiguous_en_collaboration_wording_is_rejected(self) -> None:
         for path in (".claude/agents/business-analyst.md", ".claude/agents/product-owner.md"):
             content = self.read(path)
             for line in content.splitlines():
-                if re.search(r"\ben collaboration\b", line, re.IGNORECASE):
+                if re.search(r"\bin collaboration\b", line, re.IGNORECASE):
                     self.assertRegex(
                         line,
-                        r"(BA|business-analyst|Business Analyst).*(écrit|rédig|auteur|produit la spec)",
+                        r"(BA|business-analyst|Business Analyst).*(write|author|produce|specification)",
                         msg=f"Ambiguous collaboration wording in {path}: {line}",
                     )
 
