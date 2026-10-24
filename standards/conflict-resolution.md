@@ -13,6 +13,7 @@ Resolve disagreements using this order, from highest to lowest:
 Security requirements, repository protections, and applicable law remain hard constraints: no authority level may waive them through an ordinary technical decision. A human sponsor may explicitly decide a documented risk-acceptance question only where policy and law permit it.
 
 Examples:
+
 - If the Architect recommends microservices and the Tech Lead recommends a monolith, the Architect owns the architecture decision. The Tech Lead may record technical objections and implementation risks; if disagreement persists, apply the two-strike escalation below.
 - If QA reports a reproducible acceptance-criteria bug and an implementer refuses to fix it, QA's evidence must be recorded and the orchestrator blocks completion; the implementer cannot veto verification findings. The Tech Lead may adjudicate implementation details, but cannot waive acceptance criteria.
 - If `code-review-security` blocks a PR that the Tech Lead approved, the security finding remains blocking until resolved or formally dispositioned under applicable policy. Tech Lead approval does not override security review.
@@ -22,6 +23,7 @@ Examples:
 For the same topic and story, agents may attempt at most **two evidence-based rounds** to reconcile their positions. If the disagreement remains after the second round, the orchestrator must automatically escalate it to the human sponsor at the checkpoint relevant to the current lifecycle phase (CP1–CP4). Do not restart the count by renaming the topic or changing agents.
 
 The orchestrator must:
+
 1. Preserve both positions and supporting evidence.
 2. Create/update `.claude/disagreements/<story>-<topic>.md`.
 3. Identify the applicable checkpoint and ask the human sponsor for a decision.
@@ -66,6 +68,7 @@ python scripts/detect_conflict.py --story <story> --agents <agent-a,agent-b>
 ```
 
 Exit code:
+
 - `0`: no matching story conflict exists, or all matching records contain a valid human decision.
 - `1`: at least one matching conflict exists without a valid human decision; **STOP** the transition and escalate to the human.
 - `2`: invalid invocation, unreadable record, or malformed JSON; fail closed and **STOP** the transition.
