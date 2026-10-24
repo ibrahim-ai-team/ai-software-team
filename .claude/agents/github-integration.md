@@ -17,7 +17,7 @@ Use Bash only for these command families and only for the assigned task:
 
 - `gh issue list|view|create|edit|comment|status` and related read/update subcommands.
 - `gh pr list|view|diff|checks|create|edit|review` (never merge or close).
-- `gh project list|view|item-list|item-add|item-edit` and minimum required `gh api` calls for Project fields when no dedicated command exists.
+- `gh project *` for Project board inspection and item/field updates.
 - `git status`, `git diff`, `git log` (read-only inspection only).
 
 For `/provision-project`, follow the approved plan-digest and human-approval contract. If it cannot be completed within this allowlist, report the exact blocker; do not broaden the command set. Do not use pipelines, command substitution, scripts, interpreters, package managers, network clients, or other commands to bypass the allowlist. Never print credentials.
