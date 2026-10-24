@@ -4,9 +4,9 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
-- Added fail-closed agent path-scope configuration, a standard-library preflight checker, regression tests, and documentation distinguishing preflight checks from runtime enforcement.
-
 ### Added
+
+- Added fail-closed agent path-scope configuration, a standard-library preflight checker, regression tests, and documentation distinguishing preflight checks from runtime enforcement.
 
 - Documented model-agnostic agent-contract principles, planned adapter interface, current Claude Code coupling, portability audit, and static guardrails against selected undocumented runtime syntax in agent Markdown. No agent files or adapter implementations were changed.
 
