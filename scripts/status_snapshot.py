@@ -3,6 +3,7 @@
 Claims in project-state.md are context, not proof. Only explicit, parseable
 observations produce an observed status or a drift finding.
 """
+
 from __future__ import annotations
 
 import argparse
