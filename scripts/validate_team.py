@@ -18,7 +18,7 @@ ALLOWED_TOOLS = {"Agent", "Read", "Grep", "Glob", "Edit", "Write", "Bash", "WebS
 ORCHESTRATOR = "agile-orchestrator"  # the only agent allowed to delegate (Agent tool)
 # Reviewers must not be able to change what they review; enforced through their tools allowlist.
 READ_ONLY_AGENTS = {"code-review-security", "tech-lead"}
-HARD_MINIMUMS = {"agents": 18, "skills": 22}
+HARD_MINIMUMS = {"agents": 19, "skills": 22}
 MANIFEST_PATH = ROOT / ".claude" / "manifest.json"
 errors: list[str] = []
 
@@ -148,6 +148,36 @@ def inventory_paths(kind: str) -> list[Path]:
 
 agents = inventory_paths("agents")
 skills = inventory_paths("skills")
+
+ci_verifier_path = ROOT / ".claude" / "agents" / "ci-verifier.md"
+ci_verifier_text = require_nonempty(ci_verifier_path, "ci-verifier agent")
+if ci_verifier_text:
+    required_ci_verifier_markers = (
+        "tools: Read, Bash",
+        "Closed command allowlist",
+        "Explicitly forbidden",
+        "git diff",
+        "git status",
+        "git log",
+        "python -m pytest",
+        "python -m unittest",
+        "ruff check",
+        "ruff format --check",
+        "gitleaks detect --no-git",
+        "npm test",
+        "npm run lint",
+        "npm run build",
+        "make test",
+        "make lint",
+        "NEVER write to `.claude/gates/`",
+    )
+    for marker in required_ci_verifier_markers:
+        if marker not in ci_verifier_text:
+            errors.append(f"ci-verifier agent contract missing required command/policy marker: {marker}")
+    frontmatter = parse_frontmatter(ci_verifier_path, ("name", "description", "tools"))
+    if frontmatter.get("tools") != "Read, Bash":
+        errors.append("ci-verifier must have exactly Read and Bash tools")
+
 commands = inventory_paths("commands")
 templates = inventory_paths("templates")
 
