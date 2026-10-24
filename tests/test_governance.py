@@ -301,7 +301,7 @@ class DesignGateTests(GovernanceCase):
             "User Story: #<issue-number or URL>": "User Story: #123",
             "Frontend task(s): #<issue-number(s)>": "Frontend task(s): #124",
             "Acceptance criteria covered: <IDs or links>": "Acceptance criteria covered: AC-1, AC-2",
-            "Artifact URL or repository path: <real URL/path; no placeholders in an approved handoff>": "Artifact URL or repository path: docs/designs/story-123.md",
+            "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: docs/designs/story-123.md",
             "Artifact type: Figma | annotated wireframe | design specification | other": "Artifact type: design specification",
             "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): N/A",
             "Approved by: <sponsor/designated decision authority>": "Approved by: Product sponsor",
@@ -330,7 +330,7 @@ class DesignGateTests(GovernanceCase):
     def test_template_placeholders_and_missing_approval_are_rejected(self):
         text = self.completed_template(
             **{
-                "Artifact URL or repository path: <real URL/path; no placeholders in an approved handoff>": "Artifact URL or repository path: TBD",
+                "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: TBD",
                 "Approved by: <sponsor/designated decision authority>": "Approved by: -",
             }
         )
@@ -342,7 +342,7 @@ class DesignGateTests(GovernanceCase):
         text = self.completed_template(
             **{
                 "Decision: required | exception": "Decision: exception",
-                "Artifact URL or repository path: <real URL/path; no placeholders in an approved handoff>": "Artifact URL or repository path: N/A",
+                "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: N/A",
                 "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): No material UI change; copy-only typo fix.",
             }
         )
@@ -355,7 +355,7 @@ class DesignGateTests(GovernanceCase):
         text = self.completed_template(
             **{
                 "Decision: required | exception": "Decision: exception",
-                "Artifact URL or repository path: <real URL/path; no placeholders in an approved handoff>": "Artifact URL or repository path: N/A",
+                "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: N/A",
                 "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): -",
             }
         )
