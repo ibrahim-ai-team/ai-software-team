@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Claude Code PreToolUse hook for enforcing agent write scopes and recording denials.
 
 This hook protects direct file-editing tools. It is not an OS sandbox: arbitrary
@@ -82,11 +81,7 @@ def main() -> int:
 
     candidate = Path(path)
     try:
-        resolved = (
-            candidate.resolve()
-            if candidate.is_absolute()
-            else (ROOT / candidate).resolve()
-        )
+        resolved = candidate.resolve() if candidate.is_absolute() else (ROOT / candidate).resolve()
         relative = resolved.relative_to(ROOT.resolve()).as_posix()
     except (OSError, ValueError):
         return deny("path escapes repository root", agent, path)
