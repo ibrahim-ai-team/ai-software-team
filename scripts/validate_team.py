@@ -296,6 +296,7 @@ required_files = [
     "standards/telemetry.md",
     "standards/human-in-the-loop.md",
     "standards/validation-gates.md",
+    "templates/spec-ears.md",
 ]
 for relative in required_files:
     require_nonempty(ROOT / relative)
