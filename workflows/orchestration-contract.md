@@ -164,4 +164,3 @@ Before running any command that can mutate external state, credentials, infrastr
 - [ ] PRs await human merge.
 - [ ] Daily report distinguishes implementation, testing, merge and deployment.
 - [ ] Handover persists next action and blockers.
-
