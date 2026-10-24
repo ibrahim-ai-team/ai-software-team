@@ -47,7 +47,7 @@ class PoBaBoundaryTests(unittest.TestCase):
         for path in (".claude/agents/business-analyst.md", ".claude/agents/product-owner.md"):
             content = self.read(path)
             for line in content.splitlines():
-                if re.search(r"\\ben collaboration\\b", line, re.IGNORECASE):
+                if re.search(r"\ben collaboration\b", line, re.IGNORECASE):
                     self.assertRegex(
                         line,
                         r"(BA|business-analyst|Business Analyst).*(écrit|rédig|auteur|produit la spec)",
