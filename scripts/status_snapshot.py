@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Reconcile declared project state with observed telemetry and optional GitHub state.
 
 Claims in project-state.md are context, not proof. Only explicit, parseable
@@ -22,8 +21,12 @@ DEFAULT_OUTPUT = ROOT / "state" / "effective.json"
 FRESH_SECONDS = 900
 STALE_SECONDS = 86400
 TASK_STATUSES = {
-    "draft": "DRAFT", "ready": "READY", "in progress": "IN_PROGRESS",
-    "blocked": "BLOCKED", "in review": "IN_REVIEW", "done": "DONE",
+    "draft": "DRAFT",
+    "ready": "READY",
+    "in progress": "IN_PROGRESS",
+    "blocked": "BLOCKED",
+    "in review": "IN_REVIEW",
+    "done": "DONE",
     "cancelled": "CANCELLED",
 }
 AGENT_STATUSES = {"running", "idle", "blocked", "completed", "cancelled", "unknown"}
@@ -44,8 +47,14 @@ def parse_time(value: Any) -> datetime | None:
 def normalize_status(value: str, *, agent: bool = False) -> str:
     text = value.strip().casefold().replace("-", "_").replace(" ", "_")
     if agent:
-        aliases = {"in_progress": "running", "active": "running", "done": "completed",
-                   "complete": "completed", "finished": "completed", "waiting": "idle"}
+        aliases = {
+            "in_progress": "running",
+            "active": "running",
+            "done": "completed",
+            "complete": "completed",
+            "finished": "completed",
+            "waiting": "idle",
+        }
         text = aliases.get(text, text)
         return text if text in AGENT_STATUSES else "unknown"
     aliases = {"in_progress": "IN_PROGRESS", "in_review": "IN_REVIEW"}
@@ -77,7 +86,7 @@ def parse_state(path: Path) -> tuple[dict[str, dict[str, Any]], dict[str, dict[s
             continue
         if not cells or all(set(cell) <= set("-: ") for cell in cells):
             continue
-        row = dict(zip(headers, cells))
+        row = dict(zip(headers, cells, strict=False))
         if section == "backlog and task ownership":
             task_id = row.get("task id", "")
             status = row.get("status", "")
@@ -96,11 +105,13 @@ def parse_state(path: Path) -> tuple[dict[str, dict[str, Any]], dict[str, dict[s
             if task_id and task_id.casefold() != "task id":
                 task = tasks.setdefault(task_id, {"status": None, "source": "project-state.md"})
                 task["delegations"] = task.get("delegations", [])
-                task["delegations"].append({
-                    "delegation_id": delegation_id or None,
-                    "owner": owner or None,
-                    "status": normalize_status(status, agent=True) if status else None,
-                })
+                task["delegations"].append(
+                    {
+                        "delegation_id": delegation_id or None,
+                        "owner": owner or None,
+                        "status": normalize_status(status, agent=True) if status else None,
+                    }
+                )
                 if owner:
                     agent_id = owner.casefold().replace(" ", "-")
                     item = agents.setdefault(agent_id, {"status": None, "source": "project-state.md"})
@@ -166,7 +177,10 @@ def run_gh(args: list[str]) -> list[dict[str, Any]] | None:
     try:
         proc = subprocess.run(["gh", *args], cwd=ROOT, text=True, capture_output=True, check=False, timeout=20)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        print(f"WARNING: GitHub CLI command unavailable ({type(exc).__name__}); omitting GitHub observations.", file=sys.stderr)
+        print(
+            f"WARNING: GitHub CLI command unavailable ({type(exc).__name__}); omitting GitHub observations.",
+            file=sys.stderr,
+        )
         return None
     if proc.returncode != 0:
         print("WARNING: GitHub CLI query failed; omitting GitHub observations.", file=sys.stderr)
@@ -180,12 +194,10 @@ def run_gh(args: list[str]) -> list[dict[str, Any]] | None:
 
 
 def get_github() -> dict[str, Any] | None:
-    issues = run_gh(["issue", "list", "--state", "all", "--limit", "500",
-                     "--json", "number,title,body,state,labels,updatedAt"])
+    issues = run_gh(["issue", "list", "--state", "all", "--limit", "500", "--json", "number,title,body,state,labels,updatedAt"])
     if issues is None:
         return None
-    prs = run_gh(["pr", "list", "--state", "all", "--limit", "500",
-                  "--json", "number,title,body,state,isDraft,updatedAt"])
+    prs = run_gh(["pr", "list", "--state", "all", "--limit", "500", "--json", "number,title,body,state,isDraft,updatedAt"])
     if prs is None:
         return None
     return {"issues": issues, "pull_requests": prs}
@@ -207,19 +219,20 @@ def build_snapshot(state_path: Path, log_path: Path, now: datetime) -> dict[str,
         event = latest_agents.get(agent_id)
         stamp = parse_time(event.get("ts")) if event else None
         age = max(0, int((now - stamp).total_seconds())) if stamp else None
-        staleness = ("UNKNOWN" if age is None or age > STALE_SECONDS else
-                     "FRESH" if age < FRESH_SECONDS else "STALE")
+        staleness = "UNKNOWN" if age is None or age > STALE_SECONDS else "FRESH" if age < FRESH_SECONDS else "STALE"
         observed_status = event_agent_status(event) if event else None
         declared_status = declared_record.get("declared")
         reliable = observed_status is not None
-        agents.append({
-            "agent_id": agent_id,
-            "declared": declared_status,
-            "observed": observed_status,
-            "drift": bool(reliable and declared_status is not None and declared_status != observed_status),
-            "last_event_age_seconds": age,
-            "staleness": staleness,
-        })
+        agents.append(
+            {
+                "agent_id": agent_id,
+                "declared": declared_status,
+                "observed": observed_status,
+                "drift": bool(reliable and declared_status is not None and declared_status != observed_status),
+                "last_event_age_seconds": age,
+                "staleness": staleness,
+            }
+        )
 
     github = get_github()
     tasks = []
@@ -241,23 +254,37 @@ def build_snapshot(state_path: Path, log_path: Path, now: datetime) -> dict[str,
                 if task_id.casefold() in searchable.casefold():
                     issue_observed = issue_status(issue)
                     observed = issue_observed
-                    evidence.append({"source": "github_issue", "number": issue.get("number"),
-                                     "state": issue.get("state"), "url": issue.get("url")})
+                    evidence.append(
+                        {
+                            "source": "github_issue",
+                            "number": issue.get("number"),
+                            "state": issue.get("state"),
+                            "url": issue.get("url"),
+                        }
+                    )
             for pr in github["pull_requests"]:
                 searchable = f"{pr.get('title', '')} {pr.get('body', '')}"
                 if task_id.casefold() in searchable.casefold():
-                    evidence.append({"source": "github_pull_request", "number": pr.get("number"),
-                                     "state": pr.get("state"), "is_draft": pr.get("isDraft")})
+                    evidence.append(
+                        {
+                            "source": "github_pull_request",
+                            "number": pr.get("number"),
+                            "state": pr.get("state"),
+                            "is_draft": pr.get("isDraft"),
+                        }
+                    )
                     if observed is None and str(pr.get("state", "")).casefold() == "open":
                         observed = "IN_REVIEW"
         declared_status = declared_record.get("status")
-        tasks.append({
-            "task_id": task_id,
-            "declared": declared_status,
-            "observed": observed,
-            "drift": bool(observed is not None and declared_status is not None and declared_status != observed),
-            "evidence": evidence,
-        })
+        tasks.append(
+            {
+                "task_id": task_id,
+                "declared": declared_status,
+                "observed": observed,
+                "drift": bool(observed is not None and declared_status is not None and declared_status != observed),
+                "evidence": evidence,
+            }
+        )
 
     snapshot: dict[str, Any] = {
         "schema_version": 1,
