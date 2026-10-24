@@ -47,8 +47,9 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def validate_agent_id(agent_id: str, path: Path = AGENTS_PATH) -> str:
+def validate_agent_id(agent_id: str, path: Path | None = None) -> str:
     """Return a canonical agent ID or raise ValueError with a clear explanation."""
+    path = path or AGENTS_PATH
     if not isinstance(agent_id, str) or not agent_id.strip():
         raise ValueError("agent_id is required (use --agent-id, --agent, or AGENT_ID).")
     try:
