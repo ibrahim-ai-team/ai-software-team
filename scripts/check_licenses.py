@@ -96,11 +96,7 @@ def distribution_license(name: str) -> str:
         return expression.strip()
     license_value = metadata.get("License")
     classifiers = metadata.get_all("Classifier") or []
-    license_classifiers = [
-        item.partition("::")[-1].strip()
-        for item in classifiers
-        if item.startswith("License ::")
-    ]
+    license_classifiers = [item.partition("::")[-1].strip() for item in classifiers if item.startswith("License ::")]
     pieces = [item for item in [license_value, *license_classifiers] if item and item.strip()]
     return " / ".join(dict.fromkeys(pieces)) if pieces else "UNKNOWN"
 

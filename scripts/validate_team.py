@@ -476,7 +476,9 @@ license_workflow_text = require_nonempty(license_workflow, "dependency license w
 if license_workflow_text:
     if not re.search(r"(?m)^\s*contents:\s*read\s*$", license_workflow_text):
         errors.append("License check workflow must keep contents permission read-only")
-    if not re.search(r"(?m)^\s*push\s*:", license_workflow_text) or not re.search(r"(?m)^\s*pull_request\s*:", license_workflow_text):
+    if not re.search(r"(?m)^\s*push\s*:", license_workflow_text) or not re.search(
+        r"(?m)^\s*pull_request\s*:", license_workflow_text
+    ):
         errors.append("License check workflow must run on push and pull_request")
     if "scripts/check_licenses.py" not in license_workflow_text:
         errors.append("License check workflow must run scripts/check_licenses.py")
