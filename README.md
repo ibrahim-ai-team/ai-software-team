@@ -137,6 +137,10 @@ python scripts/add_lesson.py \
 
 The script assigns sequential IDs (`L001`, `L002`, ...), appends rather than overwriting, and rejects empty fields or text containing suspicious markers such as `token`, `password`, or `secret`. This conservative filter is not a complete secret detector: sanitize lesson text manually and never include credentials, secret values, or raw logs. Existing lessons must never be deleted or edited to hide a failure.
 
+## Portabilité
+
+Les contrats d'agents Markdown sont la source de vérité ; les intégrations d'exécution doivent les traduire sans perdre les gates, les permissions ni les validations humaines. Claude Code is the current integration. DeepSeek API et LangGraph sont prévus, mais pas implémentés. Voir [l'audit de portabilité](docs/portability-audit.md), le [standard d'agnosticisme](standards/model-agnosticism.md) et la [liste des adaptateurs](adapters/README.md).
+
 ## Verification
 
 Run `python scripts/validate_team.py`, `python scripts/check_markdown_links.py`, `python scripts/check_cross_references.py`, `python scripts/check_placeholders.py` and `python -m unittest discover -s tests -v` locally, then inspect the actual CI result on the pull request. Use `docs/verification-report.md` to record a real Claude Code smoke test; do not mark runtime verification complete without evidence.

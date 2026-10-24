@@ -270,6 +270,25 @@ class ValidatorRegressionTests(unittest.TestCase):
             self.assertIn("Manifest root must be a JSON object", result.stdout)
             self.assertNotIn("Traceback", result.stderr)
 
+    def test_agent_markdown_has_no_undocumented_runtime_patterns(self):
+        import re
+
+        patterns = (r"\$ARGUMENTS", r"\$CLAUDE_[A-Z0-9_]+", r"<tool-name>|<command-name>")
+        for agent in sorted(AGENTS.glob("*.md")):
+            text = agent.read_text(encoding="utf-8")
+            for pattern in patterns:
+                self.assertIsNone(re.search(pattern, text), f"{agent}: {pattern}")
+
+    def test_validator_rejects_proprietary_pattern_in_agent_markdown(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            copy = Path(temporary) / "repo"
+            shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", "__pycache__", ".venv", "venv"))
+            path = copy / ".claude/agents/backend-developer.md"
+            path.write_text(path.read_text(encoding="utf-8") + "\nExample: $ARGUMENTS\n", encoding="utf-8")
+            result = self.run_validator(copy)
+            self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("Undocumented Claude Code-specific pattern", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()
