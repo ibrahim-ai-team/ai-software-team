@@ -61,6 +61,17 @@ Keep task, code, verification, and release states distinct.
 
 A delegation can be completed while its output is still unreviewed. A PR can be approved but not merged. A merged change is not necessarily deployed. Never collapse these states into one "done" label.
 
+## Atomic remote task claims
+
+The Active delegations table and `scripts/check_claims.py` remain local pre-flight validation; they do not provide mutual exclusion across coordinators. For atomic ownership, use `scripts/claim_task.py --task-id T-123 --run-id RUN-456`, which attempts to create `refs/claims/T-123` on the configured Git remote with an empty `--force-with-lease` expectation. The remote ref update is the compare-and-set point; a successful local pre-check is not proof of ownership.
+
+- Exit `0`: this run acquired the claim, or is retrying its own existing claim.
+- Exit `1`: a different run owns the task; do not start implementation.
+- Exit `2`: invalid input.
+- Exit `3`: remote Git operation failed; treat the result as unknown and retry/reconcile before proceeding.
+
+Set `AGENT_ID` and `SESSION_ID` for the claim payload, and reuse `--run-id`/ `RUN_ID` across retries belonging to the same run. Release with `scripts/release_claim.py --task-id T-123` when the task no longer needs exclusive ownership, and inspect current holders with `scripts/list_claims.py --remote origin`. Claims have no TTL: abandoned refs require explicit reconciliation and release. This is Git-remote coordination, not a GitHub API integration; remote policy must permit the custom `refs/claims/*` namespace.
+
 ## Coordinator protocol
 
 ### Before delegation
