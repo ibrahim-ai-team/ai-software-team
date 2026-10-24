@@ -1,4 +1,5 @@
 import unittest
+
 from models.status import (
     ALLOWED_TRANSITIONS,
     DelegationStatus,
@@ -15,22 +16,46 @@ class StatusMachineTests(unittest.TestCase):
         self.assertEqual(
             [item.value for item in ProjectPhase],
             [
-                "DISCOVERY", "SPECIFICATION", "ARCHITECTURE", "BACKLOG_READY",
-                "AWAITING_SPONSOR_DECISION", "DELIVERY", "INTEGRATION_REVIEW",
-                "AWAITING_HUMAN_MERGE", "MAINTENANCE", "BLOCKED", "COMPLETE",
+                "DISCOVERY",
+                "SPECIFICATION",
+                "ARCHITECTURE",
+                "BACKLOG_READY",
+                "AWAITING_SPONSOR_DECISION",
+                "DELIVERY",
+                "INTEGRATION_REVIEW",
+                "AWAITING_HUMAN_MERGE",
+                "MAINTENANCE",
+                "BLOCKED",
+                "COMPLETE",
             ],
         )
         self.assertEqual(
             [item.value for item in TaskStatus],
             [
-                "BACKLOG", "READY", "CLAIMED", "IN_PROGRESS", "BLOCKED",
-                "IN_REVIEW", "CHANGES_REQUESTED", "APPROVED_AWAITING_HUMAN_MERGE",
-                "DONE", "CANCELLED",
+                "BACKLOG",
+                "READY",
+                "CLAIMED",
+                "IN_PROGRESS",
+                "BLOCKED",
+                "IN_REVIEW",
+                "CHANGES_REQUESTED",
+                "APPROVED_AWAITING_HUMAN_MERGE",
+                "DONE",
+                "CANCELLED",
             ],
         )
         self.assertEqual(
             [item.value for item in DelegationStatus],
-            ["queued", "running", "completed", "partial", "blocked", "failed", "cancelled", "rejected"],
+            [
+                "queued",
+                "running",
+                "completed",
+                "partial",
+                "blocked",
+                "failed",
+                "cancelled",
+                "rejected",
+            ],
         )
 
     def test_every_declared_transition_passes_and_every_other_pair_fails(self):
@@ -53,9 +78,11 @@ class StatusMachineTests(unittest.TestCase):
         for enum_type in (ProjectPhase, TaskStatus, DelegationStatus):
             for state in enum_type:
                 if state not in ALLOWED_TRANSITIONS[enum_type][state]:
-                    with self.subTest(kind=enum_type.__name__, state=state.value):
-                        with self.assertRaises(TransitionError):
-                            validate_transition(enum_type.__name__, state.value, state.value)
+                    with (
+                        self.subTest(kind=enum_type.__name__, state=state.value),
+                        self.assertRaises(TransitionError),
+                    ):
+                        validate_transition(enum_type.__name__, state.value, state.value)
 
     def test_unknown_kind_or_state_fails_closed(self):
         with self.assertRaises(TransitionError):
