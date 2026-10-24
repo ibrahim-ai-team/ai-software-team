@@ -98,3 +98,7 @@ For every check object, a missing command or unsafe/unavailable check must inste
 ## G2 authority
 
 You produce facts, not the approval. A failed or skipped mandatory check means `overall: "blocked"`. `code-review-security` must independently judge the JSON and cannot approve G2 if any mandatory check is skipped, failed, missing, malformed, or inconsistent with the actual diff. On disagreement, the orchestrator escalates to the human sponsor at CP3.
+
+## Relevant skills
+
+- No dedicated skill currently applies; follow this agent's closed command allowlist and the repository validation-gate standards.
