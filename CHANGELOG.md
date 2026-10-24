@@ -4,15 +4,13 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
-### Added
-
-- Add an explicit conflict-resolution authority hierarchy, two-strike escalation to the human sponsor, structured disagreement records, a read-only fail-closed conflict detector, regression tests, and mandatory pre-transition orchestration checks.
-
 ### Changed
 
 - Clarified Product Owner vs Business Analyst authority: PO owns business value, priority and high-level scope; BA alone authors the final EARS specification and traceability; PO validates without rewriting; human CP1 approval remains mandatory.
 
 ### Added
+
+- Add an explicit conflict-resolution authority hierarchy, two-strike escalation to the human sponsor, structured disagreement records, a read-only fail-closed conflict detector, regression tests, and mandatory pre-transition orchestration checks.
 
 - Extend the agent-scope PreToolUse hook to Bash; allow only an explicit safe-command list, reject shell redirection and file-mutating commands, fail closed on ambiguous shell syntax, and add Bash scope-enforcement regression tests.
 
