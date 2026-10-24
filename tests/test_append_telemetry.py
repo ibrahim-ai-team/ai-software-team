@@ -30,15 +30,17 @@ class AppendTelemetryTests(unittest.TestCase):
         args = ["append_telemetry.py"]
         if agent is not None:
             args.extend(["--agent", agent])
-        args.extend([
-            "--action",
-            "delegate",
-            "--story",
-            "US-1",
-            "--details",
-            details if details is not None else '{"target":"qa-automation"}',
-            *extra_args,
-        ])
+        args.extend(
+            [
+                "--action",
+                "delegate",
+                "--story",
+                "US-1",
+                "--details",
+                details if details is not None else '{"target":"qa-automation"}',
+                *extra_args,
+            ]
+        )
         with (
             patch.object(sys, "argv", args),
             patch.object(append_telemetry, "LOG_PATH", self.log_path),
@@ -48,10 +50,7 @@ class AppendTelemetryTests(unittest.TestCase):
             return append_telemetry.main()
 
     def read_events(self):
-        return [
-            json.loads(line)
-            for line in self.log_path.read_text(encoding="utf-8").splitlines()
-        ]
+        return [json.loads(line) for line in self.log_path.read_text(encoding="utf-8").splitlines()]
 
     def test_appends_iso_timestamp_and_uuid4(self):
         self.assertEqual(self.run_append(), 0)
