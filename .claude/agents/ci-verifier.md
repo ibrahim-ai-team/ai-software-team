@@ -102,5 +102,3 @@ You produce facts, not the approval. A failed or skipped mandatory check means `
 ## Relevant skills
 
 - No dedicated skill currently applies; follow this agent's closed command allowlist and the repository validation-gate standards.
-
-
