@@ -15,8 +15,7 @@ def git(*args, input_text=None, check=True):
         ["git", *args],
         input=input_text,
         text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         check=check,
     )
 
