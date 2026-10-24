@@ -304,6 +304,7 @@ class DesignGateTests(GovernanceCase):
             "Artifact URL or repository path: <real URL/path when Decision is required; N/A only for an approved minor-change exception>": "Artifact URL or repository path: docs/designs/story-123.md",
             "Artifact type: Figma | annotated wireframe | design specification | other": "Artifact type: design specification",
             "Figma exception rationale (if applicable): <why unavailable or unnecessary; otherwise N/A>": "Figma exception rationale (if applicable): N/A",
+            "Approval status: approved | pending": "Approval status: approved",
             "Approved by: <sponsor/designated decision authority>": "Approved by: Product sponsor",
             "Approval evidence: <issue/PR/comment/decision record link>": "Approval evidence: https://github.com/example/repo/issues/123#issuecomment-456",
             "Approval date (UTC): <YYYY-MM-DD>": "Approval date (UTC): 2026-10-24",
@@ -337,6 +338,11 @@ class DesignGateTests(GovernanceCase):
         errors = check_design_handoff(self.write("missing.md", text))
         self.assertTrue(any("artifact" in error.lower() for error in errors), errors)
         self.assertTrue(any("approver" in error for error in errors), errors)
+
+    def test_pending_approval_is_rejected(self):
+        text = self.completed_template(**{"Approval status: approved | pending": "Approval status: pending"})
+        errors = check_design_handoff(self.write("pending.md", text))
+        self.assertTrue(any("Approval status must be approved" in error for error in errors), errors)
 
     def test_approved_minor_change_exception_may_omit_artifact(self):
         text = self.completed_template(
