@@ -48,7 +48,8 @@ Who decides, who proposes, and what no role may do on its own. Precedence betwee
 | G2 approval judgment | `code-review-security` judges ci-verifier JSON against the actual diff; orchestrator persists only after approval | `ci-verifier` supplies factual execution results | `ci-verifier` alone or any agent with missing/skipped mandatory evidence |
 | Security review disposition | `code-review-security` findings; orchestrator records disposition | — | The author of the change |
 | Release go/no-go | Sponsor | `release-manager` evidence and recommendation | Any agent; a deploy-time override |
-| GitHub execution (Issues, PRs, Projects, approved provisioning) | `github-integration` executes explicit instructions and verifies read-back | Orchestrator supplies approved content and reconciles results | Any agent acting without delegation; `github-integration` making planning decisions |\n| Merge | Human repository owner | Orchestrator presents the PR | Any agent |
+| GitHub execution (Issues, PRs, Projects, approved provisioning) | `github-integration` executes explicit instructions and verifies read-back | Orchestrator supplies approved content and reconciles results | Any agent acting without delegation; `github-integration` making planning decisions |
+| Merge | Human repository owner | Orchestrator presents the PR | Any agent |
 
 The orchestrator remains the only delegation coordinator. It delegates GitHub execution to `github-integration`; the integration agent performs approved operations only and has no priority or sprint-planning authority.
 
