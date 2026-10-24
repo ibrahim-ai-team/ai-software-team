@@ -65,8 +65,10 @@ def validate_agent_id(agent_id: str, path: Path | None = None) -> str:
 
 def resolve_uuid4(value: str | None, field: str) -> str:
     """Use a supplied UUID4 or generate one when the caller omits the identifier."""
-    if value is None or not value.strip():
+    if value is None:
         return str(uuid.uuid4())
+    if not value.strip():
+        raise ValueError(f"{field} must be a UUID4.")
     try:
         parsed = uuid.UUID(value)
     except (ValueError, AttributeError) as exc:
