@@ -56,7 +56,8 @@
         "session-handover-template.md",
         "sprint-review-template.md",
         "retrospective-template.md",
-        "release-readiness-template.md"
+        "release-readiness-template.md",
+        "spec-ears.md"
       ]
     }
   }
