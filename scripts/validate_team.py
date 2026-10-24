@@ -148,6 +148,65 @@ def inventory_paths(kind: str) -> list[Path]:
 
 agents = inventory_paths("agents")
 skills = inventory_paths("skills")
+
+ci_verifier_path = ROOT / ".claude" / "agents" / "ci-verifier.md"
+ci_verifier_text = require_nonempty(ci_verifier_path, "ci-verifier agent")
+if ci_verifier_text:
+    required_ci_verifier_markers = (
+        "tools: Read, Bash",
+        "Closed command allowlist",
+        "Explicitly forbidden",
+        "git diff",
+        "git status",
+        "git log",
+        "python -m pytest",
+        "python -m unittest",
+        "ruff check",
+        "ruff format --check",
+        "gitleaks detect --no-git",
+        "npm test",
+        "npm run lint",
+        "npm run build",
+        "make test",
+        "make lint",
+        "NEVER write to `.claude/gates/`",
+    )
+    for marker in required_ci_verifier_markers:
+        if marker not in ci_verifier_text:
+            errors.append(f"ci-verifier agent contract missing required command/policy marker: {marker}")
+    frontmatter_match = re.match(r"(?s)^---\n(.*?)\n---(?:\n|$)", ci_verifier_text)
+    frontmatter = frontmatter_match.group(1) if frontmatter_match else ""
+    tools_match = re.search(r"(?m)^tools:[ \t]*(.*?)[ \t]*$", frontmatter)
+    if not tools_match or tools_match.group(1) != "Read, Bash":
+        errors.append("ci-verifier must have exactly Read and Bash tools")
+
+github_integration_path = ROOT / ".claude" / "agents" / "github-integration.md"
+github_integration_text = require_nonempty(github_integration_path, "github-integration agent")
+if github_integration_text:
+    required_github_markers = (
+        "tools: Read, Bash, Grep, Glob",
+        "Closed command allowlist",
+        "Explicitly forbidden",
+        "gh issue",
+        "gh pr",
+        "gh project",
+        "git status",
+        "git diff",
+        "git log",
+        "Do not make product, priority, backlog, or sprint decisions.",
+        "gh pr merge",
+        "git push",
+        "git commit",
+    )
+    for marker in required_github_markers:
+        if marker not in github_integration_text:
+            errors.append(f"github-integration agent contract missing required marker: {marker}")
+    github_frontmatter_match = re.match(r"(?s)^---\n(.*?)\n---(?:\n|$)", github_integration_text)
+    github_frontmatter = github_frontmatter_match.group(1) if github_frontmatter_match else ""
+    github_tools_match = re.search(r"(?m)^tools:[ \t]*(.*?)[ \t]*$", github_frontmatter)
+    if not github_tools_match or github_tools_match.group(1) != "Read, Bash, Grep, Glob":
+        errors.append("github-integration must have exactly Read, Bash, Grep, Glob tools")
+
 commands = inventory_paths("commands")
 templates = inventory_paths("templates")
 

@@ -40,15 +40,18 @@ Who decides, who proposes, and what no role may do on its own. Precedence betwee
 | Backlog priority, story acceptance | `product-owner` within sponsor scope | `business-analyst`, `qa-automation` | Implementers |
 | Sprint plan, capacity, sprint closure | Sponsor approves, or `product-owner` under a recorded standing delegation; `project-manager` prepares and closes | `tech-lead` (points), `product-owner` (priority) | The orchestrator starting a sprint without an approved plan |
 | Scope change during a sprint | Sponsor, or `product-owner` within goal and capacity | Any role, as a proposal | The role that wants the work |
-| New issue | Orchestrator, after the issue creation gate | Any role | A role creating issues directly |
+| New issue content and priority | `product-owner` / orchestrator under the backlog gate | `business-analyst`, `qa-automation` | `github-integration` deciding priority or sprint scope |
 | Architecture, ADRs | `software-architect` | `tech-lead`, `technical-research` | Implementers mid-task |
 | Task breakdown, technical acceptance | `tech-lead` | Implementers | The author of the change |
 | Behaviour verified against acceptance criteria | `qa-automation` | Implementers (their own test results) | The author of the change |
+| CI verification facts for G2 | `ci-verifier` executes only its closed read-only command allowlist and returns JSON evidence | `agile-orchestrator` supplies story context | Any agent inventing results or writing gate records from the verifier role |
+| G2 approval judgment | `code-review-security` judges ci-verifier JSON against the actual diff; orchestrator persists only after approval | `ci-verifier` supplies factual execution results | `ci-verifier` alone or any agent with missing/skipped mandatory evidence |
 | Security review disposition | `code-review-security` findings; orchestrator records disposition | — | The author of the change |
 | Release go/no-go | Sponsor | `release-manager` evidence and recommendation | Any agent; a deploy-time override |
+| GitHub execution (Issues, PRs, Projects, approved provisioning) | `github-integration` executes explicit instructions and verifies read-back | Orchestrator supplies approved content and reconciles results | Any agent acting without delegation; `github-integration` making planning decisions |
 | Merge | Human repository owner | Orchestrator presents the PR | Any agent |
 
-The orchestrator also acts as the team's GitHub operator: it alone writes Issues, labels, milestones, Project fields, branches and PRs. There is no separate GitHub agent.
+The orchestrator remains the only delegation coordinator. It delegates GitHub execution to `github-integration`; the integration agent performs approved operations only and has no priority or sprint-planning authority.
 
 ## Handoffs and completion
 
