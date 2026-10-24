@@ -53,7 +53,7 @@ Shared rules for every specialist: [`standards/agent-contract.md`](standards/age
 
 ## Spec-Driven Development (SDD/EARS)
 
-Every new story starts with a formal specification using [`templates/spec-ears.md`](templates/spec-ears.md) before it enters the backlog. The Product Owner and Business Analyst write testable EARS requirements, non-functional constraints, and Gherkin acceptance criteria. The human sponsor approves the plan at CP1 and the Software Architect reviews feasibility; a story without a validated spec cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md).
+Every new story starts with a formal specification using [`templates/spec-ears.md`](templates/spec-ears.md) before it enters the backlog. The Product Owner defines business value (why, persona, success metrics, priority, high-level scope); the Business Analyst alone writes the final EARS specification, workflows, Gherkin criteria, and requirement-to-test traceability. The PO validates business alignment without rewriting the spec. The human sponsor approves the plan at CP1 and the Software Architect reviews feasibility; a story without a validated spec cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md).
 
 ## Isolation & concurrence
 
@@ -61,7 +61,7 @@ Writing agents must use one dedicated Git worktree per agent and story. The orch
 
 ## Spec-Driven Development (SDD / EARS)
 
-Every new story starts with a completed EARS specification before backlog readiness. The Product Owner and Business Analyst write it using [`templates/spec-ears.md`](templates/spec-ears.md); the Software Architect validates feasibility, and the human sponsor approves the specification at CP1. A story without a validated EARS spec and recorded CP1 approval cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md) and `tests/test_spec_ears.py` for the format guard.
+Every new story starts with a completed EARS specification before backlog readiness. The Business Analyst writes it using [`templates/spec-ears.md`](templates/spec-ears.md), based on the Product Owner's value brief; the PO validates it without rewriting it; the Software Architect validates feasibility, and the human sponsor approves the specification at CP1. A story without a validated EARS spec and recorded CP1 approval cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md) and `tests/test_spec_ears.py` for the format guard.
 
 ## Mesure du ROI
 
