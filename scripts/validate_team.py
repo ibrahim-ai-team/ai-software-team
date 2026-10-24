@@ -294,9 +294,17 @@ required_files = [
     "standards/git-workflow.md",
     "standards/definition-of-done.md",
     "standards/telemetry.md",
+    "standards/human-in-the-loop.md",
 ]
 for relative in required_files:
     require_nonempty(ROOT / relative)
+
+hitl_path = ROOT / "standards" / "human-in-the-loop.md"
+hitl_text = require_nonempty(hitl_path, "HITL standard")
+if hitl_text:
+    for checkpoint in ("CP1", "CP2", "CP3", "CP4"):
+        if checkpoint not in hitl_text:
+            errors.append(f"HITL standard is missing required checkpoint: {checkpoint}")
 
 contract_path = ROOT / "workflows" / "orchestration-contract.md"
 if contract_path.is_file():
