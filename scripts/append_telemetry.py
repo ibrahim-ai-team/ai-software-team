@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Append a validated, secret-safe event to the local JSONL telemetry log."""
 
 import argparse
