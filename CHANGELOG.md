@@ -6,6 +6,8 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Added a standard-library Python dependency license checker and push/PR workflow, license-risk and CI/CD hardening standards, minimal-permission workflow audit, validator coverage, security-policy links, and license-check tests.
+
 - Added local sprint ROI reporting: JSON metrics input schema, standard-library Markdown report generator, sprint workflow/Project Manager instructions, worked calculation example, and regression tests.
 
 - Agent worktree isolation policy, portable creation/cleanup scripts, and shell regression tests. Writing agents are instructed to work only inside their assigned per-story worktree and never write directly to `main`.
