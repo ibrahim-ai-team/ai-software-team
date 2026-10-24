@@ -6,6 +6,8 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Reject lesson sections containing potential secrets or credentials before prompt injection; emit only lesson IDs in warnings and add two regression tests for password/token filtering.
+
 - Split GitHub execution into the bounded `github-integration` agent; reduced orchestrator responsibilities and added fail-safe, story-filtered lesson selection with regression tests and six targeted unit tests.
 
 - Added the read-only `ci-verifier` role and schema tests; separated factual CI command execution from `code-review-security` G2 judgment, with orchestrator-only persistence after approval.
@@ -22,7 +24,7 @@ Notable changes to this starter kit are recorded here.
 
 - Added: EARS specification template and SDD standard requiring validated story specs before G1, Product Owner/Business Analyst ownership, human CP1 and Software Architect review, format tests, bootstrap workflow guidance, and README documentation.
 - Added: EARS specification template, SDD standard requiring a validated spec and human CP1 plus architect review before G1, agent/bootstrap instructions, and regression tests.
-- Added: append-only persistent lessons with sequential IDs, conservative sensitive-term rejection, tests, and mandatory orchestrator/workflow instructions to read applicable lessons before delegation and record sanitized lessons after failed Gates.\n\n- Added: mechanical G1 plan-review and G2 post-execution validation gates, read-only gate checker, gate schemas/examples, orchestrator and delivery workflow enforcement, reviewer output contract, validator coverage, and regression tests.
+- Added: append-only persistent lessons with sequential IDs, conservative sensitive-term rejection, tests, and mandatory orchestrator/workflow instructions to read applicable lessons before delegation and record sanitized lessons after failed Gates.\\n\\n- Added: mechanical G1 plan-review and G2 post-execution validation gates, read-only gate checker, gate schemas/examples, orchestrator and delivery workflow enforcement, reviewer output contract, validator coverage, and regression tests.
 
 - Added: mandatory human-in-the-loop checkpoints (CP1 plan, CP2 architecture, CP3 code before merge, CP4 release before tag), read-only approval-record validation, orchestrator enforcement instructions, validator coverage, and regression tests.
 
