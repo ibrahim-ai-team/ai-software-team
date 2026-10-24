@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LESSONS_PATH = ROOT / ".claude" / "lessons" / "lessons.md"
 NO_LESSONS = "Aucune leçon applicable pour cette story"
-_SECRET_PATTERN = re.compile(r"(?i)\\b(token|password|api[_-]?key|secret|bearer|credential)\\b")
+_SECRET_PATTERN = re.compile(r"(?i)\b(token|password|api[_-]?key|secret|bearer|credential)\b")
 
 
 def _contains_secret(section: str) -> bool:
@@ -20,14 +20,14 @@ def _contains_secret(section: str) -> bool:
 
 
 def _sections(text: str) -> list[str]:
-    matches = list(re.finditer(r"(?m)^##\\s+(L\\d+)\\s+—\\s+(.+?)\\s*$", text))
+    matches = list(re.finditer(r"(?m)^##\s+(L\d+)\s+—\s+(.+?)\s*$", text))
     return [
         text[m.start() : (matches[i + 1].start() if i + 1 < len(matches) else len(text))].strip() for i, m in enumerate(matches)
     ]
 
 
 def _field(section: str, name: str) -> str:
-    match = re.search(rf"(?im)^\\s*-\\s*\\*\\*{re.escape(name)}:\\*\\*\\s*(.*?)\\s*$", section)
+    match = re.search(rf"(?im)^\s*-\s*\*\*{re.escape(name)}:\*\*\s*(.*?)\s*$", section)
     return match.group(1).strip() if match else ""
 
 
@@ -61,7 +61,7 @@ def select_lessons(story: str, maximum: int = 5, lessons_path: Path | None = Non
     story_tokens = _tokens(story)
     for section in _sections(text):
         if _contains_secret(section):
-            match = re.match(r"##\\s+(L\\d+)", section)
+            match = re.match(r"##\s+(L\d+)", section)
             lesson_id = match.group(1) if match else "unknown"
             print(
                 f"WARN: lesson {lesson_id} rejected — contains potential secret",
@@ -84,7 +84,7 @@ def main() -> int:
     if args.maximum < 1:
         parser.error("--max must be at least 1")
     lessons = select_lessons(args.story, args.maximum)
-    print("\\n\\n".join(lessons) if lessons else NO_LESSONS)
+    print("\n\n".join(lessons) if lessons else NO_LESSONS)
     return 0
 
 
