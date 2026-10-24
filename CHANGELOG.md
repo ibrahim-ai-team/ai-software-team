@@ -10,6 +10,8 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Add an explicit conflict-resolution authority hierarchy, two-strike escalation to the human sponsor, structured disagreement records, a read-only fail-closed conflict detector, regression tests, and mandatory pre-transition orchestration checks.
+
 - Extend the agent-scope PreToolUse hook to Bash; allow only an explicit safe-command list, reject shell redirection and file-mutating commands, fail closed on ambiguous shell syntax, and add Bash scope-enforcement regression tests.
 
 - Reject lesson sections containing sensitive-term markers (`token`, `password`, `api_key`, `secret`, `bearer`, `credential`) before selection; emit a generic stderr warning without exposing section content, with regression tests for password and token examples.

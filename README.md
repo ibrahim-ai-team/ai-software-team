@@ -156,3 +156,19 @@ python scripts/enforce_agent_scope.py --agent backend-developer --path src/backe
 ```
 
 Exit code `0` allows the path, `1` denies it, and `2` indicates a usage error (for instance, an empty path). An agent missing from the configuration is denied. This preflight does not replace a sandbox or operating-system permissions that actually prevent unauthorized writes.
+
+## Résolution de conflits <!-- codespell:ignore -->
+
+The conflict protocol defines this authority order: **human sponsor > CP1–CP4 checkpoints > `software-architect` for architecture > `tech-lead` for code decisions > other agents**. After two unsuccessful rounds on the same story and topic, the orchestrator escalates to the human sponsor at the applicable checkpoint and blocks the affected transition until the human decision is recorded.
+
+Before every transition, run the read-only detector:
+
+```bash
+python scripts/detect_conflict.py --story US-123 --agents software-architect,tech-lead
+```
+
+- Exit code `0`: no conflict exists for the story, or all matching records have a valid human decision.
+- Exit code `1`: an unresolved conflict exists; stop and escalate.
+- Exit code `2`: invalid arguments, an unreadable record, or malformed JSON; stop (fail closed).
+
+Records live at `.claude/disagreements/<story>-<topic>.md`. Each file must contain a valid JSON object with both positions, blocking points, `human_decision`, and the date. See [`standards/conflict-resolution.md`](standards/conflict-resolution.md) for the full schema and rules.

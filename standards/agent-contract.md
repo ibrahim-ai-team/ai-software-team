@@ -100,3 +100,7 @@ The BA does not decide business priority or scope and does not contact the spons
 4. A human approves at **CP1**. Agent validation never replaces human approval.
 
 Any PO/BA disagreement is escalated to the orchestrator; neither agent may assume the other's decision authority.
+
+## Conflict resolution authority
+
+For disagreements, follow [`standards/conflict-resolution.md`](conflict-resolution.md). The authority order is: **human sponsor > CP1–CP4 human checkpoint decisions > `software-architect` for architecture > `tech-lead` for code decisions > all other agents**. Security and repository protections remain hard constraints. Specialists must return conflicting evidence rather than override one another; after two unsuccessful rounds on the same story/topic, the orchestrator escalates to the human sponsor and blocks the dependent transition until a human decision is recorded. No agent may ignore an escalated disagreement.

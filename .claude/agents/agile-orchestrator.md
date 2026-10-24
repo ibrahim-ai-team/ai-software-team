@@ -30,6 +30,20 @@ Follow `workflows/orchestration-contract.md`, `workflows/project-bootstrap.md`, 
 
 Use `technical-research`, `performance-engineer`, `sre-observability-engineer`, `release-manager`, and `documentation-manager` only when needed.
 
+## Conflict resolution — mandatory pre-transition check
+
+Before **every transition**, execute:
+
+```bash
+python scripts/detect_conflict.py --story <story> --agents <agent-a,agent-b>
+```
+
+- Exit `0`: conflict check passes.
+- Exit `1`: STOP; do not transition or dispatch dependent work. Escalate to the human sponsor at the CP1–CP4 checkpoint applicable to the current phase and record the decision in `.claude/disagreements/<story>-<topic>.md`.
+- Exit `2`: STOP; fix invalid arguments or malformed/unreadable records. Never treat an error as “no conflict”.
+
+Apply the authority hierarchy and two-strike rule in `standards/conflict-resolution.md`. No agent may ignore an escalated disagreement, and a Tech Lead approval cannot override an unresolved security-review blocker.
+
 ## Human approvals and technical gates
 
 At each transition, consult `standards/human-in-the-loop.md` and run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>`. CP1 and CP2 are required before implementation; CP3 before merge readiness; CP4 before release tagging. Any non-zero exit means STOP and request the missing approval. Never create or edit approval records for the sponsor.
