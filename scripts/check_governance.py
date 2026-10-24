@@ -311,6 +311,7 @@ def check_design_handoff(path: Path) -> list[str]:
             "acceptance criteria covered",
         ),
         "approved by": ("approved by",),
+        "approval status": ("approval status",),
         "approval evidence": ("approval evidence",),
         "qa verification": (
             "qa verification",
@@ -344,11 +345,16 @@ def check_design_handoff(path: Path) -> list[str]:
         "decision": "Decision must be required or exception",
         "acceptance criteria": "map the design to story acceptance criteria",
         "approved by": "record the design approver",
+        "approval status": "record Approval status as approved",
         "approval evidence": "link or describe durable approval evidence",
         "qa verification": "record QA verification scope or N/A rationale",
     }.items():
         if not present(data.get(key, "")):
             errors.append(f"{path}: D01 {message}")
+
+    approval_status = data.get("approval status", "").strip().lower()
+    if present(approval_status) and approval_status != "approved":
+        errors.append(f"{path}: D01 Approval status must be approved before frontend work")
 
     story = data.get("story", "")
     if present(story) and not ISSUE_REF.search(story):
