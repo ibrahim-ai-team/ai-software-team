@@ -109,11 +109,11 @@ The team maintains persistent, append-only lessons in [`.claude/lessons/lessons.
 When a G1 or G2 validation Gate fails, preserve the failure evidence and add a sanitized lesson **before retrying**:
 
 ```bash
-python scripts/add_lesson.py \\
-  --title "Verify gate evidence" \\
-  --context "A delivery story reached validation" \\
-  --error "A required check did not pass" \\
-  --rule "Verify all required evidence before advancing" \\
+python scripts/add_lesson.py \
+  --title "Verify gate evidence" \
+  --context "A delivery story reached validation" \
+  --error "A required check did not pass" \
+  --rule "Verify all required evidence before advancing" \
   --story "SHOP-12"
 ```
 
