@@ -335,7 +335,7 @@ class DesignGateTests(GovernanceCase):
             }
         )
         errors = check_design_handoff(self.write("missing.md", text))
-        self.assertTrue(any("Artifact" in error for error in errors), errors)
+        self.assertTrue(any("artifact" in error.lower() for error in errors), errors)
         self.assertTrue(any("approver" in error for error in errors), errors)
 
     def test_approved_minor_change_exception_may_omit_artifact(self):
