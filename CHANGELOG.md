@@ -10,6 +10,10 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Added the read-only `ci-verifier` role and schema tests; separated factual CI verification from G2 security review.
+
+- Added the bounded `github-integration` agent and story-filtered lesson selection with regression tests.
+
 - Added PO/BA boundary regression tests covering role ownership and ambiguous collaboration wording.
 - Added fail-closed agent path-scope configuration, a standard-library preflight checker, regression tests, and documentation distinguishing preflight checks from runtime enforcement.
 
