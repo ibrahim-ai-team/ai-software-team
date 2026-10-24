@@ -53,4 +53,4 @@ Feature: <capability>
 
 List behaviors and changes explicitly excluded from this story.
 
-- 
+-
