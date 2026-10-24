@@ -134,6 +134,8 @@ python scripts/analyze_telemetry.py
 
 The writer adds an ISO 8601 timestamp and preserves the existing `agent` and UUID4 `trace_id` fields. It rejects invalid JSON and sensitive keys containing `token`, `password`, `api_key`, or `secret`, including nested objects. Never pass secrets to telemetry commands.
 
+Telemetry uses a SHA-256 hash chain for **tamper-evidence, not cryptographic immutability**. Each event stores `prev_hash` and `event_hash`; the verifier detects content edits, broken links, deleted middle records, and legacy records without hashes. Run `python scripts/verify_telemetry.py` to verify the local log. A hash chain is not a blockchain, does not prevent someone from rewriting the entire file and recomputing every hash, and does not authenticate who wrote an event. The telemetry file is local and ignored by Git; preserve trusted external checkpoints if you need stronger audit evidence.
+
 ### Execution identity and legacy migration
 
 Every new event also includes UUID4 `session_id`, `run_id`, and `event_id`, plus a validated canonical `agent_id` from `state/agents.json`. Use `--agent-id` or `AGENT_ID`; the existing `--agent` argument remains supported. Pass the same `--session-id`/`SESSION_ID` for all events in one session and the same `--run-id`/`RUN_ID` for all events in one run. If omitted, those IDs are generated for that invocation; `event_id` is always unique per event. Existing JSONL records are not rewritten: `analyze_telemetry.py` reads them and counts any event missing one or more identity fields as legacy.

@@ -1,6 +1,7 @@
 """Append a validated, secret-safe event to the local JSONL telemetry log."""
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -78,6 +79,28 @@ def resolve_uuid4(value: str | None, field: str) -> str:
     return str(parsed)
 
 
+def canonical_json(obj: Any) -> str:
+    """Serialize JSON deterministically for the telemetry hash chain."""
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+
+
+def previous_event_hash(path: Path | None = None) -> str:
+    """Return the last recorded hash, or genesis for a new/empty log."""
+    path = path or LOG_PATH
+    if not path.exists() or path.stat().st_size == 0:
+        return "genesis"
+    try:
+        with path.open(encoding="utf-8") as handle:
+            lines = [line for line in handle if line.strip()]
+        last_event = json.loads(lines[-1])
+        value = last_event.get("event_hash") if isinstance(last_event, dict) else None
+    except (OSError, json.JSONDecodeError, IndexError) as exc:
+        raise ValueError("cannot append to telemetry: last event is unreadable or malformed") from exc
+    if not isinstance(value, str) or len(value) != 64:
+        raise ValueError("cannot append to telemetry: last event has no valid event_hash")
+    return value
+
+
 def main() -> int:
     args = parse_args()
     try:
@@ -125,10 +148,13 @@ def main() -> int:
     }
     try:
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        event["prev_hash"] = previous_event_hash()
+        event_payload = {key: value for key, value in event.items() if key not in {"prev_hash", "event_hash"}}
+        event["event_hash"] = hashlib.sha256((event["prev_hash"] + canonical_json(event_payload)).encode("utf-8")).hexdigest()
         with LOG_PATH.open("a", encoding="utf-8", newline="\n") as handle:
             handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
-    except OSError as exc:
-        print(f"ERROR: unable to append telemetry ({exc.__class__.__name__}).", file=sys.stderr)
+    except (OSError, ValueError) as exc:
+        print(f"ERROR: unable to append telemetry ({exc}).", file=sys.stderr)
         return 1
     print(f"Telemetry appended: {event['event_id']}")
     return 0

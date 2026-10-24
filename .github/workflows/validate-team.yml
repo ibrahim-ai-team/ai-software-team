@@ -48,3 +48,10 @@ jobs:
         run: python scripts/smoke_discovery.py
       - name: Run regression tests
         run: python -m unittest discover -s tests -v
+      - name: Verify telemetry hash chain when a log is present
+        run: |
+          if [ -f .claude/telemetry/activity.jsonl ]; then
+            python scripts/verify_telemetry.py
+          else
+            echo "Telemetry log absent; skipping hash-chain verification."
+          fi
