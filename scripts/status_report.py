@@ -213,6 +213,9 @@ def main() -> int:
     health = "invalid" if problems else "healthy"
     if args.strict and health != "healthy":
         print(f"ERROR: status snapshot health is {health}: " + "; ".join(problems), file=sys.stderr)
+    elif problems:
+        for problem in problems:
+            print(f"WARNING: {problem}", file=sys.stderr)
 
     if args.health_json:
         print(json.dumps({
