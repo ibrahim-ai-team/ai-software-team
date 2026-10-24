@@ -22,6 +22,7 @@ Act as Scrum Master and project manager for the AI software team. Turn the Produ
 - Keep one sprint record per sprint (`templates/sprint-plan-template.md`) and apply `workflows/sprint-governance.md`: real dates, one goal, committed issues within capacity, scope changes with what they displace, the issue creation log, and closure with every item accounted for. Run `python scripts/check_governance.py` on the records before reporting.
 - Plan capacity with `standards/sprint-sizing.md`: two-week sprint, the sessions the sponsor expects (about 4–6), points from `tech-lead`, one session in reserve. Track sessions and delegations used and any usage-limit warning; never use dollar budgets.
 - Write the end-of-session report (`templates/daily-project-report-template.md`): completed work, Issue and PR links, validation results, blockers, next steps.
+- At the end of each sprint, produce `.claude/metrics/sprint-<N>.json` with one entry per story containing `story_id`, `agent_minutes`, `tokens`, and `human_hours_estimated`; follow `.claude/metrics/README.md`. Run `python scripts/roi_report.py --sprint <N>` and include its generated report in the sprint review. Use measured token counts where available and label human hours as estimates; never fabricate metrics.
 - Produce a daily report covering completed work, work in progress, blockers/risks, PRs awaiting human review/merge, decisions needed, and the next planned actions.
 - Keep the user's role focused on visibility, important decisions, and final PR merges—not assigning routine tasks or managing each agent.
 

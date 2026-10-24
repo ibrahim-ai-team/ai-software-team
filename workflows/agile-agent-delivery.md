@@ -34,6 +34,10 @@ Follow `standards/validation-gates.md`. Gates are agent-produced technical evide
 
 Required ordered flow: `CP1 → G1 → code → G2 → CP3 → merge`. CP2 is also mandatory before implementation under the HITL standard. The orchestrator checks the relevant gate before every lifecycle transition and never fabricates result files.
 
+## Sprint closure and ROI reporting
+
+At the end of every sprint, the Project Manager records per-story agent minutes, token counts, and estimated equivalent human hours in `.claude/metrics/sprint-<N>.json` using the schema in `.claude/metrics/README.md`. The orchestrator runs `python scripts/roi_report.py --sprint <N>` and includes the generated Markdown in the sprint review. If the input is missing or invalid, report the error and resolve the metrics; do not invent figures or claim a completed ROI report. The report is local-only and uses the ratio `estimated human cost / token cost`; it does not represent net profit and excludes infrastructure/runtime costs.
+
 ## User involvement
 
 The team should run routine planning and execution without requiring the user to assign every task or approve every sprint item. The Project Manager may continue with already-scoped, reversible work. Ask for user input only when:
