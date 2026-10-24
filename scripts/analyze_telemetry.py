@@ -64,8 +64,8 @@ def summarize(events: list[dict[str, Any]]) -> str:
     average = sum(durations) / len(durations) if durations else 0.0
     agents = ", ".join(f"{agent}={count}" for agent, count in sorted(by_agent.items())) or "none"
     return (
-        f"Events: {len(events)} | Actions by agent: {agents}\\n"
-        f"Errors: {errors} | Gates recorded: {gates} | Legacy events: {legacy_events}\\n"
+        f"Events: {len(events)} | Actions by agent: {agents}\n"
+        f"Errors: {errors} | Gates recorded: {gates} | Legacy events: {legacy_events}\n"
         f"Stories: {len(story_times)} | Average duration: {average:.2f}s"
     )
 
