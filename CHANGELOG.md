@@ -6,6 +6,8 @@ Notable changes to this starter kit are recorded here.
 
 ### Added
 
+- Split GitHub execution into the bounded `github-integration` agent; reduced orchestrator responsibilities and added fail-safe, story-filtered lesson selection with regression tests.
+
 - Added the read-only `ci-verifier` role and schema tests; separated factual CI command execution from `code-review-security` G2 judgment, with orchestrator-only persistence after approval.
 
 - Added fail-closed agent path-scope configuration, a standard-library preflight checker, regression tests, and documentation distinguishing preflight checks from runtime enforcement.
