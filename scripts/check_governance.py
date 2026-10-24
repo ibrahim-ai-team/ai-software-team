@@ -169,13 +169,13 @@ def check_sprint(record: SprintRecord, as_of: dt.date) -> list[str]:
             points += int(row.get("points", "0") or 0)
         except ValueError:
             err("G15", f"{issue}: Points must be a whole number", line)
-        if status == "done":
+        if status == TaskStatus.DONE.value.lower():
             evidence = row.get("evidence", "")
             if not ISSUE_REF.search(row.get("pr", "")) or "merged" not in evidence.lower():
                 err("G08", f"{issue}: Done needs the merged PR and evidence that says 'merged' (an opened PR is not Done)", line)
             elif evidence.strip().lower() in WEAK_EVIDENCE:
                 err("G08", f"{issue}: '{evidence}' is not completion evidence", line)
-        if status == "blocked" and is_empty(row.get("next", "")):
+        if status == TaskStatus.BLOCKED.value.lower() and is_empty(row.get("next", "")):
             err("G09", f"{issue}: a Blocked item needs a next action and owner in Next", line)
         if record.status == "closed":
             if status not in SPRINT_CLOSE_STATUSES:
