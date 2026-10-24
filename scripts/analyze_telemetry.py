@@ -40,7 +40,7 @@ def load_events(path: Path = LOG_PATH) -> list[dict[str, Any]]:
 
 
 def summarize(events: list[dict[str, Any]]) -> str:
-    """Return a stable, human-readable summary."""
+    """Return a stable summary, including a count of legacy events."""
     by_agent = Counter(str(event.get("agent", "unknown")) for event in events)
     errors = sum(event.get("action") == "error" for event in events)
     gates = sum(event.get("action") == "gate" for event in events)
@@ -64,8 +64,8 @@ def summarize(events: list[dict[str, Any]]) -> str:
     average = sum(durations) / len(durations) if durations else 0.0
     agents = ", ".join(f"{agent}={count}" for agent, count in sorted(by_agent.items())) or "none"
     return (
-        f"Events: {len(events)} | Actions by agent: {agents}\n"
-        f"Errors: {errors} | Gates recorded: {gates}\n"
+        f"Events: {len(events)} | Actions by agent: {agents}\\n"
+        f"Errors: {errors} | Gates recorded: {gates} | Legacy events: {legacy_events}\\n"
         f"Stories: {len(story_times)} | Average duration: {average:.2f}s"
     )
 
