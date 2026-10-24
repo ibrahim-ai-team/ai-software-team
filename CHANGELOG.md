@@ -4,6 +4,8 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
+- Added: EARS specification template and SDD standard requiring validated story specs before G1, Product Owner/Business Analyst ownership, human CP1 and Software Architect review, format tests, bootstrap workflow guidance, and README documentation.
+- Added: EARS specification template, SDD standard requiring a validated spec and human CP1 plus architect review before G1, agent/bootstrap instructions, and regression tests.
 - Added: append-only persistent lessons with sequential IDs, conservative sensitive-term rejection, tests, and mandatory orchestrator/workflow instructions to read applicable lessons before delegation and record sanitized lessons after failed Gates.\n\n- Added: mechanical G1 plan-review and G2 post-execution validation gates, read-only gate checker, gate schemas/examples, orchestrator and delivery workflow enforcement, reviewer output contract, validator coverage, and regression tests.
 
 - Added: mandatory human-in-the-loop checkpoints (CP1 plan, CP2 architecture, CP3 code before merge, CP4 release before tag), read-only approval-record validation, orchestrator enforcement instructions, validator coverage, and regression tests.

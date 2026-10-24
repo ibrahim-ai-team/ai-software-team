@@ -4,7 +4,13 @@
 
 Use this workflow when the user provides a software idea and asks the team to build it. The team—not the user—owns discovery, specification, backlog preparation, architecture analysis, task decomposition, and routine delivery planning. The user is the project sponsor/supervisor: they follow progress and retain final PR merge authority. This workflow applies to future application projects, not changes to this reusable AI team starter kit.
 
+## Étape 0 : spec EARS avant backlog
+
+Before backlog creation or implementation planning, the Product Owner and Business Analyst must create the story specification from `templates/spec-ears.md`. It must include context, testable EARS functional requirements, applicable non-functional constraints, Gherkin acceptance criteria, and out-of-scope boundaries. The human sponsor reviews and approves the plan/specification at CP1, and the Software Architect reviews technical feasibility and constraints. A story without a validated EARS spec must not pass G1; see `standards/spec-driven-development.md` and `standards/validation-gates.md`.
+
 ## Workflow gates
+
+- **Étape 0 — Spec EARS avant backlog:** before creating or refining the backlog, `product-owner` and `business-analyst` produce a story-specific specification using `templates/spec-ears.md`. The `software-architect` validates technical feasibility and constraints, and the human sponsor approves it at CP1. A story without a validated EARS spec and recorded CP1 approval cannot pass G1; see `standards/spec-driven-development.md`.
 
 - **Gate 0 — Activation:** A clear request such as "build an e-commerce site" activates the workflow; do not demand that the user write a complete project brief.
 - **Gate 1 — Discovery and specification:** Product Owner and Business Analyst derive the product brief, user personas/journeys, functional and non-functional requirements, scope boundaries, assumptions, risks, acceptance criteria, and unresolved questions. Ask the user only for material decisions that cannot safely be inferred. Record assumptions explicitly.
