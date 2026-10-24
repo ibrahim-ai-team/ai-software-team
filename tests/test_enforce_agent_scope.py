@@ -64,11 +64,13 @@ class EnforceAgentScopeTests(unittest.TestCase):
         self.assertEqual(before, after)
 
     def hook(self, command, agent="backend-developer"):
-        payload = json.dumps({
-            "tool_name": "Bash",
-            "agent_type": agent,
-            "tool_input": {"command": command},
-        })
+        payload = json.dumps(
+            {
+                "tool_name": "Bash",
+                "agent_type": agent,
+                "tool_input": {"command": command},
+            }
+        )
         return subprocess.run(
             [sys.executable, str(HOOK)],
             cwd=ROOT,
