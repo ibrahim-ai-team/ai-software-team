@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Read-only, fail-closed detector for unresolved story disagreements."""
 
 import argparse
