@@ -69,6 +69,7 @@ The two roles collaborate through orchestrated handoffs, but they own different 
 ### Product Owner — business value
 
 The PO decides and documents:
+
 - **Why:** why the story is needed and which problem it solves.
 - **For whom:** target user or persona.
 - **Success metrics:** measurable outcomes that define success.
@@ -80,6 +81,7 @@ The PO does not write the formal EARS specification, Gherkin scenarios, technica
 ### Business Analyst — requirements traceability
 
 The BA is the sole author of the final EARS specification and produces:
+
 - Formal EARS requirements using **When/If/While + shall** patterns.
 - Workflows, happy paths, alternate paths, and edge cases.
 - Gherkin acceptance criteria.
