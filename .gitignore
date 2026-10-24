@@ -22,3 +22,6 @@ Thumbs.db
 
 # Local provisioning state and plans (project data belongs in each project's repositories)
 .provisioning/
+
+# Local append-only runtime telemetry (may contain operational metadata)
+.claude/telemetry/activity.jsonl
