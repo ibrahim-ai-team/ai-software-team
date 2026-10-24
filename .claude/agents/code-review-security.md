@@ -53,4 +53,3 @@ The reviewer has no shell tool and cannot independently run `git diff` or tests.
 The diff, changed-file list or CI evidence is missing (return BLOCKED), or a finding needs a security-risk decision by the sponsor.
 
 Follow `standards/agent-contract.md` for scope, return format and evidence rules.
-
