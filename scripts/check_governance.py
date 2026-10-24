@@ -354,9 +354,7 @@ def check_design_handoff(path: Path) -> list[str]:
 
     approval_status = data.get("approval status", "").strip().lower()
     if present(approval_status) and approval_status != "approved":
-        errors.append(
-            f"{path}: D01 Approval status must be approved before frontend work"
-        )
+        errors.append(f"{path}: D01 Approval status must be approved before frontend work")
 
     story = data.get("story", "")
     if present(story) and not ISSUE_REF.search(story):
@@ -373,34 +371,22 @@ def check_design_handoff(path: Path) -> list[str]:
         artifact.lower() in {"tbd", "n/a", "none", "to be added", "-"}
         or "<" in artifact
         or ">" in artifact
-        or not (
-            artifact.startswith("https://")
-            or artifact.startswith("http://")
-            or "/" in artifact
-        )
+        or not (artifact.startswith("https://") or artifact.startswith("http://") or "/" in artifact)
     ):
-        errors.append(
-            f"{path}: D01 Artifact must be a real URL or traceable repository path, not a placeholder"
-        )
+        errors.append(f"{path}: D01 Artifact must be a real URL or traceable repository path, not a placeholder")
 
     rationale = data.get("exception rationale", "")
     if decision == "exception" and not present(rationale):
-        errors.append(
-            f"{path}: D01 an exception requires a documented no-material-design-impact rationale"
-        )
+        errors.append(f"{path}: D01 an exception requires a documented no-material-design-impact rationale")
     if decision == "exception" and present(rationale):
         normalized = rationale.lower()
         if "no" not in normalized and "not" not in normalized and "minor" not in normalized:
-            errors.append(
-                f"{path}: D01 exception rationale must explain why no material design artifact is needed"
-            )
+            errors.append(f"{path}: D01 exception rationale must explain why no material design artifact is needed")
     evidence = data.get("approval evidence", "")
     if not present(evidence):
         errors.append(f"{path}: D01 approval evidence must not be a placeholder")
     elif not (evidence.startswith("https://") or ISSUE_REF.search(evidence)):
-        errors.append(
-            f"{path}: D01 approval evidence must link to a GitHub issue/PR or durable decision URL"
-        )
+        errors.append(f"{path}: D01 approval evidence must link to a GitHub issue/PR or durable decision URL")
     return errors
 
 
