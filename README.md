@@ -25,7 +25,8 @@ A reusable, project-independent starter kit for coordinating AI-assisted softwar
 
 1. Clone or download this repository.
 2. From the repository root, run `python scripts/validate_team.py`, `python scripts/smoke_discovery.py` (offline inventory check only), and `python -m unittest discover -s tests -v`.
-3. The orchestrator filters persistent lessons before each delegation with `python scripts/relevant_lessons.py --story <story-id> --max 5`; only relevant, bounded results enter the brief.\n4. Start the team from this directory with `claude --agent agile-orchestrator`. This makes the orchestrator the main session; it delegates to the specialists.
+3. The orchestrator filters persistent lessons before each delegation with `python scripts/relevant_lessons.py --story <story-id> --max 5`; only relevant, bounded results enter the brief.
+4. Start the team from this directory with `claude --agent agile-orchestrator`. This makes the orchestrator the main session; it delegates to the specialists.
 5. To check the setup only, ask it to report which agents and skills it discovers. To start a project, give it your idea (next section).
 
 For a fictional end-to-end illustration, see [Example Walkthrough](docs/example-walkthrough.md). The example is documentation, not runtime evidence.
