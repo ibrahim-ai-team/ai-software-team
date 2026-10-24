@@ -4,24 +4,24 @@
 
 Use this workflow when the user provides a software idea and asks the team to build it. The team—not the user—owns discovery, specification, backlog preparation, architecture analysis, task decomposition, and routine delivery planning. The user is the project sponsor/supervisor: they follow progress and retain final PR merge authority. This workflow applies to future application projects, not changes to this reusable AI team starter kit.
 
-## Phase Discovery — brief PO, spec BA, validation PO, approbation CP1
+## Discovery phase — PO brief, BA specification, PO validation, CP1 approval
 
-Avant la création du backlog ou la planification de l'implémentation, respecter cet ordre strict :
+Before creating the backlog or planning implementation, follow this strict order:
 
-1. **Product Owner — brief de valeur métier :** documente why, for whom/persona, success metrics, priorité P0/P1/P2 et scope haut niveau (in/out).
-2. **Business Analyst — spec EARS :** rédige seul la spécification finale à partir du brief PO : EARS formel, contraintes non fonctionnelles applicables, workflows et edge cases, Gherkin, matrice requirement → test, glossaire, hypothèses et questions ouvertes.
-3. **Product Owner — validation métier :** vérifie la cohérence de la spec avec le brief et retourne des commentaires précis au BA. Le PO ne réécrit pas la spec.
-4. **Humain — CP1 :** approuve le plan/la spec. Une validation agent ne remplace jamais l'approbation humaine.
+1. **Product Owner — business-value brief:** document why, target user/persona, success metrics, P0/P1/P2 priority, and high-level in/out scope.
+2. **Business Analyst — EARS specification:** solely author the final specification from the PO brief, including formal EARS, applicable non-functional constraints, workflows and edge cases, Gherkin, requirement-to-test traceability, glossary, assumptions, and open questions.
+3. **Product Owner — business validation:** check the specification against the brief and return precise comments to the BA. The PO does not rewrite the specification.
+4. **Human — CP1:** approve the plan/specification. Agent validation never replaces human approval.
 
-Si le PO et le BA divergent, l'orchestrateur arbitre le processus et escalade toute décision de valeur/priorité/scope au PO ou au sponsor selon l'autorité définie. Une story sans spec EARS validée et approbation CP1 enregistrée ne passe pas G1 ; voir `standards/spec-driven-development.md` et `standards/validation-gates.md`.
+If the PO and BA disagree, the orchestrator manages the escalation and routes business-value, priority, or scope decisions to the PO or sponsor according to the authority rules. A story without a validated EARS specification and recorded CP1 approval cannot pass G1; see `standards/spec-driven-development.md` and `standards/validation-gates.md`.
 
-## Étape 1 — créer les worktrees par agent
+## Step 1 — create per-agent worktrees
 
 Before delegating any task that writes repository files, the orchestrator runs `./scripts/new_worktree.sh <agent> <story>` and passes the resulting path, branch, and allowed paths to that agent. Each writing agent works only in its assigned worktree; concurrent writing tasks never share a worktree. At story completion, preserve/commit the work and run `./scripts/cleanup_worktree.sh <agent> <story>`; cleanup requires confirmation. Never write directly to `main`. See `standards/agent-isolation.md`.
 
 ## Workflow gates
 
-- **Phase Discovery — Spec EARS avant backlog :** suivre l'ordre PO brief → BA spec → PO validation → approbation humaine CP1. Le BA est l'unique auteur de la spec EARS ; le PO décide priorité/scope et valide la cohérence métier sans réécrire la spec. Toute divergence remonte à l'orchestrateur. Une story sans spec validée et approbation CP1 enregistrée ne passe pas G1 ; voir `standards/spec-driven-development.md`.
+- **Discovery phase — EARS specification before backlog:** follow PO brief → BA specification → PO validation → human CP1 approval. The BA is the sole EARS specification author; the PO decides priority/scope and validates business alignment without rewriting the specification. Escalate disagreements to the orchestrator. A story without a validated specification and recorded CP1 approval cannot pass G1; see `standards/spec-driven-development.md`.
 
 - **Gate 1 — Worktree isolation:** create a dedicated worktree for each writing agent/story with `scripts/new_worktree.sh`; no shared worktree for concurrent writers. Clean up with the confirmation-protected cleanup script after the story.
 - **Gate 0 — Activation:** A clear request such as "build an e-commerce site" activates the workflow; do not demand that the user write a complete project brief.
@@ -38,8 +38,8 @@ Before delegating any task that writes repository files, the orchestrator runs `
 - **Agile Orchestrator (`agile-orchestrator`):** single entry point; delegates every phase, verifies results, owns GitHub writes and reports to the sponsor.
 - **Tech Lead (`tech-lead`):** validates the stack for buildability, splits stories into small tasks, sets implementation standards and reviews PRs for technical quality.
 
-- **Product Owner :** décide de la valeur métier, des personas, des métriques de succès, de la priorité et du scope haut niveau ; valide la spec métier sans la réécrire.
-- **Business Analyst :** seul auteur de la spec EARS finale, des workflows/edge cases, critères Gherkin, glossaire, hypothèses et matrice de traçabilité.
+- **Product Owner:** owns business value, personas, success metrics, priority, and high-level scope; validates business alignment without rewriting the specification.
+- **Business Analyst:** sole author of the final EARS specification, workflows/edge cases, Gherkin criteria, glossary, assumptions, and traceability matrix.
 - **Software Architect:** evaluate architecture and repository options, define boundaries/API contracts, record ADRs, and advise on technical quality. Technical review belongs to `tech-lead`; `code-review-security` performs the independent read-only security review; the orchestrator records review disposition.
 - **Project Manager / Scrum Master:** sequence work, manage dependencies and work in progress, prepare delegation records for the orchestrator to dispatch, update task state, and publish daily reports.
 - **DevOps / Repository Setup:** scaffold the approved environment, CI, developer setup, and operational baseline; do not create unapproved external resources or incur costs.
