@@ -63,6 +63,12 @@ Writing agents must use one dedicated Git worktree per agent and story. The orch
 
 Every new story starts with a completed EARS specification before backlog readiness. The Product Owner and Business Analyst write it using [`templates/spec-ears.md`](templates/spec-ears.md); the Software Architect validates feasibility, and the human sponsor approves the specification at CP1. A story without a validated EARS spec and recorded CP1 approval cannot pass G1. See [`standards/spec-driven-development.md`](standards/spec-driven-development.md) and `tests/test_spec_ears.py` for the format guard.
 
+## Mesure du ROI
+
+At the end of each sprint, the Project Manager records story-level agent minutes, token counts, and estimated equivalent human hours in `.claude/metrics/sprint-<N>.json`. Generate the local Markdown report with `python scripts/roi_report.py --sprint 3`; optional overrides are `--rate-hourly 80` and `--token-cost 0.000003`. The script uses only the Python standard library and makes no network calls. See `.claude/metrics/README.md` for the input schema.
+
+**Manual calculation example:** for 125,000 tokens at $0.000003/token, token cost is 125,000 × 0.000003 = $0.375. If equivalent human work is estimated at 2.5 hours and the rate is $80/hour, human cost is 2.5 × $80 = $200. The ROI ratio is $200 ÷ $0.375 = **533.33**. This is a cost comparison, not net profit; it excludes agent runtime and other infrastructure costs.
+
 ## Agile commands
 
 A new idea becomes its own GitHub workspace named after the app you propose (for example `shopinow-management`, `shopinow-front`, `shopinow-back`) with one Project board through `/provision-project`; see [project provisioning](docs/project-provisioning.md). This repository is never copied per application.

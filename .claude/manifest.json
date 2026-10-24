@@ -57,7 +57,8 @@
         "sprint-review-template.md",
         "retrospective-template.md",
         "release-readiness-template.md",
-        "spec-ears.md"
+        "spec-ears.md",
+        "sprint-roi-report.md"
       ]
     }
   }

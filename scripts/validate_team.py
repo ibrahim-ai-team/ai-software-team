@@ -301,6 +301,9 @@ required_files = [
     "scripts/new_worktree.sh",
     "scripts/cleanup_worktree.sh",
     "tests/test_worktree.sh",
+    "scripts/roi_report.py",
+    ".claude/metrics/README.md",
+    "tests/test_roi_report.py",
 ]
 for relative in required_files:
     require_nonempty(ROOT / relative)
