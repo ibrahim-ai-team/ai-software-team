@@ -4,6 +4,8 @@ Notable changes to this starter kit are recorded here.
 
 ## Unreleased
 
+- Added: mechanical G1 plan-review and G2 post-execution validation gates, read-only gate checker, gate schemas/examples, orchestrator and delivery workflow enforcement, reviewer output contract, validator coverage, and regression tests.
+
 - Added: mandatory human-in-the-loop checkpoints (CP1 plan, CP2 architecture, CP3 code before merge, CP4 release before tag), read-only approval-record validation, orchestrator enforcement instructions, validator coverage, and regression tests.
 
 - Added: local append-only JSONL telemetry with UUID4 trace IDs, secret-key rejection, event analysis, orchestrator delegation/gate guidance, tests, and validator coverage.
