@@ -12,7 +12,7 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
-from scripts import analyze_telemetry, append_telemetry
+from scripts import analyze_telemetry, append_telemetry, verify_telemetry
 
 
 class AppendTelemetryTests(unittest.TestCase):
@@ -169,6 +169,68 @@ class AppendTelemetryTests(unittest.TestCase):
         self.assertIn("Legacy events: 1", summary)
         self.assertIn("qa-automation=1", summary)
         self.assertIn("agile-orchestrator=1", summary)
+
+
+    def verify_log(self):
+        with (
+            patch.object(verify_telemetry, "LOG_PATH", self.log_path),
+            contextlib.redirect_stderr(io.StringIO()),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            return verify_telemetry.verify_file(self.log_path)
+
+    def test_hash_chain_fields_and_linkage(self):
+        for _ in range(2):
+            self.assertEqual(self.run_append(), 0)
+        first, second = self.read_events()
+        self.assertEqual(first["prev_hash"], "genesis")
+        self.assertRegex(first["event_hash"], r"^[0-9a-f]{64}$")
+        self.assertEqual(second["prev_hash"], first["event_hash"])
+        self.assertRegex(second["event_hash"], r"^[0-9a-f]{64}$")
+
+    def test_three_events_verify_successfully(self):
+        for _ in range(3):
+            self.assertEqual(self.run_append(), 0)
+        self.assertEqual(self.verify_log(), 0)
+
+    def test_modified_second_event_fails_with_line_number(self):
+        for _ in range(3):
+            self.assertEqual(self.run_append(), 0)
+        lines = self.log_path.read_text(encoding="utf-8").splitlines()
+        second = json.loads(lines[1])
+        second["story"] = "US-TAMPERED"
+        lines[1] = json.dumps(second, ensure_ascii=False, separators=(",", ":"))
+        self.log_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr):
+            self.assertEqual(verify_telemetry.verify_file(self.log_path), 1)
+        self.assertIn("line 2", stderr.getvalue())
+
+    def test_deleted_middle_event_breaks_chain(self):
+        for _ in range(3):
+            self.assertEqual(self.run_append(), 0)
+        lines = self.log_path.read_text(encoding="utf-8").splitlines()
+        self.log_path.write_text(lines[0] + "\n" + lines[2] + "\n", encoding="utf-8")
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr):
+            self.assertEqual(verify_telemetry.verify_file(self.log_path), 1)
+        self.assertIn("line 2", stderr.getvalue())
+
+    def test_empty_or_missing_telemetry_verifies_successfully(self):
+        self.log_path.write_text("", encoding="utf-8")
+        self.assertEqual(self.verify_log(), 0)
+        self.log_path.unlink()
+        self.assertEqual(self.verify_log(), 0)
+
+    def test_legacy_events_are_rejected_explicitly(self):
+        self.log_path.write_text(
+            json.dumps({"ts": "2026-01-01T00:00:00+00:00", "action": "delegate"}) + "\n",
+            encoding="utf-8",
+        )
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr):
+            self.assertEqual(verify_telemetry.verify_file(self.log_path), 1)
+        self.assertIn("legacy events detected", stderr.getvalue())
 
 
 if __name__ == "__main__":
