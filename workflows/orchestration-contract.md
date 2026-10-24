@@ -31,6 +31,16 @@ Rules:
 - A newer decision supersedes an older one only for what it states. Record which requirement it replaces, then update every copy listed as a mirror.
 - Each rule has one home: sprint rules in `workflows/sprint-governance.md`, issue creation in `workflows/backlog-quality-gates.md`, roles and decision authority in `standards/agent-contract.md`, status transitions in `workflows/project-status-transitions.md`. Commands and agent files link to them instead of copying them.
 
+## Conflict Resolution
+
+Follow [`standards/conflict-resolution.md`](../standards/conflict-resolution.md) for authority precedence, the two-strike escalation rule, and the canonical disagreement-record format. Before **every transition**, execute:
+
+```bash
+python scripts/detect_conflict.py --story <story> --agents <agent-a,agent-b>
+```
+
+Interpret exit codes strictly: `0` allows the conflict check to pass; `1` means an unresolved disagreement and requires STOP plus escalation to the human sponsor at the applicable CP1–CP4 checkpoint; `2` means invalid input, unreadable record, or malformed JSON and also requires STOP. Never continue a dependent transition while a disagreement is unresolved. No agent may ignore or override an escalated conflict. The detector is read-only.
+
 ## HITL Enforcement
 
 Human checkpoints are mandatory lifecycle controls and are distinct from automated agent Gates. A Gate records technical verification; only the human sponsor/repository-authorized human can approve a CP. A passing Gate never satisfies a CP.
