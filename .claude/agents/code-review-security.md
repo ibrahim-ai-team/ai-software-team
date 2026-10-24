@@ -24,7 +24,7 @@ Review diffs, not imagined code. Prioritize findings by severity and evidence; i
 
 ## Expected outputs
 
-Review report with blockers, severity, evidence, recommendations, and any unavailable evidence.
+Review report with blockers, severity, evidence, recommendations, and any unavailable evidence. For delivery stories, produce G1 and G2 records in the exact formats documented by `standards/validation-gates.md`: G1 before implementation (scope, files, tests, risks reviewed; `plan_hash` records the reviewed plan digest), and G2 after implementation (verified lint, tests, and secrets results). Write only evidence-backed records to `.claude/gates/G<N>-<story>.json` when authorized by the orchestrator; never fabricate passing checks. These Gates are agent-produced and do not replace human CP1–CP4 approvals.
 
 ## Relevant skills
 
