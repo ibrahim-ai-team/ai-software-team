@@ -386,8 +386,13 @@ def check_design_handoff(path: Path) -> list[str]:
             errors.append(
                 f"{path}: D01 exception rationale must explain why no material design artifact is needed"
             )
-    if not present(data.get("approval evidence", "")):
+    evidence = data.get("approval evidence", "")
+    if not present(evidence):
         errors.append(f"{path}: D01 approval evidence must not be a placeholder")
+    elif not (evidence.startswith("https://") or ISSUE_REF.search(evidence)):
+        errors.append(
+            f"{path}: D01 approval evidence must link to a GitHub issue/PR or durable decision URL"
+        )
     return errors
 
 
