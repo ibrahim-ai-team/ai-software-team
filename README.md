@@ -102,6 +102,23 @@ python scripts/analyze_telemetry.py
 
 The writer adds an ISO 8601 timestamp and a UUID4 `trace_id`. It rejects invalid JSON and sensitive keys containing `token`, `password`, `api_key`, or `secret`, including nested objects. Never pass secrets to telemetry commands.
 
+## Apprentissage continu
+
+The team maintains persistent, append-only lessons in [`.claude/lessons/lessons.md`](.claude/lessons/lessons.md). Before every delegation, the orchestrator reads the lessons and includes applicable rules in the brief. Lessons are binding constraints, not optional advice.
+
+When a G1 or G2 validation Gate fails, preserve the failure evidence and add a sanitized lesson **before retrying**:
+
+```bash
+python scripts/add_lesson.py \\
+  --title "Verify gate evidence" \\
+  --context "A delivery story reached validation" \\
+  --error "A required check did not pass" \\
+  --rule "Verify all required evidence before advancing" \\
+  --story "SHOP-12"
+```
+
+The script assigns sequential IDs (`L001`, `L002`, ...), appends rather than overwriting, and rejects empty fields or text containing suspicious markers such as `token`, `password`, or `secret`. This conservative filter is not a complete secret detector: sanitize lesson text manually and never include credentials, secret values, or raw logs. Existing lessons must never be deleted or edited to hide a failure.
+
 ## Verification
 
 Run `python scripts/validate_team.py`, `python scripts/check_markdown_links.py`, `python scripts/check_cross_references.py`, `python scripts/check_placeholders.py` and `python -m unittest discover -s tests -v` locally, then inspect the actual CI result on the pull request. Use `docs/verification-report.md` to record a real Claude Code smoke test; do not mark runtime verification complete without evidence.
