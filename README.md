@@ -139,7 +139,7 @@ The script assigns sequential IDs (`L001`, `L002`, ...), appends rather than ove
 
 ## Portabilité
 
-Les contrats d'agents Markdown sont la source de vérité ; les intégrations d'exécution doivent les traduire sans perdre les gates, les permissions ni les validations humaines. Claude Code reste l'intégration actuelle. DeepSeek API et LangGraph sont prévus, mais pas implémentés. Voir [l'audit de portabilité](docs/portability-audit.md), le [standard d'agnosticisme](standards/model-agnosticism.md) et la [liste des adaptateurs](adapters/README.md).
+Les contrats d'agents Markdown sont la source de vérité ; les intégrations d'exécution doivent les traduire sans perdre les gates, les permissions ni les validations humaines. Claude Code is the current integration. DeepSeek API et LangGraph sont prévus, mais pas implémentés. Voir [l'audit de portabilité](docs/portability-audit.md), le [standard d'agnosticisme](standards/model-agnosticism.md) et la [liste des adaptateurs](adapters/README.md).
 
 ## Verification
 

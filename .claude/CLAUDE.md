@@ -2,7 +2,7 @@
 
 ## Model-agnostic agent contracts
 
-Les fichiers `.claude/agents/*.md` sont les contrats de rôle faisant autorité. Ils ne doivent pas contenir de syntaxe propriétaire Claude Code non documentée. Les conventions propres au runtime doivent être documentées dans les standards/adaptateurs ; le validateur signale les patterns interdits définis dans `standards/model-agnosticism.md`. Ne réécris pas le contrat commun pour un seul orchestrateur.
+Les fichiers `.claude/agents/*.md` sont les contrats de rôle faisant autorité. They must not contain undocumented Claude Code-specific syntax. Les conventions propres au runtime doivent être documentées dans les standards/adaptateurs ; le validateur signale les patterns interdits définis dans `standards/model-agnosticism.md`. Do not rewrite the shared contract for a single orchestrator.
 
 ## Scope and activation
 
