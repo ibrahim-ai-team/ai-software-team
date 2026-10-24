@@ -80,6 +80,28 @@ For the exact phases, recovery rules, evidence requirements and safety boundarie
 - The validator reads `.claude/manifest.json` for minimum agent/skill inventories and required command/template files. The offline `scripts/smoke_discovery.py` checks whether inventory files and agent/skill metadata can be discovered without launching Claude Code. Neither check proves real Claude Code discovery, delegation, application correctness, deployment, or branch protection.
 - Licensed under the [MIT License](LICENSE): free to use, copy, modify and share, including in your own applications, provided the copyright notice is kept. Applications built with this kit choose their own licence.
 
+## Telemetry
+
+Orchestration events are recorded locally in the append-only JSONL file `.claude/telemetry/activity.jsonl`, which is ignored by Git. The schema, secret-safety rules, and limitations are documented in [standards/telemetry.md](standards/telemetry.md).
+
+Append a delegation event:
+
+```bash
+python scripts/append_telemetry.py \
+  --agent agile-orchestrator \
+  --action delegate \
+  --story US-123 \
+  --details '{"target":"qa-automation"}'
+```
+
+Analyze the events:
+
+```bash
+python scripts/analyze_telemetry.py
+```
+
+The writer adds an ISO 8601 timestamp and a UUID4 `trace_id`. It rejects invalid JSON and sensitive keys containing `token`, `password`, `api_key`, or `secret`, including nested objects. Never pass secrets to telemetry commands.
+
 ## Verification
 
 Run `python scripts/validate_team.py`, `python scripts/check_markdown_links.py`, `python scripts/check_cross_references.py`, `python scripts/check_placeholders.py` and `python -m unittest discover -s tests -v` locally, then inspect the actual CI result on the pull request. Use `docs/verification-report.md` to record a real Claude Code smoke test; do not mark runtime verification complete without evidence.
