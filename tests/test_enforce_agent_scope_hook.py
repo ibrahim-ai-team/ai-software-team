@@ -2,10 +2,8 @@
 import json
 import subprocess
 import sys
-import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "scripts" / "enforce_agent_scope_hook.py"
@@ -27,26 +25,19 @@ class ScopeHookTests(unittest.TestCase):
         self.assertEqual(result.stdout, "")
 
     def test_out_of_scope_write_is_blocked_and_telemetry_recorded(self):
-        with tempfile.TemporaryDirectory() as temp:
-            log = Path(temp) / "activity.jsonl"
-            with patch("builtins.open"):
-                pass
-            # Isolate the telemetry destination by patching the child process environment
-            # is not possible through this subprocess interface; use the actual log and
-            # compare only the final appended event.
-            telemetry = ROOT / ".claude/telemetry/activity.jsonl"
-            before = telemetry.read_text(encoding="utf-8") if telemetry.exists() else ""
-            result = invoke({"hook_event_name": "PreToolUse", "tool_name": "Write",
-                             "agent_type": "backend-developer",
-                             "tool_input": {"file_path": str(ROOT / "src/frontend/blocked.tsx"), "content": "secret-not-logged"}})
-            self.assertEqual(result.returncode, 0, result.stderr)
-            decision = json.loads(result.stdout)
-            self.assertEqual(decision["hookSpecificOutput"]["permissionDecision"], "deny")
-            after = telemetry.read_text(encoding="utf-8")
-            self.assertGreater(len(after), len(before))
-            event = json.loads(after.splitlines()[-1])
-            self.assertEqual(event["details"]["refused_path"], "src/frontend/blocked.tsx")
-            self.assertNotIn("secret-not-logged", after)
+        telemetry = ROOT / ".claude/telemetry/activity.jsonl"
+        before = telemetry.read_text(encoding="utf-8") if telemetry.exists() else ""
+        result = invoke({"hook_event_name": "PreToolUse", "tool_name": "Write",
+                         "agent_type": "backend-developer",
+                         "tool_input": {"file_path": str(ROOT / "src/frontend/blocked.tsx"), "content": "secret-not-logged"}})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        decision = json.loads(result.stdout)
+        self.assertEqual(decision["hookSpecificOutput"]["permissionDecision"], "deny")
+        after = telemetry.read_text(encoding="utf-8")
+        self.assertGreater(len(after), len(before))
+        event = json.loads(after.splitlines()[-1])
+        self.assertEqual(event["details"]["refused_path"], "src/frontend/blocked.tsx")
+        self.assertNotIn("secret-not-logged", after)
 
     def test_unknown_subagent_fails_closed(self):
         result = invoke({"tool_name": "Edit", "agent_type": "not-configured",
