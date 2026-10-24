@@ -4,9 +4,16 @@
 
 Use this workflow when the user provides a software idea and asks the team to build it. The team—not the user—owns discovery, specification, backlog preparation, architecture analysis, task decomposition, and routine delivery planning. The user is the project sponsor/supervisor: they follow progress and retain final PR merge authority. This workflow applies to future application projects, not changes to this reusable AI team starter kit.
 
-## Étape 0 : spec EARS avant backlog
+## Phase Discovery — brief PO, spec BA, validation PO, approbation CP1
 
-Before backlog creation or implementation planning, the Product Owner and Business Analyst must create the story specification from `templates/spec-ears.md`. It must include context, testable EARS functional requirements, applicable non-functional constraints, Gherkin acceptance criteria, and out-of-scope boundaries. The human sponsor reviews and approves the plan/specification at CP1, and the Software Architect reviews technical feasibility and constraints. A story without a validated EARS spec must not pass G1; see `standards/spec-driven-development.md` and `standards/validation-gates.md`.
+Avant la création du backlog ou la planification de l'implémentation, respecter cet ordre strict :
+
+1. **Product Owner — brief de valeur métier :** documente why, for whom/persona, success metrics, priorité P0/P1/P2 et scope haut niveau (in/out).
+2. **Business Analyst — spec EARS :** rédige seul la spécification finale à partir du brief PO : EARS formel, contraintes non fonctionnelles applicables, workflows et edge cases, Gherkin, matrice requirement → test, glossaire, hypothèses et questions ouvertes.
+3. **Product Owner — validation métier :** vérifie la cohérence de la spec avec le brief et retourne des commentaires précis au BA. Le PO ne réécrit pas la spec.
+4. **Humain — CP1 :** approuve le plan/la spec. Une validation agent ne remplace jamais l'approbation humaine.
+
+Si le PO et le BA divergent, l'orchestrateur arbitre le processus et escalade toute décision de valeur/priorité/scope au PO ou au sponsor selon l'autorité définie. Une story sans spec EARS validée et approbation CP1 enregistrée ne passe pas G1 ; voir `standards/spec-driven-development.md` et `standards/validation-gates.md`.
 
 ## Étape 1 — créer les worktrees par agent
 
@@ -14,7 +21,7 @@ Before delegating any task that writes repository files, the orchestrator runs `
 
 ## Workflow gates
 
-- **Étape 0 — Spec EARS avant backlog:** before creating or refining the backlog, `product-owner` and `business-analyst` produce a story-specific specification using `templates/spec-ears.md`. The `software-architect` validates technical feasibility and constraints, and the human sponsor approves it at CP1. A story without a validated EARS spec and recorded CP1 approval cannot pass G1; see `standards/spec-driven-development.md`.
+- **Phase Discovery — Spec EARS avant backlog :** suivre l'ordre PO brief → BA spec → PO validation → approbation humaine CP1. Le BA est l'unique auteur de la spec EARS ; le PO décide priorité/scope et valide la cohérence métier sans réécrire la spec. Toute divergence remonte à l'orchestrateur. Une story sans spec validée et approbation CP1 enregistrée ne passe pas G1 ; voir `standards/spec-driven-development.md`.
 
 - **Gate 1 — Worktree isolation:** create a dedicated worktree for each writing agent/story with `scripts/new_worktree.sh`; no shared worktree for concurrent writers. Clean up with the confirmation-protected cleanup script after the story.
 - **Gate 0 — Activation:** A clear request such as "build an e-commerce site" activates the workflow; do not demand that the user write a complete project brief.
@@ -31,7 +38,8 @@ Before delegating any task that writes repository files, the orchestrator runs `
 - **Agile Orchestrator (`agile-orchestrator`):** single entry point; delegates every phase, verifies results, owns GitHub writes and reports to the sponsor.
 - **Tech Lead (`tech-lead`):** validates the stack for buildability, splits stories into small tasks, sets implementation standards and reviews PRs for technical quality.
 
-- **Product Owner / Business Analyst:** own product discovery, requirements, assumptions, acceptance criteria, and backlog readiness.
+- **Product Owner :** décide de la valeur métier, des personas, des métriques de succès, de la priorité et du scope haut niveau ; valide la spec métier sans la réécrire.
+- **Business Analyst :** seul auteur de la spec EARS finale, des workflows/edge cases, critères Gherkin, glossaire, hypothèses et matrice de traçabilité.
 - **Software Architect:** evaluate architecture and repository options, define boundaries/API contracts, record ADRs, and advise on technical quality. Technical review belongs to `tech-lead`; `code-review-security` performs the independent read-only security review; the orchestrator records review disposition.
 - **Project Manager / Scrum Master:** sequence work, manage dependencies and work in progress, prepare delegation records for the orchestrator to dispatch, update task state, and publish daily reports.
 - **DevOps / Repository Setup:** scaffold the approved environment, CI, developer setup, and operational baseline; do not create unapproved external resources or incur costs.
