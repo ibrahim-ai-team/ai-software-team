@@ -184,10 +184,19 @@ github_integration_path = ROOT / ".claude" / "agents" / "github-integration.md"
 github_integration_text = require_nonempty(github_integration_path, "github-integration agent")
 if github_integration_text:
     required_github_markers = (
-        "tools: Read, Bash, Grep, Glob", "Closed command allowlist", "Explicitly forbidden",
-        "gh issue", "gh pr", "gh project", "git status", "git diff", "git log",
+        "tools: Read, Bash, Grep, Glob",
+        "Closed command allowlist",
+        "Explicitly forbidden",
+        "gh issue",
+        "gh pr",
+        "gh project",
+        "git status",
+        "git diff",
+        "git log",
         "Do not make product, priority, backlog, or sprint decisions.",
-        "gh pr merge", "git push", "git commit",
+        "gh pr merge",
+        "git push",
+        "git commit",
     )
     for marker in required_github_markers:
         if marker not in github_integration_text:
