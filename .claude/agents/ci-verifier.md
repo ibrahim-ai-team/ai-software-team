@@ -40,7 +40,7 @@ Use `Read` to inspect whether `package.json` or `Makefile` exists before conside
 ## Explicitly forbidden
 
 - Any mutating Git command, including `git commit`, `git push`, `git merge`, `git reset`, `git checkout`, `git switch`, `git restore`, `git clean`, `git cherry-pick`, and `git rebase`.
-- Installation or package-management commands, including `pip install`, `python -m pip install`, `npm install`, `npm ci`, `apt-get`, and equivalent installers.
+- Installation or package-management commands, including Python package installers, `npm install`, `npm ci`, operating-system package managers, and equivalent installers.
 - Network commands or access, including `curl`, `wget`, and any unlisted network client.
 - File-writing or file-mutating commands and syntax, including `sed -i`, `>`, `>>`, `tee`, `touch`, `mkdir`, `rm`, `cp`, `mv`, `cat > file`, inline scripts, and any command whose purpose or effect is to write a file.
 - Arbitrary shell expressions, unlisted commands, command chaining, pipelines, and wrappers. If a requested check requires an unlisted command, refuse it and report the limitation. Never expand the allowlist yourself.
