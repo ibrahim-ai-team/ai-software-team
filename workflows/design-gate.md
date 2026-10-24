@@ -16,7 +16,7 @@ Create a durable handoff record using `templates/design-handoff-template.md` and
 - User Story reference and the acceptance criteria covered;
 - a real Figma URL when Figma is available and appropriate, or a concrete repository artifact path/URL;
 - responsive behavior, interaction details, and applicable loading, empty, error, success, validation, accessibility and keyboard states;
-- the approver and durable approval evidence;
+- an explicit `Approval status: approved`, the approver, and durable approval evidence;
 - QA verification scope and evidence.
 
 Never invent a Figma URL. If Figma is unavailable or inappropriate, provide a concrete alternative such as an annotated wireframe or implementation-ready design specification. Explain the reason and record approval. An exception to Figma does not waive the requirement for a traceable artifact when design work is needed.
@@ -27,7 +27,8 @@ Frontend implementation must not begin while any of these is true:
 - the required handoff is missing;
 - the artifact is a placeholder or cannot be located;
 - acceptance criteria are not mapped to the handoff;
-- approval is missing;
+- approval status is not explicitly `approved`;
+- approval evidence or approver is missing;
 - a Figma exception lacks rationale or approval.
 
 The orchestrator owns the gate and must verify evidence rather than relying on an agent's statement. QA compares implementation against the approved handoff and records deviations or explicit non-applicability.
