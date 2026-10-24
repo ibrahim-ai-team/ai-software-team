@@ -20,6 +20,7 @@
 - Assumptions and open questions:
 
 ## Approval
+- Approval status: approved | pending
 - Approved by: <sponsor/designated decision authority>
 - Approval evidence: <issue/PR/comment/decision record link>
 - Approval date (UTC): <YYYY-MM-DD>
