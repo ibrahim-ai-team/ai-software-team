@@ -5,7 +5,6 @@ This hook protects direct file-editing tools. It is not an OS sandbox: arbitrary
 shell commands and external tools must be separately restricted for full isolation.
 """
 import json
-import os
 import subprocess
 import sys
 from pathlib import Path
