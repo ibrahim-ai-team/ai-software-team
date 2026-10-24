@@ -172,8 +172,7 @@ def acquire(path: Path, ttl_seconds: int) -> int:
             current = read_lock(path)
             if current is not None:
                 print(
-                    f"Lock held by PID {current['pid']} on {current['hostname']} "
-                    f"(holder: {current['holder']}).",
+                    f"Lock held by PID {current['pid']} on {current['hostname']} (holder: {current['holder']}).",
                     file=sys.stderr,
                 )
             return 2
