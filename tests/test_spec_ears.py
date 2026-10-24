@@ -12,6 +12,8 @@ def has_ears_requirement(spec_text: str) -> bool:
     """Return whether the spec contains at least one EARS requirement line."""
     for line in spec_text.splitlines():
         statement = line.strip()
+        if statement.startswith(("-", "*")):
+            statement = statement[1:].strip()
         if statement.startswith(EARS_PREFIXES) and "shall" in statement:
             return True
     return False
