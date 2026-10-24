@@ -4,7 +4,7 @@
     "agents": {
       "directory": ".claude/agents",
       "pattern": "*.md",
-      "minimum_count": 18,
+      "minimum_count": 19,
       "required": [
         "agile-orchestrator.md",
         "product-owner.md",
@@ -17,6 +17,7 @@
         "qa-automation.md",
         "devops-platform.md",
         "code-review-security.md",
+        "ci-verifier.md",
         "documentation-manager.md"
       ]
     },
