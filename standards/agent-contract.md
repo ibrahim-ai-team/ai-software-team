@@ -100,5 +100,3 @@ The BA does not decide business priority or scope and does not contact the spons
 4. A human approves at **CP1**. Agent validation never replaces human approval.
 
 Any PO/BA disagreement is escalated to the orchestrator; neither agent may assume the other's decision authority.
-
-
