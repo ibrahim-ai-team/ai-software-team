@@ -288,5 +288,7 @@ class ValidatorRegressionTests(unittest.TestCase):
             result = self.run_validator(copy)
             self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("Undocumented Claude Code-specific pattern", result.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()
