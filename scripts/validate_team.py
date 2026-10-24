@@ -303,7 +303,6 @@ required_files = [
     "tests/test_worktree.sh",
     "scripts/roi_report.py",
     ".claude/metrics/README.md",
-    ".claude/metrics/.gitkeep",
     "tests/test_roi_report.py",
 ]
 for relative in required_files:
