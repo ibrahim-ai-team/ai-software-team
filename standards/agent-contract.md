@@ -60,3 +60,39 @@ The orchestrator also acts as the team's GitHub operator: it alone writes Issues
 ## Scope enforcement
 
 Before any agent write, run `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`. The central `.claude/agent-scopes.json` is authoritative. Unknown agents, malformed configuration, forbidden paths, and paths outside the allowlist are denied. This preflight is not a sandbox; runtime/tool-level controls must also constrain writes. Scope denials must be reported and logged as telemetry with `action=error` and `details.refused_path`.
+
+
+## PO vs BA : séparation des responsabilités
+
+Les deux rôles collaborent par des hand-offs orchestrés, mais ils ne produisent pas le même artefact. Le **Product Owner (PO) est responsable de la valeur métier** ; le **Business Analyst (BA) est l'unique auteur de la spécification EARS finale**.
+
+### Product Owner — valeur métier
+
+Le PO décide et documente :
+- **Why** : pourquoi cette story est nécessaire et quel problème elle résout.
+- **For whom** : utilisateur/persona cible.
+- **Success metrics** : résultats mesurables qui définissent le succès.
+- **Priorité** : P0/P1/P2.
+- **Scope haut niveau** : éléments inclus et exclus (in/out).
+
+Le PO ne rédige pas la spécification EARS formelle, les scénarios Gherkin, les edge cases techniques ni la matrice de traçabilité. Il ne réécrit jamais la spec BA : il la valide au regard de la valeur métier et renvoie des commentaires précis si elle ne la reflète pas.
+
+### Business Analyst — traçabilité des exigences
+
+Le BA est l'unique auteur de la spec EARS finale et produit :
+- Les exigences EARS formelles avec les formes **When/If/While + shall**.
+- Les workflows, happy path, alternate paths et edge cases.
+- Les critères d'acceptation Gherkin.
+- La matrice de traçabilité requirement → test.
+- Le glossaire, les hypothèses et les questions ouvertes.
+
+Le BA ne décide ni de la priorité ni du scope métier et ne sollicite pas directement le sponsor. Si le brief, la priorité ou le scope manquent ou se contredisent, il escalade à l'orchestrateur, qui obtient la décision du PO ou du sponsor selon les règles d'autorité.
+
+### Règle d'assemblage et approbation
+
+1. Le PO fournit le brief de valeur métier (why, for whom, success metrics, priorité, scope haut niveau).
+2. Le BA utilise ce brief pour écrire et maintenir la spec EARS finale dans `templates/spec-ears.md`.
+3. Le PO valide la spec pour cohérence avec le brief et retourne des commentaires précis ; le BA effectue les modifications de spécification.
+4. L'humain approuve à **CP1**. La validation d'un agent ne remplace jamais cette approbation humaine.
+
+Toute divergence PO/BA est escaladée à l'orchestrateur ; aucun des deux agents ne s'attribue l'autorité de l'autre.
