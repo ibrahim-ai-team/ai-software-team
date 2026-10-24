@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Reconcile declared project state with observed telemetry and optional GitHub state.
 
 Claims in project-state.md are context, not proof. Only explicit, parseable
