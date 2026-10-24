@@ -81,5 +81,3 @@ Named acceptance checks pass; technical/security findings are dispositioned; PR-
 - `.claude/skills/documentation-session-handover/SKILL.md`
 
 Specialists follow `standards/agent-contract.md`; verify their returns against it.
-
-
