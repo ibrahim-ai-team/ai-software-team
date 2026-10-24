@@ -41,9 +41,7 @@ def next_lesson_id(existing: str) -> str:
     return f"L{max(numbers, default=0) + 1:03d}"
 
 
-def render_lesson(
-    lesson_id: str, title: str, context: str, error: str, rule: str, story: str
-) -> str:
+def render_lesson(lesson_id: str, title: str, context: str, error: str, rule: str, story: str) -> str:
     safe_title = " ".join(title.split())
     return (
         f"\n## {lesson_id} — {safe_title}\n\n"
