@@ -50,8 +50,8 @@ Allowed statuses: Draft, Ready, In Progress, Blocked, In Review, Done, Cancelled
 
 ## Active delegations
 
-| Delegation ID | Task ID | Owner | Branch/worktree | Scope/allowed paths | Expected output | Status | Evidence |
-|---|---|---|---|---|---|---|---|
+| Delegation ID | Task ID | Owner | Branch/worktree | Scope/allowed paths | Expected output | Status | run_id | session_id | Evidence |
+|---|---|---|---|---|---|---|---|---|---|
 
 Before dispatching, run `python scripts/check_claims.py <this file>`; it rejects two active claims on the same task, branch/worktree or overlapping paths.
 
