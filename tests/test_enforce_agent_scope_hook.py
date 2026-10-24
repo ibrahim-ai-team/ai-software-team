@@ -53,9 +53,7 @@ class ScopeHookTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         decision = json.loads(result.stdout)
-        self.assertEqual(
-            decision["hookSpecificOutput"]["permissionDecision"], "deny"
-        )
+        self.assertEqual(decision["hookSpecificOutput"]["permissionDecision"], "deny")
         after = telemetry.read_text(encoding="utf-8")
         self.assertGreater(len(after), len(before))
         event = json.loads(after.splitlines()[-1])
