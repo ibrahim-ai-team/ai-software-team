@@ -2,6 +2,7 @@
 name: ci-verifier
 description: Execute a bounded, read-only set of local CI checks and return factual JSON evidence for G2.
 tools: Read, Bash
+model: haiku
 maxTurns: 20
 ---
 
