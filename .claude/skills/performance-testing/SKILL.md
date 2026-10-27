@@ -12,6 +12,7 @@ Use when latency, throughput, concurrency, capacity, resource efficiency, or per
 ## Required inputs
 
 Measurable performance requirements (latency, throughput, budgets), a representative environment and data set, and the baseline to compare with.
+
 ## Procedure
 
 1. Define target journeys/endpoints, workload assumptions, concurrency, ramp-up, duration, test data, and explicit pass/fail thresholds.

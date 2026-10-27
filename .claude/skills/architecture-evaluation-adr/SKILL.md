@@ -12,6 +12,7 @@ Use this skill during architecture design when boundaries, quality attributes, d
 ## Required inputs
 
 Requirements and quality attributes (NFRs), constraints (budget, hosting, team skills), existing ADRs, and the decision to be made.
+
 ## Procedure
 
 Start from requirements and quality attributes. Compare viable options against constraints, costs, security, operability, and reversibility. Record context, alternatives, decision, consequences, and evidence in an ADR.

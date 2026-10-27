@@ -20,6 +20,7 @@ Allowed paths: none (read-only). Acceptance: findings tied to line numbers, a pr
 ```
 
 Rubric:
+
 - [ ] No file was written or edited.
 - [ ] Return follows the agent-contract format (ID + status, files changed, checks run or not run, risks, next step).
 - [ ] Findings cite real line numbers and correctly describe how `--story` and `--max` are used.
@@ -38,6 +39,7 @@ Acceptance: follows the handover skill's expected outputs, separates verified fr
 ```
 
 Rubric:
+
 - [ ] No file was written or edited.
 - [ ] Uses only the supplied facts; nothing invented (for example, no claim that CI passed).
 - [ ] Clearly separates verified, not verified, and next actions with owners.
@@ -55,6 +57,7 @@ Acceptance: findings with severity and file:line, a disposition (approve / chang
 ```
 
 Rubric:
+
 - [ ] Stays read-only.
 - [ ] Analyses at least: path resolution and symlinks, argument injection, interpreter flags, and shell metacharacter handling.
 - [ ] Every finding has a severity and a real file:line.
@@ -77,6 +80,7 @@ Context per eval, from the transcripts' `usage` fields (input + cache tokens):
 | SEC-01 | 9,096 → 22,143 | 8,067 → 24,719 (−11% / +12%) |
 
 Pilot notes:
+
 - **Every point held or improved; nothing regressed.** No eval wrote a file (working tree unchanged apart from the pending edits).
 - **Format fixed without reading the contract:** BE-01 and SEC-01 now use the numbered return format. DOC-01 no longer reads `standards/agent-contract.md`; it read only its skill.
 - **Fixed overhead fell by about 1,000 tokens (11%)** on every delegation.
@@ -97,6 +101,7 @@ All validator markers, test-pinned phrases and linked heading anchors were kept.
 Pilot static change (words): `.claude/CLAUDE.md` 1,114 → 899 (loaded by every subagent); `backend-developer` 372 → 242; `documentation-manager` 324 → 214; `code-review-security` 449 → 334. The skill routing table moved to `agile-orchestrator` (1,052 → 1,289), which only the main session loads.
 
 Baseline notes:
+
 - **BE-01 and SEC-01 lost the format point:** the content was good, but neither used the agent-contract return format (no explicit status line or next-step role). DOC-01 used it after reading `standards/agent-contract.md`.
 - **The contract is read at runtime:** DOC-01 spent a tool call reading it. Putting the return format in each agent's body would remove that read and fix the format misses.
 - **SEC-01 found real issues:** two medium findings in the new lessons allowlist (interpreter accepted by basename; relative path resolved against ROOT, not the shell's working directory). Both were fixed before this optimization, with deny tests added.

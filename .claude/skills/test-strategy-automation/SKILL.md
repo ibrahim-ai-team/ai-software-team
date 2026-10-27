@@ -12,6 +12,7 @@ Use this skill when defining a test strategy, selecting automation targets, inve
 ## Required inputs
 
 The acceptance criteria and risk, the existing test levels and commands, the environments and test data available, and the CI constraints.
+
 ## Procedure
 
 Map acceptance criteria to test levels. Prioritize fast unit, integration/contract, and API tests where appropriate; add UI and end-to-end tests for critical user journeys. Isolate data, avoid flakiness, and report evidence and gaps.

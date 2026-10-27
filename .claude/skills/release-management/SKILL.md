@@ -12,6 +12,7 @@ Use when a set of changes is being considered for release, a release candidate n
 ## Required inputs
 
 The release scope (PRs/commits), the release criteria table and decision IDs from the project state, CI and QA evidence, known defects, and the rollback path.
+
 ## Procedure
 
 1. Confirm release scope, target environment, versioning policy, window, owners, and approval requirements.

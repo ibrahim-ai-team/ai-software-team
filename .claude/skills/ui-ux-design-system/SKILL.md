@@ -12,6 +12,7 @@ Mandatory before frontend implementation for a new user journey, material layout
 ## Required inputs
 
 The user stories and journeys, the target devices and accessibility level, and the existing design system or brand constraints.
+
 ## Procedure
 
 1. Read the approved User Story and acceptance criteria; record the story link and acceptance criteria covered in the handoff.

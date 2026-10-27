@@ -12,6 +12,7 @@ Use when a service needs operational readiness, diagnosability, reliability targ
 ## Required inputs
 
 The service's user journeys, the reliability objectives or the decision that none apply, the current telemetry and alerting, and the deployment model.
+
 ## Procedure
 
 1. Identify critical user journeys, dependencies, failure modes, data sensitivity, and operational owners.

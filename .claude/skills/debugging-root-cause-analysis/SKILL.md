@@ -12,6 +12,7 @@ Use this skill for a bug, failing check, flaky test, unexpected behavior, or rec
 ## Required inputs
 
 A reproduction (failing test, CI log or steps), the commit or environment where it fails, and the last known good state if any.
+
 ## Procedure
 
 Reproduce the issue, capture observable evidence, narrow hypotheses, and change one variable at a time. Distinguish root cause from symptoms. Add a regression check and document what was verified.

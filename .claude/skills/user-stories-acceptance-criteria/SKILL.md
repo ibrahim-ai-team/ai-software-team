@@ -12,6 +12,7 @@ Use this skill when converting requirements into backlog items, splitting oversi
 ## Required inputs
 
 The requirement or problem statement, the persona, the approved scope and the decisions that bound it, and the known edge cases.
+
 ## Procedure
 
 Describe user, capability, and value. Add Given/When/Then acceptance criteria, edge cases, dependencies, and test notes. Ensure stories are independently reviewable and small enough to complete within a planned increment.

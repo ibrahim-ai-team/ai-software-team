@@ -12,6 +12,7 @@ Use for new/changed user interfaces, forms, dialogs, navigation, interactive com
 ## Required inputs
 
 The UI change or design (diff, screenshots or running build), the target conformance level (default WCAG 2.2 AA), and the user journeys in scope. If none is available, report what cannot be reviewed.
+
 ## Procedure
 
 1. Identify applicable accessibility requirements and the tested page/component scope.

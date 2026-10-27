@@ -12,6 +12,7 @@ Use this skill when recommending or choosing a language, framework, database, ho
 ## Required inputs
 
 Requirements and NFRs, constraints (hosting, budget, licensing, team skills), the options to compare, and any existing ADRs.
+
 ## Procedure
 
 Capture functional and non-functional needs, team skills, deployment constraints, ecosystem maturity, licensing, cost, security, and operational burden. Prefer free and open-source tools and free tiers (OSI-licensed libraries, GitHub Actions within the free minutes, free hosting tiers). Any paid service, plan or usage-based billing is a sponsor decision: list it with its free alternative. Compare a shortlist transparently; state assumptions and avoid premature commitment.

@@ -12,6 +12,7 @@ Use this skill for repository changes, branch/commit strategy, pull requests, CI
 ## Required inputs
 
 The target repository and branch, the linked issue, the base branch state, and the permission boundary (no merge, no push to the default branch).
+
 ## Procedure
 
 Inspect status and diffs before changes. Use focused branches and descriptive commits, and report checks skipped.
