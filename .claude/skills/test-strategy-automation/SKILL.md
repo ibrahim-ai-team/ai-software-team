@@ -1,6 +1,6 @@
 ---
 name: test-strategy-automation
-description: Use when planning test levels, automation coverage, or quality gates.
+description: Designs a risk-based test approach across test levels, automation and quality gates. Use when planning or writing tests or defining quality gates.
 ---
 
 # Design a risk-based testing approach

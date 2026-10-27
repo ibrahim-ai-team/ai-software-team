@@ -1,6 +1,6 @@
 ---
 name: architecture-evaluation-adr
-description: Use when comparing architecture options or recording consequential decisions.
+description: Compares architecture options against quality attributes and records the decision as an ADR. Use when choosing system boundaries or making a consequential, hard-to-reverse technical decision.
 ---
 
 # Evaluate architecture choices and record decisions

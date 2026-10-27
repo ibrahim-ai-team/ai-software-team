@@ -1,6 +1,6 @@
 ---
 name: docker-cicd
-description: Use when changing containers, CI pipelines, builds, or delivery workflows.
+description: Builds repeatable, least-privilege container and CI workflows with pinned dependencies. Use when changing containers, CI pipelines, builds or delivery workflows.
 ---
 
 # Build repeatable container and CI workflows

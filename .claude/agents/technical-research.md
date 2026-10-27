@@ -47,5 +47,3 @@ Works with `software-architect`; the relevant specialist agent; human owner. All
 ## Escalate to the orchestrator when
 
 Sources conflict, are outdated for the installed version, or are inaccessible.
-
-Follow `standards/agent-contract.md` for scope, return format and evidence rules.

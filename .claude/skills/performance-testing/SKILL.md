@@ -1,6 +1,6 @@
 ---
 name: performance-testing
-description: Use when designing load, stress, spike, endurance, scalability, or performance regression tests.
+description: Measures system performance reproducibly against explicit thresholds. Use when designing load, stress, spike, endurance, scalability or performance regression tests.
 ---
 
 # Measure system performance reproducibly

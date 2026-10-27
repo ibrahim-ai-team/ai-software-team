@@ -1,6 +1,6 @@
 ---
 name: ui-ux-design-system
-description: Use when defining user flows, screen structure, interaction behavior, responsive layouts, or reusable design-system patterns.
+description: Designs implementation-ready user flows, screens, interactions, responsive layouts and design-system patterns. Use before building a new journey or a material UI change.
 ---
 
 # Design implementation-ready user experiences

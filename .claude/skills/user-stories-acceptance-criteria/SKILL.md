@@ -1,6 +1,6 @@
 ---
 name: user-stories-acceptance-criteria
-description: Use when creating small stories and testable acceptance criteria.
+description: Writes small, independent user stories with testable acceptance criteria. Use when creating or refining backlog stories.
 ---
 
 # Write small, testable user stories

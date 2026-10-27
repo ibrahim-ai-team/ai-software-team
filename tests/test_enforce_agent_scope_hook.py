@@ -84,8 +84,9 @@ class ScopeHookTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "")
 
-    def bash_decision(self, command):
-        result = invoke({"tool_name": "Bash", "agent_type": "agile-orchestrator", "tool_input": {"command": command}})
+    def bash_decision(self, command, cwd=str(ROOT)):
+        payload = {"tool_name": "Bash", "agent_type": "agile-orchestrator", "cwd": cwd, "tool_input": {"command": command}}
+        result = invoke(payload)
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] if result.stdout else "allow"
 
@@ -108,9 +109,26 @@ class ScopeHookTests(unittest.TestCase):
             "python3 scripts/relevant_lessons.py --story S1 --max -1",
             "python3 scripts/relevant_lessons.py --story S1 > out.txt",
             "python3 -m scripts.relevant_lessons --story S1",
+            "./python3 scripts/relevant_lessons.py --story S1",
+            "/tmp/x/python3 scripts/relevant_lessons.py --story S1",
+            # Shell expansion: bash would run something other than what shlex shows the hook.
+            "python3 {-c,x}/../scripts/relevant_lessons.py --story S1",
+            "python3 */../scripts/relevant_lessons.py --story S1",
+            "python3 ~/../scripts/relevant_lessons.py --story S1",
+            "python3 scripts/relevant_lessons.py --story S$IFS-c",
+            "python3 scripts/./relevant_lessons.py --story S1",
+            "python3  scripts/relevant_lessons.py --story S1",
+            "python3 scripts/relevant_lessons.py --story S1 --max ²",
         ):
             with self.subTest(command=command):
                 self.assertEqual(self.bash_decision(command), "deny")
+
+    def test_relative_lessons_lookup_requires_repository_cwd(self):
+        command = "python3 scripts/relevant_lessons.py --story S1"
+        self.assertEqual(self.bash_decision(command, cwd="/tmp"), "deny")
+        self.assertEqual(self.bash_decision(command, cwd=None), "deny")
+        absolute = f"python3 {ROOT / 'scripts/relevant_lessons.py'} --story S1"
+        self.assertEqual(self.bash_decision(absolute, cwd="/tmp"), "allow")
 
     def test_non_write_tool_is_ignored(self):
         result = invoke(

@@ -1,6 +1,6 @@
 ---
 name: api-design-documentation
-description: Use when defining API contracts, schemas, errors, or compatibility.
+description: Designs consistent, secure API contracts with schemas, error models and compatibility rules. Use when defining or changing an API contract or its documentation.
 ---
 
 # Design consistent and secure APIs

@@ -48,5 +48,3 @@ Breakdown: every task is small, owned, path-bounded and testable, with dependenc
 ## Escalate to the orchestrator when
 
 The architecture cannot meet a requirement, a task cannot be made small or independent, the diff or evidence needed for a review is missing (return `BLOCKED`), or a decision would change scope, cost or security posture.
-
-Follow `standards/agent-contract.md` for return format and evidence rules.

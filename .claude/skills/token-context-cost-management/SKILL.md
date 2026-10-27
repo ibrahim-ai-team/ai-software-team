@@ -1,6 +1,6 @@
 ---
 name: token-context-cost-management
-description: Use when bounding agent delegation, context usage, or execution cost.
+description: Keeps delegations bounded and context small to save subscription usage. Use when planning delegations, managing context pressure or controlling execution cost.
 ---
 
 # Manage context and usage efficiently

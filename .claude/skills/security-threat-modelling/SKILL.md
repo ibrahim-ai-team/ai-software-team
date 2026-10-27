@@ -1,6 +1,6 @@
 ---
 name: security-threat-modelling
-description: Use when reviewing trust boundaries, sensitive flows, or security risks.
+description: Identifies trust boundaries, threats and abuse cases and ranks mitigations by risk. Use when designing or reviewing authentication, authorization, sensitive data flows, secrets or other security-relevant changes.
 ---
 
 # Identify threats and prioritize mitigations

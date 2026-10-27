@@ -1,6 +1,6 @@
 ---
 name: technology-stack-selection
-description: Use when selecting frameworks, platforms, or infrastructure technologies.
+description: Chooses technologies only after requirements, favoring free and open-source options with documented trade-offs. Use when selecting frameworks, platforms or infrastructure.
 ---
 
 # Choose technologies only after requirements

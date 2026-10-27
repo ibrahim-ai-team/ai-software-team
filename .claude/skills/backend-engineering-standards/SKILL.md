@@ -1,6 +1,6 @@
 ---
 name: backend-engineering-standards
-description: Use when implementing server-side business logic, APIs, or authorization.
+description: Implements testable server-side logic with trust-boundary validation, server-side authorization and safe errors. Use when implementing business logic, APIs, integrations or authorization-sensitive code.
 ---
 
 # Implement maintainable and secure backend behavior

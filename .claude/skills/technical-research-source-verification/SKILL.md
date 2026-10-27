@@ -1,6 +1,6 @@
 ---
 name: technical-research-source-verification
-description: Use when verifying technical claims, versions, or vendor capabilities.
+description: Researches technical claims against current primary sources and cites them. Use when verifying versions, vendor capabilities or any technical claim.
 ---
 
 # Research technical claims responsibly

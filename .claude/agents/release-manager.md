@@ -64,6 +64,4 @@ Any go/no-go item lacks evidence, or a release step needs the sponsor (tags, pub
 
 ## Worktree isolation
 
-Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
-
-Follow `standards/agent-contract.md` for scope, return format and evidence rules.
+Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `release-manager` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.

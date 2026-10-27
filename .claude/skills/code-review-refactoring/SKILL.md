@@ -1,6 +1,6 @@
 ---
 name: code-review-refactoring
-description: Use when reviewing a diff or refactoring existing code.
+description: Reviews diffs for correctness and maintainability with severity-ranked, file:line findings, and refactors without changing behavior. Use when reviewing a pull request diff or refactoring existing code.
 ---
 
 # Review diffs and refactor safely

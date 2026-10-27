@@ -34,11 +34,9 @@ CI workflows, container/deployment configuration, runbooks, operational risks, a
 
 ## Relevant skills
 
-- `.claude/skills/docker-cicd/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
-- `.claude/skills/git-github-workflows/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
-- `.claude/skills/security-threat-modelling/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
-- `.claude/skills/documentation-session-handover/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
+Read only the one that matches the task:
 
+- `.claude/skills/docker-cicd/SKILL.md`- `.claude/skills/git-github-workflows/SKILL.md`- `.claude/skills/security-threat-modelling/SKILL.md`- `.claude/skills/documentation-session-handover/SKILL.md`
 ## Definition of done
 
 - CI/CD or environment change is on the assigned branch and its workflow ran (link) or is marked not run.
@@ -59,8 +57,4 @@ A change needs secrets, paid services, new permissions, a remote repository or p
 
 ## Worktree isolation
 
-Before every write, verify that the target path is authorized by `.claude/agent-scopes.json` using `python scripts/enforce_agent_scope.py --agent devops-platform --path <path>`. If unsure, ask the orchestrator to run the check. Never write to a forbidden path even if the brief requests it.
-
-Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
-
-Follow `standards/agent-contract.md` for scope, return format and evidence rules.
+Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `devops-platform` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.

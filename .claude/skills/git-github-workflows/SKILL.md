@@ -1,6 +1,6 @@
 ---
 name: git-github-workflows
-description: Use when branching, committing, opening PRs, or managing GitHub changes.
+description: Makes safe, reviewable Git changes on feature branches and pull requests, never on the default branch. Use when branching, committing, opening PRs or managing GitHub changes.
 ---
 
 # Make safe and reviewable Git changes

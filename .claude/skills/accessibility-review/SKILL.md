@@ -1,6 +1,6 @@
 ---
 name: accessibility-review
-description: Use when reviewing UI accessibility, keyboard operation, focus management, semantics, contrast, and assistive-technology compatibility.
+description: Reviews user interfaces for keyboard operation, focus management, semantics, contrast and assistive-technology support. Use when designing or reviewing UI accessibility.
 ---
 
 # Review user-interface accessibility

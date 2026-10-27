@@ -1,6 +1,6 @@
 ---
 name: debugging-root-cause-analysis
-description: Use when diagnosing a reproducible defect or unstable test.
+description: Finds root causes from reproduction and evidence before fixing. Use when diagnosing a reproducible defect, a failing build or an unstable test.
 ---
 
 # Find root causes with evidence

@@ -31,10 +31,9 @@ You alone write and maintain the final EARS specification in `templates/spec-ear
 
 ## Relevant skills
 
-- `.claude/skills/requirements-analysis/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
-- `.claude/skills/user-stories-acceptance-criteria/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
-- `.claude/skills/agile-planning/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
+Read only the one that matches the task:
 
+- `.claude/skills/requirements-analysis/SKILL.md`- `.claude/skills/user-stories-acceptance-criteria/SKILL.md`- `.claude/skills/agile-planning/SKILL.md`
 ## Definition of done
 
 - Every requirement is testable and traced to a story.
@@ -51,8 +50,4 @@ Requirements conflict, a business rule needs the sponsor's judgement, or a depen
 
 ## Worktree isolation
 
-Before every write, verify that the target path is authorized by `.claude/agent-scopes.json` using `python scripts/enforce_agent_scope.py --agent business-analyst --path <path>`. If unsure, ask the orchestrator to run the check. Never write to a forbidden path even if the brief requests it.
-
-Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
-
-Follow `standards/agent-contract.md` for scope, return format and evidence rules.
+Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `business-analyst` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.

@@ -1,6 +1,6 @@
 ---
 name: database-modelling-migrations
-description: Use when designing schemas, queries, data integrity, or migrations.
+description: Models data and evolves schemas with reversible, safe migrations and integrity constraints. Use when designing schemas, queries, data integrity rules or migrations.
 ---
 
 # Model data and evolve schemas safely

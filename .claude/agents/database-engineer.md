@@ -29,10 +29,9 @@ Data model, migration scripts, query guidance, integrity tests.
 
 ## Relevant skills
 
-- `.claude/skills/database-modelling-migrations/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
-- `.claude/skills/security-threat-modelling/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
-- `.claude/skills/debugging-root-cause-analysis/SKILL.md` — consult when the task matches this domain; follow its concrete procedure and report its outputs.
+Read only the one that matches the task:
 
+- `.claude/skills/database-modelling-migrations/SKILL.md`- `.claude/skills/security-threat-modelling/SKILL.md`- `.claude/skills/debugging-root-cause-analysis/SKILL.md`
 ## Definition of done
 
 - Schema/migration is reversible or the irreversibility is flagged.
@@ -49,8 +48,4 @@ A migration would lose data, needs downtime, or conflicts with another task's sc
 
 ## Worktree isolation
 
-Before every write, verify that the target path is authorized by `.claude/agent-scopes.json` using `python scripts/enforce_agent_scope.py --agent database-engineer --path <path>`. If unsure, ask the orchestrator to run the check. Never write to a forbidden path even if the brief requests it.
-
-Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
-
-Follow `standards/agent-contract.md` for scope, return format and evidence rules.
+Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `database-engineer` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.

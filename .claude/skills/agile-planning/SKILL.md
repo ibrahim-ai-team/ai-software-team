@@ -1,6 +1,6 @@
 ---
 name: agile-planning
-description: Use when sequencing work, planning a sprint, or managing delivery dependencies.
+description: Plans small, reviewable increments with explicit dependencies and capacity. Use when sequencing work, planning a sprint, or managing delivery dependencies.
 ---
 
 # Plan small, reviewable increments

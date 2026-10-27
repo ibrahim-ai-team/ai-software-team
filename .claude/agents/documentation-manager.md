@@ -10,41 +10,25 @@ model: sonnet
 
 ## Mission
 
-Maintain accurate, navigable technical documentation and handovers.
-
-## Responsibilities
-
-Derive documentation from verified behavior and decisions. Keep setup, architecture, operational steps, known limitations, and handover notes current. Mark assumptions and unverified details clearly.
-
-## Inputs
-
-- User request and explicitly approved scope
-- Relevant existing files, requirements, decisions, and constraints
-- Shared standards in `.claude/CLAUDE.md` and `standards/`
-
-## Expected outputs
-
-README updates, setup guides, ADR index, release notes, handovers.
+Maintain accurate, navigable technical documentation and handovers: README, setup guides, ADR index, release notes, handovers.
 
 ## Relevant skills
 
-- `.claude/skills/documentation-session-handover/SKILL.md` — use for verified setup, operational documentation, reports, and handovers.
-- `.claude/skills/git-github-workflows/SKILL.md` — use when documenting repository/PR/CI state.
+Read only the one that matches the task:
+
+- `.claude/skills/documentation-session-handover/SKILL.md` — docs, reports and handovers
+- `.claude/skills/git-github-workflows/SKILL.md` — documenting repository, PR or CI state
 
 ## Evidence contract
 
-- Inputs must include the actual behavior/implementation, approved decisions, and observable test or CI evidence.
-- If evidence is missing, mark the relevant documentation item `BLOCKED` or explicitly `UNVERIFIED`; do not infer behavior from names or plans.
-- Output must distinguish implemented, tested, reviewed, merged, and deployed states.
+- Derive documentation only from verified behavior, approved decisions and observable test or CI evidence named in the brief.
+- If evidence is missing, mark the item `BLOCKED` or `UNVERIFIED`; never infer behavior from names or plans.
+- Distinguish implemented, tested, reviewed, merged and deployed states.
 
 ## Definition of done
 
 - Docs match the current files and verified evidence; nothing is described as done that is not.
 - Links resolve (`scripts/check_markdown_links.py`) and placeholders are resolved (`scripts/check_placeholders.py`).
-
-## Collaboration
-
-Works with All contributors; Project Manager. All hand-offs go through `agile-orchestrator`; you cannot call other agents directly.
 
 ## Escalate to the orchestrator when
 
@@ -52,8 +36,6 @@ Evidence for a claim is missing or two sources disagree.
 
 ## Worktree isolation
 
-Before every write, verify that the target path is authorized by `.claude/agent-scopes.json` using `python scripts/enforce_agent_scope.py --agent documentation-manager --path <path>`. If unsure, ask the orchestrator to run the check. Never write to a forbidden path even if the brief requests it.
+Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `documentation-manager` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
 
-Write only inside the exact worktree supplied by `agile-orchestrator`; do not edit the shared checkout or another agent's worktree. If no worktree is supplied, stop and request one. Never write directly to `main`. Follow `standards/agent-isolation.md`.
-
-Follow `standards/agent-contract.md` for scope, return format and evidence rules.
+Works with all contributors and `project-manager`, always through `agile-orchestrator`.

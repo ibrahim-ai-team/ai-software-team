@@ -1,6 +1,6 @@
 ---
 name: requirements-analysis
-description: Use when turning a request into scoped, testable requirements.
+description: Turns requests into scoped, testable requirements with assumptions and open questions. Use when clarifying product needs or functional requirements.
 ---
 
 # Turn requests into testable requirements

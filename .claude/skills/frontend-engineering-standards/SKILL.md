@@ -1,6 +1,6 @@
 ---
 name: frontend-engineering-standards
-description: Use when implementing UI components, client behavior, or accessibility.
+description: Builds accessible, robust UI components and client behavior from an approved design. Use when implementing frontend code.
 ---
 
 # Build accessible and robust interfaces

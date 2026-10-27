@@ -1,6 +1,6 @@
 ---
 name: release-management
-description: Use when preparing a release plan, version, changelog, go/no-go recommendation, rollback plan, or post-release verification.
+description: Coordinates evidence-based releases and prepares the human go/no-go decision. Use when preparing a release plan, version, changelog, rollback plan or post-release verification.
 ---
 
 # Coordinate evidence-based releases
