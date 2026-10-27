@@ -11,8 +11,7 @@ Use this skill for server-side behavior, endpoints, integrations, data access, a
 
 ## Required inputs
 
-The delegation (task ID, allowed paths, acceptance checks), the approved architecture/ADRs, the API contract, and the existing test commands. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The delegation (task ID, allowed paths, acceptance checks), the approved architecture/ADRs, the API contract, and the existing test commands.
 ## Procedure
 
 Keep business rules testable, validate at trust boundaries, authorize every sensitive operation server-side, handle errors consistently, avoid leaking secrets, and test normal and failure paths. Do not assume a framework.

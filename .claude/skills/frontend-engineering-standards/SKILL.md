@@ -11,8 +11,7 @@ Use this skill when building or changing user-facing screens, components, client
 
 ## Required inputs
 
-The delegation (task ID, allowed paths, acceptance checks), the design specification from `ui-ux-designer`, the accessibility target, and the existing test commands. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The delegation (task ID, allowed paths, acceptance checks), the design specification from `ui-ux-designer`, the accessibility target, and the existing test commands.
 ## Procedure
 
 Implement responsive, semantic UI with keyboard accessibility and clear loading, empty, error, success, and validation states. Keep components focused and test key interactions. Never rely on client checks for authorization.

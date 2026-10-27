@@ -11,8 +11,7 @@ Use this skill when the answer depends on current technical facts, tool capabili
 
 ## Required inputs
 
-The exact claim or question, the versions in use, and the decision the answer will inform. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The exact claim or question, the versions in use, and the decision the answer will inform.
 ## Procedure
 
 Prefer official documentation and primary sources. Verify product/version/date, compare independent evidence where useful, distinguish facts from inference, and cite links. Never fabricate sources, benchmarks, or capabilities.

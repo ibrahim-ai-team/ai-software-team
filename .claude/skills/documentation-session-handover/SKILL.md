@@ -11,8 +11,7 @@ Use this skill when updating README/setup/operations docs, recording decisions, 
 
 ## Required inputs
 
-The reconciled project state, the delegation records and their evidence (PRs, CI runs), and the open decisions and blockers. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The reconciled project state, the delegation records and their evidence (PRs, CI runs), and the open decisions and blockers.
 ## Procedure
 
 Document verified setup, decisions, changed files, checks and exact outcomes, unresolved questions, blockers, and the next one to three actions. Label assumptions and unverified runtime behavior.

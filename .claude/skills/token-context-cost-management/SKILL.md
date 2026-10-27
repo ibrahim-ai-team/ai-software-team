@@ -11,8 +11,7 @@ Use this skill before multi-agent tasks, long sessions, large research jobs, or 
 
 ## Required inputs
 
-The task to delegate, the session and usage limits in `standards/sprint-sizing.md`, and the context already established that the delegate needs. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The task to delegate, the session and usage limits in `standards/sprint-sizing.md`, and the context already established that the delegate needs.
 ## Procedure
 
 Work within the Claude Pro subscription's five-hour and weekly usage limits; never switch to API billing or buy extra usage. Break work into bounded tasks, load only relevant files, reuse existing skills and templates, summarize durable decisions, and hand off concise context. Run one delegation at a time and avoid redundant agent calls. Apply the token-saving practices and stop rules in `standards/sprint-sizing.md`, and stop to ask when missing information changes the result.

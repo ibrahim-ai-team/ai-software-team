@@ -84,6 +84,16 @@ Pilot notes:
 
 Rollout (same transformations as the pilot): the 13 remaining specialists with boilerplate lost the generic skill suffix, the repeated worktree paragraph and the contract pointer. The 19 remaining skill descriptions were rewritten as "what it does, then when to use it". `ci-verifier` and `github-integration` keep their bodies (low-freedom roles). CLAUDE.md now states that an agent's own output format, such as `ci-verifier` JSON, takes precedence. Totals: specialist bodies 8,841 → 7,950 words; CLAUDE.md 1,114 → 912. The rollout agents were not re-evaluated individually; rerun this file after the next session start to confirm.
 
+Full-depth pass (2026-10-28), same treatment as the pilot for every role, skill and workflow:
+
+| Area | Words before → after | What changed |
+| --- | --- | --- |
+| 17 specialists (excluding `ci-verifier`, `github-integration`) | 7,566 → 5,579 (−26%) | Generic Inputs/Expected outputs lists folded into one line; collaboration lines shortened; per-skill hints; every safety, domain and test-pinned rule kept verbatim where tests require it |
+| 23 skills | 4,763 → 4,620 | The repeated missing-input sentence removed (now in CLAUDE.md); duplicated git rules removed; descriptions grew for the what+when form; "When to use" kept (specific triggers, validator-required) |
+| Workflows | 10,466 → 9,029 (−14%) | `orchestration-contract.md` −13% (a literal `\n\n` heading bug fixed, GitHub delegation stated once); `agile-agent-delivery.md` −20% (sections owned by the contract now link to it); `project-bootstrap.md` −27% (duplicate discovery and worktree sections and a duplicated "Gate 1" removed); `future-project-workflow.md` −43% (now an index). `backlog-quality-gates.md`, `project-status-transitions.md`, `sprint-execution-checklist.md` and `design-gate.md` were already single-source and are unchanged; `sprint-governance.md` had one paragraph tightened |
+
+All validator markers, test-pinned phrases and linked heading anchors were kept.
+
 Pilot static change (words): `.claude/CLAUDE.md` 1,114 → 899 (loaded by every subagent); `backend-developer` 372 → 242; `documentation-manager` 324 → 214; `code-review-security` 449 → 334. The skill routing table moved to `agile-orchestrator` (1,052 → 1,289), which only the main session loads.
 
 Baseline notes:

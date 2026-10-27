@@ -11,8 +11,7 @@ Use this skill during discovery or when requirements are incomplete, ambiguous, 
 
 ## Required inputs
 
-The idea or request, the users and their goals, known constraints, and the latest sponsor decisions that bound the scope. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The idea or request, the users and their goals, known constraints, and the latest sponsor decisions that bound the scope.
 ## Procedure
 
 Clarify users, goals, in-scope and out-of-scope behavior, constraints, permissions, data, edge cases, failure modes, and measurable acceptance criteria. Separate facts, assumptions, decisions, and open questions.

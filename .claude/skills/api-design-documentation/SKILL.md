@@ -11,8 +11,7 @@ Use this skill when creating or changing an HTTP/API contract, integration bound
 
 ## Required inputs
 
-The requirement or story the API serves, the consumers, existing contracts and versioning policy, and the error and authorization model. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The requirement or story the API serves, the consumers, existing contracts and versioning policy, and the error and authorization model.
 ## Procedure
 
 Define resources, methods, request/response schemas, status codes, validation, authentication, authorization, pagination, idempotency, versioning, and error format. Document examples and compatibility risks. Test contracts.

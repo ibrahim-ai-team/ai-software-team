@@ -11,8 +11,7 @@ Use this skill when assessing a PR/diff for defects, maintainability, security i
 
 ## Required inputs
 
-The actual diff or PR head commit, the linked issue and acceptance criteria, CI results, and the author (the reviewer must not be the author). If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The actual diff or PR head commit, the linked issue and acceptance criteria, CI results, and the author (the reviewer must not be the author).
 ## Procedure
 
 Review actual changes for correctness, readability, coupling, duplication, testability, and regressions. Report evidence-based findings with severity and file/line. Refactor in small steps and rerun relevant checks.

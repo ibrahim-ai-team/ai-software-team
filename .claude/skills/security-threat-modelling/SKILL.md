@@ -11,8 +11,7 @@ Use this skill before implementing authentication/authorization, sensitive data 
 
 ## Required inputs
 
-The data flows and trust boundaries, the assets and data classification, authentication/authorization design, and the external integrations. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
-
+The data flows and trust boundaries, the assets and data classification, authentication/authorization design, and the external integrations.
 ## Procedure
 
 Map assets, trust boundaries, actors, entry points, and sensitive flows. Consider spoofing, tampering, repudiation, information disclosure, denial of service, and privilege escalation. Rank risks and propose practical mitigations.
