@@ -11,6 +11,7 @@
 - **Branch / worktree:**
 - **Allowed paths (exact directories/files):**
 - **Size / points:** XS / S / M / L (1 / 2 / 3 / 5); XL (8) must be split
+- **Model tier:** light / standard / premium; agent default or override (primary skill + rule applied, per `docs/model-routing-decision.md`)
 - **Turn cap (agent `maxTurns`):**
 - **Turn cap hit:** yes / no
 - **Re-delegations after hitting the turn cap (max 1):**

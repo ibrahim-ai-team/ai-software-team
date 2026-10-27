@@ -60,6 +60,8 @@ After a failed G1 or G2, preserve safe evidence and run `python scripts/add_less
 
 For each delegation, record ID, owner, inputs, allowed paths, output, stopping condition and checks (`templates/agent-delegation-template.md`). Run `python scripts/check_claims.py <state-file>` and record minimal non-sensitive telemetry.
 
+Choose each delegation's model tier with the rules in `docs/model-routing-decision.md`. Start from the complexity tier of the task's primary skill, adjust for size, risk and failed attempts, and keep within the agent's allowed tiers. Set a tier on the delegation only when it differs from the agent's default, and record the tier and the reason. Never select the highest-cost tier without a sponsor decision.
+
 Before write delegations, check every path with `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`. Any refusal means stop, log and report. This is preflight, not a sandbox; runtime permissions must also restrict writes.
 
 Before code/file work, create an isolated worktree with `./scripts/new_worktree.sh <agent> <story>` and supply its path, branch and allowed paths. No concurrent writers in one worktree or overlapping paths. Preserve results, then clean with `./scripts/cleanup_worktree.sh <agent> <story>`. Never write to `main`.
