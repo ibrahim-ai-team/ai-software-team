@@ -123,6 +123,44 @@ class ScopeHookTests(unittest.TestCase):
             with self.subTest(command=command):
                 self.assertEqual(self.bash_decision(command), "deny")
 
+    def test_read_only_commands_stay_allowed(self):
+        for command in (
+            "git status",
+            "git diff --stat",
+            "git log --oneline -3",
+            "ruff check scripts",
+            "find . -name x",
+            "ls -la",
+        ):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command), "allow")
+
+    def test_path_qualified_commands_and_write_options_are_denied(self):
+        for command in (
+            "/tmp/x/git status",
+            "./ls",
+            "/usr/bin/cat README.md",
+            "git diff --output=out.txt",
+            "git log --output out.txt",
+            "git diff --ext-diff",
+            "git log -p --textconv",
+            "ruff check --fix scripts",
+            "ruff check --fix-only scripts",
+            "ruff check --output-file=out.txt scripts",
+            "ruff check -oout.txt scripts",
+            "gitleaks detect --report-path=out.json",
+            "gitleaks detect -r out.json",
+            "find . -fprint out.txt",
+            "find . -fprintf out.txt %p",
+            "find . -fls out.txt",
+            "find . -ok rm {}",
+            "find . -okdir rm {}",
+            "find . -exec rm {}",
+            "find . -delete",
+        ):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command), "deny")
+
     def test_relative_lessons_lookup_requires_repository_cwd(self):
         command = "python3 scripts/relevant_lessons.py --story S1"
         self.assertEqual(self.bash_decision(command, cwd="/tmp"), "deny")

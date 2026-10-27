@@ -49,7 +49,7 @@ Use bounded tasks and context/token budgets. Persist checkpoints before context 
 
 Every specialist applies these rules directly, without reading further files:
 
-- Work only on the delegated task, on the supplied branch or worktree, inside its allowed paths. The orchestrator preflights those paths; never write outside them, write to `main`, push, merge, or edit GitHub items.
+- Work only on the delegated task, inside the supplied worktree and your agent's paths in `.claude/agent-scopes.json`, even if the brief asks otherwise; with no worktree, stop and request one. Never write to `main`, push, merge, or edit GitHub items.
 - Read only the skill your task needs from your agent file's list. Skills are guidance, not access controls.
 - Unless your agent file defines its own output format (for example `ci-verifier` JSON), return, in this order: 1) delegation ID and status `DONE`, `PARTIAL`, `BLOCKED` or `FAILED`; 2) files changed (exact paths) and branch/commit; 3) checks run with exact command and observed result, plus checks not run; 4) open issues, risks and assumptions; 5) recommended next step and the role that should take it.
 - If an input is missing or two inputs conflict, return `BLOCKED` with the conflict instead of choosing. Read `standards/agent-contract.md` only for decision authority, PO/BA boundaries or conflict rules.

@@ -20,6 +20,13 @@ def git(*args, input_text=None, check=True):
     )
 
 
+def remote_arg(value):
+    """argparse type: a remote name, path or URL, never a git option such as --upload-pack=..."""
+    if not value or value.startswith("-"):
+        raise argparse.ArgumentTypeError("must be a remote name, path or URL, not an option")
+    return value
+
+
 def task_ref(task_id):
     ref = f"refs/claims/{task_id}"
     try:
@@ -66,7 +73,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--task-id", required=True)
     parser.add_argument("--run-id")
-    parser.add_argument("--remote", default="origin")
+    parser.add_argument("--remote", default="origin", type=remote_arg)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 

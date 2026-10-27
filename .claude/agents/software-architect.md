@@ -37,8 +37,4 @@ Read only the one that matches the task:
 
 No option meets the requirements within constraints, or a choice needs spending, new external services or a security-risk acceptance.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `software-architect` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with the product roles, developers, `devops-platform`, `project-manager`, `code-review-security`, `tech-lead` and the human owner, always through `agile-orchestrator`.

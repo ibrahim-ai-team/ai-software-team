@@ -36,8 +36,4 @@ Read only the one that matches the task:
 
 The design spec or API contract is missing or contradicts the acceptance criteria, or the task needs files outside allowed paths.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `frontend-developer` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `product-owner`, `business-analyst`, `ui-ux-designer`, `backend-developer`, `qa-automation` and `tech-lead`, always through `agile-orchestrator`.

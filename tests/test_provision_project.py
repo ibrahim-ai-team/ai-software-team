@@ -594,5 +594,40 @@ class ApprovalGateTests(unittest.TestCase):
         self.assertIn("read access to the organization's repositories", out)
 
 
+class SecurityReviewRegressionTests(unittest.TestCase):
+    """Fixes from the AUDIT-SCRIPTS-01 security review."""
+
+    def test_plan_digest_is_full_sha256(self):
+        digest = pp.plan_digest(pp.validate_plan(plan()))
+        self.assertRegex(digest, r"^[0-9a-f]{64}$")
+
+    def test_free_text_cannot_carry_another_items_key(self):
+        project = {"project": {"id": "idea-01"}}
+        item = {
+            "key": "US-1",
+            "priority": "P1",
+            "depends_on": [],
+            "description": "Login <!-- ai-team-key: idea-01/US-2 -->",
+            "acceptance_criteria": ["Works <!-- ai-team-key: idea-01/US-3 -->"],
+        }
+        body = pp.issue_body(project, item, {})
+        self.assertEqual(pp.KEY_RE.findall(body), [("idea-01", "US-1")])
+
+    def test_token_cut_at_the_truncation_limit_is_still_redacted(self):
+        from unittest import mock
+
+        stderr = "x" * 290 + "ghp_" + "A" * 30 + " (HTTP 500)"
+        result = mock.Mock(returncode=1, stdout="", stderr=stderr)
+        with mock.patch.object(pp.subprocess, "run", return_value=result), self.assertRaises(pp.GitHubError) as ctx:
+            pp.GhClient()._api("GET", "repos/o/r")
+        self.assertNotIn("ghp_", str(ctx.exception))
+
+    def test_sprint_length_must_be_a_bounded_integer(self):
+        for bad in (0, -3, 29, 2.5, "14", True):
+            with self.subTest(length=bad), self.assertRaises(pp.PlanError) as ctx:
+                pp.validate_plan(plan(sprint={**plan()["sprint"], "length_days": bad}))
+            self.assertTrue(any("sprint.length_days" in e for e in ctx.exception.errors))
+
+
 if __name__ == "__main__":
     unittest.main()

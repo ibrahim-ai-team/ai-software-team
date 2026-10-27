@@ -40,8 +40,4 @@ Read only the one that matches the task:
 
 Requirements conflict, a business rule needs the sponsor's judgement, or a dependency on another system is unknown.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `business-analyst` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `product-owner`, `qa-automation` and `software-architect`, always through `agile-orchestrator`.

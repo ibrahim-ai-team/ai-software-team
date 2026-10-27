@@ -40,8 +40,4 @@ Read only the one that matches the task:
 
 A change needs secrets, paid services, new permissions, a remote repository or production access.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `devops-platform` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with the architect, developers, `code-review-security`, `sre-observability-engineer`, `release-manager`, `project-manager`, `tech-lead` and the human owner, always through `agile-orchestrator`.

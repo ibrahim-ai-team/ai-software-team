@@ -11,9 +11,16 @@ def git(*args, check=True):
     return subprocess.run(["git", *args], capture_output=True, text=True, check=check)
 
 
+def remote_arg(value):
+    """argparse type: a remote name, path or URL, never a git option such as --upload-pack=..."""
+    if not value or value.startswith("-"):
+        raise argparse.ArgumentTypeError("must be a remote name, path or URL, not an option")
+    return value
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--remote", default="origin")
+    parser.add_argument("--remote", default="origin", type=remote_arg)
     args = parser.parse_args()
     result = git("ls-remote", "--refs", args.remote, "refs/claims/*", check=False)
     if result.returncode:

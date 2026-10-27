@@ -1,6 +1,6 @@
 # Agent Capabilities and Runtime Caveats
 
-This kit contains 18 agent profile files: `agile-orchestrator` (run as the main session with `claude --agent agile-orchestrator`) and 17 specialists. Their presence as Markdown files does not prove runtime discovery or guarantee that all agents can be spawned in parallel. Actual capabilities depend on installed Claude Code version, settings, permissions, and available tools.
+This kit contains 20 agent profile files: `agile-orchestrator` (run as the main session with `claude --agent agile-orchestrator`) and 19 specialists. Their presence as Markdown files does not prove runtime discovery or guarantee that all agents can be spawned in parallel. Actual capabilities depend on installed Claude Code version, settings, permissions, and available tools.
 
 The `description` frontmatter is intended to help routing. Agent definitions intentionally do not hard-code a project stack. Skills are shared procedural references and do not grant permissions by themselves.
 

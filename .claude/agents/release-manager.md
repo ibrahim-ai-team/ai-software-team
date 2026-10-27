@@ -43,8 +43,4 @@ Read only the one that matches the task:
 
 Any go/no-go item lacks evidence, or a release step needs the sponsor (tags, publishing, deployment).
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `release-manager` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `project-manager`, `product-owner`, `qa-automation`, `code-review-security`, `devops-platform`, `sre-observability-engineer` and `performance-engineer`, always through `agile-orchestrator`.

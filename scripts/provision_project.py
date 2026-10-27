@@ -140,7 +140,8 @@ def default_roles(architecture: dict) -> list[str]:
 def plan_digest(plan: dict) -> str:
     """Digest of the normalized plan without its approval block; the sponsor approves this value."""
     body = {k: v for k, v in plan.items() if k not in ("approval", "repos", "home_role")}
-    return hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()[:16]
+    # Full SHA-256: a truncated digest would let a second plan be found with the same value.
+    return hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()
 
 
 def validate_plan(raw: dict, existing_repos: list | None = None) -> dict:
@@ -218,6 +219,9 @@ def validate_plan(raw: dict, existing_repos: list | None = None) -> dict:
     sprint = plan.setdefault("sprint", {})
     sprint.setdefault("length_days", 14)
     sprint.setdefault("count", 1)
+    length = sprint["length_days"]
+    if not (isinstance(length, int) and not isinstance(length, bool) and 1 <= length <= 28):
+        errors.append("sprint.length_days must be an integer from 1 to 28")
     try:
         dt.date.fromisoformat(str(sprint.get("start", "")))
     except ValueError:
@@ -392,14 +396,19 @@ def scaffold_files(plan: dict, repo: dict) -> dict[str, str]:
     return files
 
 
+def _strip_keys(text: str) -> str:
+    """Remove ai-team-key markers from free text so one backlog item cannot claim another's issue."""
+    return re.sub(r"<!--\s*ai-team-key:.*?-->", "", text, flags=re.DOTALL)
+
+
 def issue_body(plan: dict, item: dict, resolved: dict[str, str]) -> str:
     deps = [f"- Depends on: {resolved.get(d, d + ' (link pending)')}" for d in item["depends_on"]] or ["- None"]
-    criteria = [f"- [ ] {c}" for c in item.get("acceptance_criteria", [])] or ["- Not applicable"]
+    criteria = [f"- [ ] {_strip_keys(str(c))}" for c in item.get("acceptance_criteria", [])] or ["- Not applicable"]
     sprint = f" · Sprint: {item['sprint']}" if "sprint" in item else ""
     return (
         "\n".join(
             [
-                item.get("description", "").strip(),
+                _strip_keys(item.get("description", "")).strip(),
                 "",
                 "## Acceptance criteria",
                 *criteria,
@@ -831,7 +840,8 @@ class GhClient:
                     (self.GRAPHQL_STATUS[e["type"]] for e in errors if e.get("type") in self.GRAPHQL_STATUS), 422
                 )
                 message = "; ".join(e.get("message", "") for e in errors)
-            raise classify(status, message[:300])
+            # Redact before truncating so a token cut at the limit cannot escape the pattern.
+            raise classify(status, redact(message)[:300])
         return proc.stdout
 
     def _api(self, method: str, path: str, body=None):

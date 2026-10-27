@@ -20,6 +20,13 @@ SAFE_SIMPLE_COMMANDS = {"pytest", "ls", "cat", "grep", "find", "wc", "head", "ta
 SHELL_META = re.compile(r"[<>|;&`]|\$\(|\n|\r")
 REDIRECTION_TARGET = re.compile(r"(?:>>?|[0-9]+>>?)\s*([^\s;&|<>]+)")
 WRITE_COMMANDS = {"tee", "cp", "mv", "rm", "dd"}
+# Options that make an otherwise read-only allowed command write files or run other commands.
+UNSAFE_OPTIONS = {
+    "git": ("--output", "--ext-diff", "--textconv"),
+    "ruff": ("--fix", "--fix-only", "--unsafe-fixes", "--add-noqa", "--output-file", "-o", "--watch", "-w"),
+    "gitleaks": ("--report-path", "-r"),
+    "find": ("-exec", "-execdir", "-delete", "-ok", "-okdir", "-fprint", "-fprint0", "-fprintf", "-fls"),
+}
 # The orchestrator must run this read-only lessons lookup before every delegation.
 LESSONS_SCRIPT = ROOT / "scripts" / "relevant_lessons.py"
 # Matched against the raw command string, not shlex tokens: bash applies brace, glob, `$` and `~`
@@ -97,6 +104,17 @@ def _scope_check_target(agent: str, target: str) -> tuple[bool, str]:
     return result.returncode == 0, relative
 
 
+def _has_unsafe_option(executable: str, args: list[str]) -> bool:
+    for option in UNSAFE_OPTIONS.get(executable, ()):
+        for arg in args[1:]:
+            if arg == option or arg.startswith(option + "="):
+                return True
+            # Short options can carry their value attached, as in `-ofile`.
+            if len(option) == 2 and option[1] != "-" and arg.startswith(option):
+                return True
+    return False
+
+
 def _bash_decision(command: object, agent: str, cwd: object = None) -> tuple[bool, str, str]:
     if not isinstance(command, str) or not command.strip():
         return False, "missing or invalid Bash command", ""
@@ -117,7 +135,12 @@ def _bash_decision(command: object, agent: str, cwd: object = None) -> tuple[boo
         return False, "malformed shell quoting", ""
     if not args:
         return False, "empty Bash command", ""
-    executable = Path(args[0]).name
+    # A bare command name only: a path such as `./git` or `/tmp/x/ls` could run any binary.
+    if "/" in args[0]:
+        return False, "commands must be invoked by bare name", ""
+    executable = args[0]
+    if _has_unsafe_option(executable, args):
+        return False, f"unsafe {executable} option", ""
     if executable == "git" and len(args) >= 2 and args[1] in {"status", "diff", "log"}:
         return True, "", ""
     if executable == "ruff" and len(args) >= 2 and args[1] == "check":
@@ -127,8 +150,6 @@ def _bash_decision(command: object, agent: str, cwd: object = None) -> tuple[boo
     if _is_lessons_lookup(command, cwd):
         return True, "", ""
     if executable in SAFE_SIMPLE_COMMANDS:
-        if executable == "find" and any(arg in {"-exec", "-execdir", "-delete"} for arg in args):
-            return False, "unsafe find option", ""
         return True, "", ""
     if executable == "sed" and any(arg == "-i" or arg.startswith("-i") for arg in args[1:]):
         return False, "in-place sed edits are not allowed", args[-1] if len(args) > 1 else ""

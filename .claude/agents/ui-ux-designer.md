@@ -38,8 +38,4 @@ Material design choices are tied to user goals and acceptance criteria; key stat
 
 User goals or acceptance criteria are too vague to design against, or a design choice changes scope.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `ui-ux-designer` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `product-owner`, `business-analyst`, `software-architect`, `frontend-developer` and `qa-automation`, always through `agile-orchestrator`.

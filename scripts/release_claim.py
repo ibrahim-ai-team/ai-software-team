@@ -6,10 +6,17 @@ import subprocess
 import sys
 
 
+def remote_arg(value):
+    """argparse type: a remote name, path or URL, never a git option such as --receive-pack=..."""
+    if not value or value.startswith("-"):
+        raise argparse.ArgumentTypeError("must be a remote name, path or URL, not an option")
+    return value
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--task-id", required=True)
-    parser.add_argument("--remote", default="origin")
+    parser.add_argument("--remote", default="origin", type=remote_arg)
     args = parser.parse_args()
     ref = f"refs/claims/{args.task_id}"
     check = subprocess.run(["git", "check-ref-format", ref], capture_output=True, text=True)

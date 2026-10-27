@@ -34,8 +34,4 @@ Read only the one that matches the task:
 
 Evidence for a claim is missing or two sources disagree.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `documentation-manager` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with all contributors and `project-manager`, always through `agile-orchestrator`.
