@@ -20,6 +20,26 @@ SAFE_SIMPLE_COMMANDS = {"pytest", "ls", "cat", "grep", "find", "wc", "head", "ta
 SHELL_META = re.compile(r"[<>|;&`]|\$\(|\n|\r")
 REDIRECTION_TARGET = re.compile(r"(?:>>?|[0-9]+>>?)\s*([^\s;&|<>]+)")
 WRITE_COMMANDS = {"tee", "cp", "mv", "rm", "dd"}
+# The orchestrator must run this read-only lessons lookup before every delegation.
+LESSONS_SCRIPT = ROOT / "scripts" / "relevant_lessons.py"
+LESSONS_STORY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
+
+
+def _is_lessons_lookup(executable: str, args: list[str]) -> bool:
+    """Allow only `python[3] scripts/relevant_lessons.py --story ID [--max N]`."""
+    if executable not in {"python", "python3"} or len(args) < 4:
+        return False
+    script = Path(args[1])
+    try:
+        resolved = script.resolve() if script.is_absolute() else (ROOT / script).resolve()
+    except OSError:
+        return False
+    if resolved != LESSONS_SCRIPT.resolve():
+        return False
+    options = args[2:]
+    if len(options) not in {2, 4} or options[0] != "--story" or not LESSONS_STORY.match(options[1]):
+        return False
+    return len(options) == 2 or (options[2] == "--max" and options[3].isdigit())
 
 
 def deny(reason: str, agent: str, path: str = "") -> int:
@@ -103,6 +123,8 @@ def _bash_decision(command: object, agent: str) -> tuple[bool, str, str]:
     if executable == "ruff" and len(args) >= 2 and args[1] == "check":
         return True, "", ""
     if executable == "gitleaks" and len(args) >= 2 and args[1] == "detect":
+        return True, "", ""
+    if _is_lessons_lookup(executable, args):
         return True, "", ""
     if executable in SAFE_SIMPLE_COMMANDS:
         if executable == "find" and any(arg in {"-exec", "-execdir", "-delete"} for arg in args):

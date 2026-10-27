@@ -2,7 +2,7 @@
 
 ## Decision status
 
-**Status: ADOPTED 2026-10-27, statically verified; runtime smoke test pending (see "Verification").**
+**Status: ADOPTED 2026-10-27; routing verified at runtime (see "Verification").**
 
 Supersedes the DEFERRED decision of PR #44. Each specialist now declares a Claude Code `model` alias in its frontmatter. `agile-orchestrator` declares none, so the main session keeps the model the sponsor picks with `/model`.
 
@@ -65,8 +65,9 @@ If an alias is not available on the account, the delegation fails with a model e
 
 - [x] Supported syntax and aliases confirmed (official docs, validator, binary 2.1.312)
 - [x] Installed version and account constraints recorded
-- [ ] Runtime smoke test: in a **new** session started after these frontmatter changes, delegate one trivial task each to `ci-verifier` (haiku) and `software-architect` (opus) and confirm in `/usage` or the transcript that the expected model ran. Record the result in `docs/verification-report.md`
+- [x] Runtime smoke test: in a **new** session started after these frontmatter changes, delegate one trivial task each to `ci-verifier` (haiku) and `software-architect` (opus) and confirm in `/usage` or the transcript that the expected model ran. Record the result in `docs/verification-report.md`
   - 2026-10-27, attempt 1: **inconclusive.** It ran in the same session that edited the frontmatter. Claude Code loads agent definitions at session start, so both agents inherited the session model (`claude-opus-5-5` in both transcripts). Repeat it in a fresh session.
+  - 2026-10-27, attempt 2 (fresh `claude --agent agile-orchestrator` session, Claude Code 2.1.312, branch `chore/agent-model-routing` at `f473b77`): **passed.** SMOKE-MODEL-05 `ci-verifier` ran every turn on `claude-haiku-5-5`. SMOKE-MODEL-06 `software-architect` ran every turn on `claude-opus-5-5`. The one `claude-opus-5-5` value in the ci-verifier transcript is the model of the built-in `advisor` tool (deferred, not called), not a turn the agent ran. Evidence: the subagent transcripts' `model` fields. This shows routing only, not application behaviour.
 - [ ] Pilot sprint (#45): compare rework, review findings and usage per story; revisit tiers at sprint review
 
-This record is not proof that runtime routing has been tested until the smoke-test box is checked with evidence.
+The smoke test verified two agents, one each on `haiku` and `opus`. The `sonnet` agents use the same frontmatter mechanism but were not run individually.
