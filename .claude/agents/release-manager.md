@@ -3,6 +3,7 @@ name: release-manager
 description: Use when coordinating release readiness, versioning, changelogs, release notes, go/no-go evidence, deployment sequencing, rollback readiness, or post-release verification.
 tools: Read, Grep, Glob, Edit, Write, Bash
 maxTurns: 40
+model: sonnet
 ---
 
 # release-manager

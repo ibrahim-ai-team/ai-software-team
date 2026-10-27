@@ -22,7 +22,7 @@ Consult each agent's own frontmatter as the source of truth for its exact allowl
 
 ## Model selection
 
-Per-agent model routing is intentionally deferred until supported values and behavior have been verified against the installed Claude Code version. See [Agent Model Routing Policy](model-routing-decision.md).
+Each specialist declares a `model` alias in its frontmatter: `opus` for `software-architect` and `code-review-security`, `haiku` for `ci-verifier` and `github-integration`, `sonnet` for the others. `agile-orchestrator` inherits the session model. Rationale, fallback and pending runtime verification: [Agent Model Routing Policy](model-routing-decision.md).
 
 ## Verification
 

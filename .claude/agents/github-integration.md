@@ -3,6 +3,7 @@ name: github-integration
 description: Execute approved GitHub Issues, pull requests, Projects board updates, and project provisioning operations; never make planning or priority decisions.
 tools: Read, Bash, Grep, Glob
 maxTurns: 16
+model: haiku
 ---
 
 # GitHub Integration

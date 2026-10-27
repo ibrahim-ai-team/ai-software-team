@@ -84,6 +84,34 @@ class ScopeHookTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "")
 
+    def bash_decision(self, command):
+        result = invoke({"tool_name": "Bash", "agent_type": "agile-orchestrator", "tool_input": {"command": command}})
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] if result.stdout else "allow"
+
+    def test_lessons_lookup_is_allowed(self):
+        for command in (
+            "python scripts/relevant_lessons.py --story SHOP-12 --max 5",
+            "python3 scripts/relevant_lessons.py --story SMOKE-MODEL-05",
+            f"python3 {ROOT / 'scripts/relevant_lessons.py'} --story S1 --max 3",
+        ):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command), "allow")
+
+    def test_other_python_commands_stay_denied(self):
+        for command in (
+            "python3 -c print(1)",
+            "python3 scripts/add_lesson.py --story S1",
+            "python3 scripts/relevant_lessons.py",
+            "python3 scripts/relevant_lessons.py --story S1 --max 5 --extra x",
+            "python3 scripts/relevant_lessons.py --story ../x --max 5",
+            "python3 scripts/relevant_lessons.py --story S1 --max -1",
+            "python3 scripts/relevant_lessons.py --story S1 > out.txt",
+            "python3 -m scripts.relevant_lessons --story S1",
+        ):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command), "deny")
+
     def test_non_write_tool_is_ignored(self):
         result = invoke(
             {

@@ -3,6 +3,7 @@ name: software-architect
 description: Use when evaluating system boundaries, architecture options, or technical decisions.
 tools: Read, Grep, Glob, Edit, Write
 maxTurns: 25
+model: opus
 ---
 
 # software-architect

@@ -3,6 +3,7 @@ name: ui-ux-designer
 description: Use when a feature needs user journeys, interaction design, wireframes, visual direction, design-system decisions, or usability/accessibility review before UI implementation.
 tools: Read, Grep, Glob, Edit, Write
 maxTurns: 25
+model: sonnet
 ---
 
 # ui-ux-designer
