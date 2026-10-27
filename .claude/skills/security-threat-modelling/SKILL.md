@@ -1,6 +1,6 @@
 ---
 name: security-threat-modelling
-description: Use when reviewing trust boundaries, sensitive flows, or security risks.
+description: Identifies trust boundaries, threats and abuse cases and ranks mitigations by risk. Use when designing or reviewing authentication, authorization, sensitive data flows, secrets or other security-relevant changes.
 ---
 
 # Identify threats and prioritize mitigations
@@ -11,7 +11,7 @@ Use this skill before implementing authentication/authorization, sensitive data 
 
 ## Required inputs
 
-The data flows and trust boundaries, the assets and data classification, authentication/authorization design, and the external integrations. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The data flows and trust boundaries, the assets and data classification, authentication/authorization design, and the external integrations.
 
 ## Procedure
 

@@ -311,10 +311,11 @@ for path in agents:
         if target not in skill_paths or not target.is_file():
             errors.append(f"Agent references a missing skill '{reference}': {path.relative_to(ROOT)}")
 
-claude_instructions = read_text(ROOT / ".claude" / "CLAUDE.md")
+# The routing index lives in the orchestrator, not CLAUDE.md, which every subagent loads.
+routing_index = read_text(ROOT / ".claude" / "agents" / "agile-orchestrator.md")
 for path in skills:
     reference = path.relative_to(ROOT).as_posix()
-    if reference not in claude_instructions:
+    if reference not in routing_index:
         errors.append(f"Shared skill is missing from the skill routing index: {reference}")
 
 for path in agents:

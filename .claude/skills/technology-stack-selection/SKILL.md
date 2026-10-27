@@ -1,6 +1,6 @@
 ---
 name: technology-stack-selection
-description: Use when selecting frameworks, platforms, or infrastructure technologies.
+description: Chooses technologies only after requirements, favoring free and open-source options with documented trade-offs. Use when selecting frameworks, platforms or infrastructure.
 ---
 
 # Choose technologies only after requirements
@@ -11,7 +11,7 @@ Use this skill when recommending or choosing a language, framework, database, ho
 
 ## Required inputs
 
-Requirements and NFRs, constraints (hosting, budget, licensing, team skills), the options to compare, and any existing ADRs. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+Requirements and NFRs, constraints (hosting, budget, licensing, team skills), the options to compare, and any existing ADRs.
 
 ## Procedure
 

@@ -1,6 +1,6 @@
 ---
 name: frontend-engineering-standards
-description: Use when implementing UI components, client behavior, or accessibility.
+description: Builds accessible, robust UI components and client behavior from an approved design. Use when implementing frontend code.
 ---
 
 # Build accessible and robust interfaces
@@ -11,7 +11,7 @@ Use this skill when building or changing user-facing screens, components, client
 
 ## Required inputs
 
-The delegation (task ID, allowed paths, acceptance checks), the design specification from `ui-ux-designer`, the accessibility target, and the existing test commands. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The delegation (task ID, allowed paths, acceptance checks), the design specification from `ui-ux-designer`, the accessibility target, and the existing test commands.
 
 ## Procedure
 

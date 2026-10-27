@@ -1,6 +1,6 @@
 ---
 name: release-management
-description: Use when preparing a release plan, version, changelog, go/no-go recommendation, rollback plan, or post-release verification.
+description: Coordinates evidence-based releases and prepares the human go/no-go decision. Use when preparing a release plan, version, changelog, rollback plan or post-release verification.
 ---
 
 # Coordinate evidence-based releases
@@ -11,7 +11,7 @@ Use when a set of changes is being considered for release, a release candidate n
 
 ## Required inputs
 
-The release scope (PRs/commits), the release criteria table and decision IDs from the project state, CI and QA evidence, known defects, and the rollback path. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The release scope (PRs/commits), the release criteria table and decision IDs from the project state, CI and QA evidence, known defects, and the rollback path.
 
 ## Procedure
 

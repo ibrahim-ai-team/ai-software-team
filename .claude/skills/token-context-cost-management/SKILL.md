@@ -1,6 +1,6 @@
 ---
 name: token-context-cost-management
-description: Use when bounding agent delegation, context usage, or execution cost.
+description: Keeps delegations bounded and context small to save subscription usage. Use when planning delegations, managing context pressure or controlling execution cost.
 ---
 
 # Manage context and usage efficiently
@@ -11,7 +11,7 @@ Use this skill before multi-agent tasks, long sessions, large research jobs, or 
 
 ## Required inputs
 
-The task to delegate, the session and usage limits in `standards/sprint-sizing.md`, and the context already established that the delegate needs. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The task to delegate, the session and usage limits in `standards/sprint-sizing.md`, and the context already established that the delegate needs.
 
 ## Procedure
 

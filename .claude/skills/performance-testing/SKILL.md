@@ -1,6 +1,6 @@
 ---
 name: performance-testing
-description: Use when designing load, stress, spike, endurance, scalability, or performance regression tests.
+description: Measures system performance reproducibly against explicit thresholds. Use when designing load, stress, spike, endurance, scalability or performance regression tests.
 ---
 
 # Measure system performance reproducibly
@@ -11,7 +11,7 @@ Use when latency, throughput, concurrency, capacity, resource efficiency, or per
 
 ## Required inputs
 
-Measurable performance requirements (latency, throughput, budgets), a representative environment and data set, and the baseline to compare with. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+Measurable performance requirements (latency, throughput, budgets), a representative environment and data set, and the baseline to compare with.
 
 ## Procedure
 

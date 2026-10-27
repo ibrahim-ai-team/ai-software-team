@@ -1,6 +1,6 @@
 ---
 name: observability-sre
-description: Use when defining service reliability objectives, telemetry, alerting, runbooks, incident response, or production-readiness checks.
+description: Designs observable, reliable services with SLOs, telemetry, actionable alerts and runbooks. Use when defining reliability objectives, alerting, incident response or production-readiness checks.
 ---
 
 # Design observable and reliable services
@@ -11,7 +11,7 @@ Use when a service needs operational readiness, diagnosability, reliability targ
 
 ## Required inputs
 
-The service's user journeys, the reliability objectives or the decision that none apply, the current telemetry and alerting, and the deployment model. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The service's user journeys, the reliability objectives or the decision that none apply, the current telemetry and alerting, and the deployment model.
 
 ## Procedure
 

@@ -1,6 +1,6 @@
 ---
 name: ui-ux-design-system
-description: Use when defining user flows, screen structure, interaction behavior, responsive layouts, or reusable design-system patterns.
+description: Designs implementation-ready user flows, screens, interactions, responsive layouts and design-system patterns. Use before building a new journey or a material UI change.
 ---
 
 # Design implementation-ready user experiences
@@ -11,7 +11,7 @@ Mandatory before frontend implementation for a new user journey, material layout
 
 ## Required inputs
 
-The user stories and journeys, the target devices and accessibility level, and the existing design system or brand constraints. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The user stories and journeys, the target devices and accessibility level, and the existing design system or brand constraints.
 
 ## Procedure
 

@@ -1,6 +1,6 @@
 ---
 name: architecture-evaluation-adr
-description: Use when comparing architecture options or recording consequential decisions.
+description: Compares architecture options against quality attributes and records the decision as an ADR. Use when choosing system boundaries or making a consequential, hard-to-reverse technical decision.
 ---
 
 # Evaluate architecture choices and record decisions
@@ -11,7 +11,7 @@ Use this skill during architecture design when boundaries, quality attributes, d
 
 ## Required inputs
 
-Requirements and quality attributes (NFRs), constraints (budget, hosting, team skills), existing ADRs, and the decision to be made. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+Requirements and quality attributes (NFRs), constraints (budget, hosting, team skills), existing ADRs, and the decision to be made.
 
 ## Procedure
 

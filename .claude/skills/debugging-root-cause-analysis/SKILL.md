@@ -1,6 +1,6 @@
 ---
 name: debugging-root-cause-analysis
-description: Use when diagnosing a reproducible defect or unstable test.
+description: Finds root causes from reproduction and evidence before fixing. Use when diagnosing a reproducible defect, a failing build or an unstable test.
 ---
 
 # Find root causes with evidence
@@ -11,7 +11,7 @@ Use this skill for a bug, failing check, flaky test, unexpected behavior, or rec
 
 ## Required inputs
 
-A reproduction (failing test, CI log or steps), the commit or environment where it fails, and the last known good state if any. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+A reproduction (failing test, CI log or steps), the commit or environment where it fails, and the last known good state if any.
 
 ## Procedure
 

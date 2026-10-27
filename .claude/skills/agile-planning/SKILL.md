@@ -1,6 +1,6 @@
 ---
 name: agile-planning
-description: Use when sequencing work, planning a sprint, or managing delivery dependencies.
+description: Plans small, reviewable increments with explicit dependencies and capacity. Use when sequencing work, planning a sprint, or managing delivery dependencies.
 ---
 
 # Plan small, reviewable increments
@@ -11,7 +11,7 @@ Use this skill before selecting sprint scope, splitting work, sequencing depende
 
 ## Required inputs
 
-The project state (goal, MVP scope, release criteria, open conflicts), the previous sprint record, the prioritized backlog with Project fields, and `tech-lead` points. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The project state (goal, MVP scope, release criteria, open conflicts), the previous sprint record, the prioritized backlog with Project fields, and `tech-lead` points.
 
 ## Procedure
 

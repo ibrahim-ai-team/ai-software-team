@@ -1,6 +1,6 @@
 ---
 name: user-stories-acceptance-criteria
-description: Use when creating small stories and testable acceptance criteria.
+description: Writes small, independent user stories with testable acceptance criteria. Use when creating or refining backlog stories.
 ---
 
 # Write small, testable user stories
@@ -11,7 +11,7 @@ Use this skill when converting requirements into backlog items, splitting oversi
 
 ## Required inputs
 
-The requirement or problem statement, the persona, the approved scope and the decisions that bound it, and the known edge cases. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The requirement or problem statement, the persona, the approved scope and the decisions that bound it, and the known edge cases.
 
 ## Procedure
 

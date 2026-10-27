@@ -1,6 +1,6 @@
 ---
 name: database-modelling-migrations
-description: Use when designing schemas, queries, data integrity, or migrations.
+description: Models data and evolves schemas with reversible, safe migrations and integrity constraints. Use when designing schemas, queries, data integrity rules or migrations.
 ---
 
 # Model data and evolve schemas safely
@@ -11,7 +11,7 @@ Use this skill when adding or changing entities, relationships, indexes, constra
 
 ## Required inputs
 
-The data requirements, current schema and migrations, data volume and retention constraints, and the rollback expectation. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The data requirements, current schema and migrations, data volume and retention constraints, and the rollback expectation.
 
 ## Procedure
 

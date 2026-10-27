@@ -1,6 +1,6 @@
 ---
 name: accessibility-review
-description: Use when reviewing UI accessibility, keyboard operation, focus management, semantics, contrast, and assistive-technology compatibility.
+description: Reviews user interfaces for keyboard operation, focus management, semantics, contrast and assistive-technology support. Use when designing or reviewing UI accessibility.
 ---
 
 # Review user-interface accessibility
@@ -11,7 +11,7 @@ Use for new/changed user interfaces, forms, dialogs, navigation, interactive com
 
 ## Required inputs
 
-The UI change or design (diff, screenshots or running build), the target conformance level (default WCAG 2.2 AA), and the user journeys in scope. If none is available, report what cannot be reviewed. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The UI change or design (diff, screenshots or running build), the target conformance level (default WCAG 2.2 AA), and the user journeys in scope. If none is available, report what cannot be reviewed.
 
 ## Procedure
 

@@ -1,6 +1,6 @@
 ---
 name: documentation-session-handover
-description: Use when writing technical docs, status reports, or session handovers.
+description: Writes technical docs, status reports and resumable session handovers that separate verified facts from unverified claims. Use when documenting setup or behavior, reporting progress, or ending a session.
 ---
 
 # Keep documentation and handovers actionable
@@ -11,7 +11,7 @@ Use this skill when updating README/setup/operations docs, recording decisions, 
 
 ## Required inputs
 
-The reconciled project state, the delegation records and their evidence (PRs, CI runs), and the open decisions and blockers. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The reconciled project state, the delegation records and their evidence (PRs, CI runs), and the open decisions and blockers.
 
 ## Procedure
 

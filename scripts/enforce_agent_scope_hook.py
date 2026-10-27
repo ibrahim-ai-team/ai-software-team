@@ -22,24 +22,24 @@ REDIRECTION_TARGET = re.compile(r"(?:>>?|[0-9]+>>?)\s*([^\s;&|<>]+)")
 WRITE_COMMANDS = {"tee", "cp", "mv", "rm", "dd"}
 # The orchestrator must run this read-only lessons lookup before every delegation.
 LESSONS_SCRIPT = ROOT / "scripts" / "relevant_lessons.py"
-LESSONS_STORY = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
+# Matched against the raw command string, not shlex tokens: bash applies brace, glob, `$` and `~`
+# expansion to what it runs, so the pattern admits none of those characters.
+LESSONS_ARGS = r" --story [A-Za-z0-9][A-Za-z0-9._-]{0,63}(?: --max [0-9]{1,4})?"
+LESSONS_RELATIVE = re.compile(r"python3? scripts/relevant_lessons\.py" + LESSONS_ARGS)
+LESSONS_ABSOLUTE = re.compile(r"python3? " + re.escape(LESSONS_SCRIPT.as_posix()) + LESSONS_ARGS)
 
 
-def _is_lessons_lookup(executable: str, args: list[str]) -> bool:
+def _is_lessons_lookup(command: str, cwd: object) -> bool:
     """Allow only `python[3] scripts/relevant_lessons.py --story ID [--max N]`."""
-    if executable not in {"python", "python3"} or len(args) < 4:
+    if LESSONS_ABSOLUTE.fullmatch(command):
+        return True
+    # Bash resolves a relative path against its own working directory, so require it to be ROOT.
+    if not LESSONS_RELATIVE.fullmatch(command) or not isinstance(cwd, str):
         return False
-    script = Path(args[1])
     try:
-        resolved = script.resolve() if script.is_absolute() else (ROOT / script).resolve()
+        return Path(cwd).resolve() == ROOT.resolve()
     except OSError:
         return False
-    if resolved != LESSONS_SCRIPT.resolve():
-        return False
-    options = args[2:]
-    if len(options) not in {2, 4} or options[0] != "--story" or not LESSONS_STORY.match(options[1]):
-        return False
-    return len(options) == 2 or (options[2] == "--max" and options[3].isdigit())
 
 
 def deny(reason: str, agent: str, path: str = "") -> int:
@@ -97,7 +97,7 @@ def _scope_check_target(agent: str, target: str) -> tuple[bool, str]:
     return result.returncode == 0, relative
 
 
-def _bash_decision(command: object, agent: str) -> tuple[bool, str, str]:
+def _bash_decision(command: object, agent: str, cwd: object = None) -> tuple[bool, str, str]:
     if not isinstance(command, str) or not command.strip():
         return False, "missing or invalid Bash command", ""
     # Extract common output redirection targets before rejecting shell syntax so
@@ -124,7 +124,7 @@ def _bash_decision(command: object, agent: str) -> tuple[bool, str, str]:
         return True, "", ""
     if executable == "gitleaks" and len(args) >= 2 and args[1] == "detect":
         return True, "", ""
-    if _is_lessons_lookup(executable, args):
+    if _is_lessons_lookup(command, cwd):
         return True, "", ""
     if executable in SAFE_SIMPLE_COMMANDS:
         if executable == "find" and any(arg in {"-exec", "-execdir", "-delete"} for arg in args):
@@ -157,7 +157,7 @@ def main() -> int:
         agent = agent_value.strip() if isinstance(agent_value, str) and agent_value.strip() else "unknown-agent"
         tool_input = payload.get("tool_input")
         command = tool_input.get("command") if isinstance(tool_input, dict) else None
-        allowed, reason, path = _bash_decision(command, agent)
+        allowed, reason, path = _bash_decision(command, agent, payload.get("cwd"))
         if allowed:
             return 0
         return deny(reason, agent, path)

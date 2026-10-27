@@ -1,6 +1,6 @@
 ---
 name: backend-engineering-standards
-description: Use when implementing server-side business logic, APIs, or authorization.
+description: Implements testable server-side logic with trust-boundary validation, server-side authorization and safe errors. Use when implementing business logic, APIs, integrations or authorization-sensitive code.
 ---
 
 # Implement maintainable and secure backend behavior
@@ -11,7 +11,7 @@ Use this skill for server-side behavior, endpoints, integrations, data access, a
 
 ## Required inputs
 
-The delegation (task ID, allowed paths, acceptance checks), the approved architecture/ADRs, the API contract, and the existing test commands. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The delegation (task ID, allowed paths, acceptance checks), the approved architecture/ADRs, the API contract, and the existing test commands.
 
 ## Procedure
 

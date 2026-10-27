@@ -1,6 +1,6 @@
 ---
 name: requirements-analysis
-description: Use when turning a request into scoped, testable requirements.
+description: Turns requests into scoped, testable requirements with assumptions and open questions. Use when clarifying product needs or functional requirements.
 ---
 
 # Turn requests into testable requirements
@@ -11,7 +11,7 @@ Use this skill during discovery or when requirements are incomplete, ambiguous, 
 
 ## Required inputs
 
-The idea or request, the users and their goals, known constraints, and the latest sponsor decisions that bound the scope. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The idea or request, the users and their goals, known constraints, and the latest sponsor decisions that bound the scope.
 
 ## Procedure
 

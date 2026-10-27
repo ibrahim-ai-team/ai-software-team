@@ -1,6 +1,6 @@
 ---
 name: api-design-documentation
-description: Use when defining API contracts, schemas, errors, or compatibility.
+description: Designs consistent, secure API contracts with schemas, error models and compatibility rules. Use when defining or changing an API contract or its documentation.
 ---
 
 # Design consistent and secure APIs
@@ -11,7 +11,7 @@ Use this skill when creating or changing an HTTP/API contract, integration bound
 
 ## Required inputs
 
-The requirement or story the API serves, the consumers, existing contracts and versioning policy, and the error and authorization model. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The requirement or story the API serves, the consumers, existing contracts and versioning policy, and the error and authorization model.
 
 ## Procedure
 

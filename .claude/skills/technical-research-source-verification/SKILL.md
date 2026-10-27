@@ -1,6 +1,6 @@
 ---
 name: technical-research-source-verification
-description: Use when verifying technical claims, versions, or vendor capabilities.
+description: Researches technical claims against current primary sources and cites them. Use when verifying versions, vendor capabilities or any technical claim.
 ---
 
 # Research technical claims responsibly
@@ -11,7 +11,7 @@ Use this skill when the answer depends on current technical facts, tool capabili
 
 ## Required inputs
 
-The exact claim or question, the versions in use, and the decision the answer will inform. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The exact claim or question, the versions in use, and the decision the answer will inform.
 
 ## Procedure
 

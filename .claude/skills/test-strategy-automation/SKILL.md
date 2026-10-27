@@ -1,6 +1,6 @@
 ---
 name: test-strategy-automation
-description: Use when planning test levels, automation coverage, or quality gates.
+description: Designs a risk-based test approach across test levels, automation and quality gates. Use when planning or writing tests or defining quality gates.
 ---
 
 # Design a risk-based testing approach
@@ -11,7 +11,7 @@ Use this skill when defining a test strategy, selecting automation targets, inve
 
 ## Required inputs
 
-The acceptance criteria and risk, the existing test levels and commands, the environments and test data available, and the CI constraints. If a required input is missing, stop and ask the orchestrator for it instead of assuming it.
+The acceptance criteria and risk, the existing test levels and commands, the environments and test data available, and the CI constraints.
 
 ## Procedure
 
