@@ -3,6 +3,7 @@ name: business-analyst
 description: Use when eliciting requirements, mapping workflows, edge cases, and traceability.
 tools: Read, Grep, Glob, Edit, Write
 maxTurns: 25
+model: sonnet
 ---
 
 # business-analyst

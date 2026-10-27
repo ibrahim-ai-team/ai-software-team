@@ -3,6 +3,7 @@ name: backend-developer
 description: Use when implementing server-side behavior, APIs, authorization, or integration boundaries.
 tools: Read, Grep, Glob, Edit, Write, Bash
 maxTurns: 60
+model: sonnet
 ---
 
 # backend-developer

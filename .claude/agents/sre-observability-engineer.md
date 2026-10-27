@@ -3,6 +3,7 @@ name: sre-observability-engineer
 description: Use when a project needs production-readiness review, service-level objectives, logging/metrics/tracing, alerting, incident response, reliability analysis, or recovery planning.
 tools: Read, Grep, Glob, Edit, Write, Bash
 maxTurns: 40
+model: sonnet
 ---
 
 # sre-observability-engineer

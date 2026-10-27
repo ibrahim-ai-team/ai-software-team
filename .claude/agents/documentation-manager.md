@@ -3,6 +3,7 @@ name: documentation-manager
 description: Use when updating technical documentation, verified reports, or session handovers.
 tools: Read, Grep, Glob, Edit, Write
 maxTurns: 25
+model: sonnet
 ---
 
 # documentation-manager

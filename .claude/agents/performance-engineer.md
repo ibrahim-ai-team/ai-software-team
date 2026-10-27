@@ -3,6 +3,7 @@ name: performance-engineer
 description: Use when requirements include latency, throughput, scalability, resource efficiency, load/stress/endurance testing, or performance regression analysis.
 tools: Read, Grep, Glob, Edit, Write, Bash
 maxTurns: 40
+model: sonnet
 ---
 
 # performance-engineer

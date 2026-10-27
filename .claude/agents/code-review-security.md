@@ -3,6 +3,7 @@ name: code-review-security
 description: Use when reviewing supplied PR diffs and evidence for correctness, security, and maintainability.
 tools: Read, Grep, Glob
 maxTurns: 40
+model: opus
 ---
 
 # code-review-security

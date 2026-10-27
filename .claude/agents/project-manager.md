@@ -3,6 +3,7 @@ name: project-manager
 description: Use as Scrum Master / Project Manager for backlog grooming, two-week sprint planning, impediments, Agile ceremonies, task state and verified progress reports.
 tools: Read, Grep, Glob, Edit, Write, Bash
 maxTurns: 25
+model: sonnet
 ---
 
 # project-manager
