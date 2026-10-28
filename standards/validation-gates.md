@@ -46,13 +46,14 @@ Schema and complete example:
     "lint": "pass",
     "tests": "pass",
     "secrets": "pass"
-  }
+  },
+  "commit": "0123456789abcdef0123456789abcdef01234567"
 }
 ```
 
-A Gate 2 passes only if `passed` is the boolean `true`, the reviewer and date are valid, and all three check values are exactly `pass`. A failed, missing, unknown, or incomplete check makes G2 invalid. Never mark a check as passed without its actual output/evidence. No merge may proceed without G2 passing and human CP3 approval.
+A Gate 2 passes only if `passed` is the boolean `true`, the reviewer and date are valid, all three check values are exactly `pass`, and `commit` is the full 40-character SHA that `ci-verifier` tested and the reviewer judged. The checker compares it with the commit being merged (`--commit <PR head SHA>`, or `git rev-parse HEAD` when omitted); any later commit needs a new G2. A failed, missing, unknown, or incomplete check makes G2 invalid. Never mark a check as passed without its actual output/evidence. No merge may proceed without G2 passing and human CP3 approval.
 
-Check with: `python scripts/check_gates.py --story <story> --gate G2`.
+Check with: `python scripts/check_gates.py --story <story> --gate G2 --commit <PR head SHA>`.
 
 ## Required ordered flow
 

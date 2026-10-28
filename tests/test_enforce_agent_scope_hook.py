@@ -155,6 +155,74 @@ class ScopeHookTests(unittest.TestCase):
                 with self.subTest(agent=agent, command=command):
                     self.assertEqual(self.bash_decision(command, agent=agent), "allow")
 
+    def tool_decision(self, tool, tool_input, agent="backend-developer", cwd=str(ROOT)):
+        payload = {"tool_name": tool, "cwd": cwd, "tool_input": tool_input}
+        if agent:
+            payload["agent_type"] = agent
+        result = invoke(payload)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] if result.stdout else "allow"
+
+    def test_specialists_read_only_inside_the_repository_and_worktrees(self):
+        worktree_file = str(ROOT.parent / "worktrees" / "wt-backend-developer-US-1" / "src" / "app.py")
+        for tool, tool_input in (
+            ("Read", {"file_path": str(ROOT / "README.md")}),
+            ("Read", {"file_path": worktree_file}),
+            ("Grep", {"pattern": "TODO", "path": str(ROOT / "scripts")}),
+            ("Glob", {"pattern": "**/*.md"}),
+        ):
+            with self.subTest(tool=tool, tool_input=tool_input):
+                self.assertEqual(self.tool_decision(tool, tool_input), "allow")
+        for tool, tool_input in (
+            ("Read", {"file_path": "/etc/passwd"}),
+            ("Read", {"file_path": str(ROOT / ".." / ".." / "secret.txt")}),
+            ("Read", {"file_path": "~/.ssh/id_rsa"}),
+            ("Grep", {"pattern": "x", "path": "/home"}),
+            ("Glob", {"pattern": "/etc/**"}),
+            ("Glob", {"pattern": "../../**"}),
+        ):
+            with self.subTest(tool=tool, tool_input=tool_input):
+                self.assertEqual(self.tool_decision(tool, tool_input), "deny")
+        # The main session and the orchestrator are not restricted.
+        self.assertEqual(self.tool_decision("Read", {"file_path": "/etc/hostname"}, agent=None), "allow")
+        self.assertEqual(self.tool_decision("Read", {"file_path": "/etc/hostname"}, agent="agile-orchestrator"), "allow")
+
+    def test_specialist_bash_reads_stay_inside_the_repository(self):
+        for command in ("cat README.md", "grep -rn TODO scripts", "git log --oneline HEAD~3", "ls"):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command, agent="backend-developer"), "allow")
+        for command in (
+            "cat /etc/passwd",
+            "cat ../../.ssh/id_rsa",
+            "grep -r key /home",
+            "grep -f/etc/shadow x",
+            "grep --file=/etc/shadow x",
+            "cat ~/.aws/credentials",
+            "cat $HOME/.ssh/id_rsa",
+            "head {/etc,x}/passwd",
+            "ls ..",
+            "git diff --no-index /etc/passwd README.md",
+        ):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command, agent="backend-developer"), "deny")
+        self.assertEqual(self.bash_decision("cat README.md", agent="backend-developer", cwd="/tmp"), "deny")
+        self.assertEqual(self.bash_decision("cat /etc/hostname", agent=None), "allow")
+
+    def test_writing_agents_write_in_their_own_worktree_only(self):
+        worktrees = ROOT.parent / "worktrees"
+        own = {"tool_name": "Write", "agent_type": "backend-developer", "tool_input": {"content": "x"}}
+        for path, expected in (
+            (worktrees / "wt-backend-developer-US-1" / "src" / "backend" / "app.py", "allow"),
+            (worktrees / "wt-backend-developer-US-1" / "src" / "frontend" / "app.tsx", "deny"),
+            (worktrees / "wt-frontend-developer-US-1" / "src" / "backend" / "app.py", "deny"),
+            (Path("/tmp") / "src" / "backend" / "app.py", "deny"),
+        ):
+            with self.subTest(path=path):
+                payload = {**own, "tool_input": {"file_path": str(path), "content": "x"}}
+                result = invoke(payload)
+                decision = json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] if result.stdout else "allow"
+                self.assertEqual(decision, expected)
+
     def test_ci_verifier_can_run_only_its_contract_checks(self):
         for command in (
             "python -m unittest discover -s tests",

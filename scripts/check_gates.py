@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -15,13 +16,25 @@ GATES_DIR = ROOT / ".claude" / "gates"
 VALID_GATES = ("G1", "G2")
 STORY_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SHA256_PATTERN = re.compile(r"^[a-fA-F0-9]{64}$")
+COMMIT_PATTERN = re.compile(r"^[a-fA-F0-9]{40}$")
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--story", required=True, help="Story identifier, e.g. SHOP-12")
     parser.add_argument("--gate", required=True, choices=VALID_GATES, help="Gate to validate")
+    parser.add_argument("--commit", help="full SHA of the commit being merged (G2; default: git HEAD)")
     return parser.parse_args(argv)
+
+
+def current_commit() -> str | None:
+    """Full SHA of HEAD in the current repository, or None when it cannot be read."""
+    try:
+        result = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
+    except OSError:
+        return None
+    sha = result.stdout.strip()
+    return sha if result.returncode == 0 and COMMIT_PATTERN.fullmatch(sha) else None
 
 
 def is_iso8601(value: object) -> bool:
@@ -35,7 +48,7 @@ def is_iso8601(value: object) -> bool:
     return parsed.tzinfo is not None and parsed.utcoffset() is not None
 
 
-def validate_record(story: str, gate: str, path: Path) -> tuple[bool, str]:
+def validate_record(story: str, gate: str, path: Path, expected_commit: str | None = None) -> tuple[bool, str]:
     if not STORY_PATTERN.fullmatch(story) or story in {".", ".."}:
         return False, "invalid story identifier"
     try:
@@ -70,6 +83,14 @@ def validate_record(story: str, gate: str, path: Path) -> tuple[bool, str]:
         for name in ("lint", "tests", "secrets"):
             if checks.get(name) != "pass":
                 return False, f"checks.{name} must equal 'pass'"
+        # Bind the evidence to the code it was produced for: a later commit needs a new G2.
+        commit = record.get("commit")
+        if not isinstance(commit, str) or not COMMIT_PATTERN.fullmatch(commit):
+            return False, "commit must be the full 40-character SHA that was verified"
+        if expected_commit is None:
+            return False, "cannot determine the commit being merged; pass --commit <sha>"
+        if commit.casefold() != expected_commit.casefold():
+            return False, f"G2 was recorded for commit {commit[:12]}, not {expected_commit[:12]}"
 
     return True, f"{gate} record is valid and passing"
 
@@ -84,8 +105,12 @@ def main(argv: list[str] | None = None) -> int:
         print("ERROR: invalid story identifier", file=sys.stderr)
         return 1
 
+    if args.commit is not None and not COMMIT_PATTERN.fullmatch(args.commit):
+        print("ERROR: --commit must be a full 40-character SHA", file=sys.stderr)
+        return 2
     path = GATES_DIR / f"{args.gate}-{args.story}.json"
-    valid, message = validate_record(args.story, args.gate, path)
+    expected = (args.commit or current_commit()) if args.gate == "G2" else None
+    valid, message = validate_record(args.story, args.gate, path, expected)
     if valid:
         print(f"PASS: {message}")
         return 0

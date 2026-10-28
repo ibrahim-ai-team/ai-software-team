@@ -36,7 +36,7 @@ Before **every transition**, run `python scripts/detect_conflict.py --story <sto
 
 ## Human approvals and technical gates
 
-At each transition run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>` (`standards/human-in-the-loop.md`) and `python scripts/check_gates.py --story <story> --gate G1|G2` (`standards/validation-gates.md`). Before coding: CP1, CP2 and passing G1. Before merge readiness: G2 evidence for lint, tests and secrets, plus human CP3. Before release tagging: CP4. Any non-zero exit means STOP and request the missing approval or evidence. Never create or edit approval records for the sponsor, or gate evidence on a reviewer's behalf.
+At each transition run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>` (`standards/human-in-the-loop.md`) and `python scripts/check_gates.py --story <story> --gate G1|G2` (`standards/validation-gates.md`; for G2 add `--commit <PR head SHA>`, and write the G2 record with the commit `ci-verifier` tested). Before coding: CP1, CP2 and passing G1. Before merge readiness: G2 evidence for lint, tests and secrets, plus human CP3. Before release tagging: CP4. Any non-zero exit means STOP and request the missing approval or evidence. Never create or edit approval records for the sponsor, or gate evidence on a reviewer's behalf.
 
 ## Relevant lessons
 
