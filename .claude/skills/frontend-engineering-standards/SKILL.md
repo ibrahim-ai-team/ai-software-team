@@ -1,6 +1,7 @@
 ---
 name: frontend-engineering-standards
 description: Builds accessible, robust UI components and client behavior from an approved design. Use when implementing frontend code.
+disable-model-invocation: true
 ---
 
 # Build accessible and robust interfaces

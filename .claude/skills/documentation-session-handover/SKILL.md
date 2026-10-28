@@ -1,6 +1,7 @@
 ---
 name: documentation-session-handover
 description: Writes technical docs, status reports and resumable session handovers that separate verified facts from unverified claims. Use when documenting setup or behavior, reporting progress, or ending a session.
+disable-model-invocation: true
 ---
 
 # Keep documentation and handovers actionable

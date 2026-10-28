@@ -1,6 +1,7 @@
 ---
 name: release-management
 description: Coordinates evidence-based releases and prepares the human go/no-go decision. Use when preparing a release plan, version, changelog, rollback plan or post-release verification.
+disable-model-invocation: true
 ---
 
 # Coordinate evidence-based releases

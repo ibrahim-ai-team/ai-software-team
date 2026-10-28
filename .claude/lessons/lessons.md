@@ -15,3 +15,11 @@ Do not store credentials, tokens, passwords, secret values, private keys, or sen
 ## Adding lessons
 
 Use `python scripts/add_lesson.py --title "..." --context "..." --error "..." --rule "..." --story "STORY-123"`. The script assigns the next L-number and appends a new section. It does not edit or delete existing lessons. Only provide sanitized, non-sensitive descriptions.
+
+## L002 — Use repository paths in file anchor references
+
+- **Context:** Progressive disclosure validation ran the new link and anchor checker on the whole repository
+- **Observed error:** A doc referenced workflow files by bare file name with an anchor, which an agent cannot resolve from the docs folder
+- **Rule to apply:** Write file references as repository-root paths such as workflows/orchestration-contract.md#section, never bare file names
+- **Date:** 2026-10-28
+- **Source story:** PROGRESSIVE-DISCLOSURE

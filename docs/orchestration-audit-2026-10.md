@@ -36,7 +36,7 @@ Severity scale: Critical, High, Medium, Low, Informational.
   - The offline checker, run on the real files (§4), reports 4 mismatches and 2 bypass lines.
 - Root cause: thresholds had no single authoritative home or decision ID. The kit had no rule for a newer decision versus an older requirement. Release override inputs were not prohibited.
 - Impact: agents read different targets (60 in code, 24 from the sponsor). Releases pass by override rather than by criteria, so "release-ready" means nothing verifiable.
-- Correction: one `## Release criteria` table with decision IDs and mirrors, plus a `## Requirement conflicts` table (`templates/project-state-template.md`). Precedence now puts human decisions above requirements and code (`orchestration-contract.md#authority-and-precedence`). `check_governance.py --release` fails on mismatches, open conflicts and bypass inputs.
+- Correction: one `## Release criteria` table with decision IDs and mirrors, plus a `## Requirement conflicts` table (`templates/project-state-template.md`). Precedence now puts human decisions above requirements and code (`workflows/orchestration-contract.md#authority-and-precedence`). `check_governance.py --release` fails on mismatches, open conflicts and bypass inputs.
 - Validation: `tests/test_governance.py` `test_3_*`, and the live offline run in §4.
 - App follow-up (not done here; the mission forbids app changes): the sponsor records the 24/3 decision. Then a reviewed app PR aligns `RELEASE_THRESHOLDS` and the docs, moves 60/8 to a future milestone, and removes the override input.
 
@@ -59,7 +59,7 @@ Severity scale: Critical, High, Medium, Low, Informational.
   - Issue forms had no duplicate-check or target field. `backlog-quality-gates.md` had no creation gate.
 - Root cause: rules covered readiness, not creation. Forms could be bypassed by API creation.
 - Impact: the backlog grows (37 → 47 tasks during Sprints 2–3) while MVP stories stay open, and justification is lost.
-- Correction: `backlog-quality-gates.md#issue-creation-gate` (7 questions, reject conditions, exceptions, proportionality). `duplicate_check` and `target` fields in all four forms. The issue creation log in the sprint record. Checker rule G12.
+- Correction: `workflows/backlog-quality-gates.md#issue-creation-gate` (7 questions, reject conditions, exceptions, proportionality). `duplicate_check` and `target` fields in all four forms. The issue creation log in the sprint record. Checker rule G12.
 - Validation: `test_1_duplicate_issue_is_rejected`, `test_2_*`.
 
 ### F-04 Scope changed during sprints without a record. High
@@ -70,7 +70,7 @@ Severity scale: Critical, High, Medium, Low, Informational.
   - #45 (T-27) was closed by its PR although the OAuth/JWT part was cut (sponsor choice "HTTP auth only", made in chat).
 - Root cause: no scope-change procedure, no capacity check, and no rule on closing issues whose scope was cut.
 - Impact: a sprint's commitment silently grows or shrinks; cut scope disappears.
-- Correction: `sprint-governance.md#scope-protection` (scope change row, what it displaces, approver). Capacity check G15. Closure rule 5 on cut scope.
+- Correction: `workflows/sprint-governance.md#scope-protection` (scope change row, what it displaces, approver). Capacity check G15. Closure rule 5 on cut scope.
 - Validation: `test_2b_*`, `SprintRecordTests.test_capacity_is_enforced`.
 
 ### F-05 Story issues never accepted or closed; Done is not reconciled. High
@@ -86,7 +86,7 @@ Severity scale: Critical, High, Medium, Low, Informational.
 - Evidence (Verified): `sprint-execution-checklist.md` said only "Record carryover with reason and owner". There was no end-date rule, no replanning, and no closure states.
 - Root cause: closure was never specified.
 - Impact: sprints run until work ends (the Sprint 2 "end" was never recorded); everything unfinished rolls forward by default.
-- Correction: `sprint-governance.md#sprint-closure` and `#next-sprint`. Checker G10, G11 and G14.
+- Correction: `workflows/sprint-governance.md#sprint-closure` and `#next-sprint`. Checker G10, G11 and G14.
 - Validation: `test_5_*`, `test_6_*`, `test_7_*`.
 
 ### F-07 Precedence did not cover business decisions. High
@@ -94,7 +94,7 @@ Severity scale: Critical, High, Medium, Low, Informational.
 - Evidence (Verified): the old contract precedence ranked repository facts, sponsor decisions/ADRs, task status, delegation records, then chat. It had no ranking for release criteria, sprint commitment versus requirements, and no conflict procedure.
 - Root cause: precedence was designed for fact reconciliation only.
 - Impact: agents resolve conflicts by whichever source they read; see F-01.
-- Correction: a 7-level authority order and conflict rules (`orchestration-contract.md#authority-and-precedence`); decision authority table (`standards/agent-contract.md#decision-authority`).
+- Correction: a 7-level authority order and conflict rules (`workflows/orchestration-contract.md#authority-and-precedence`); decision authority table (`standards/agent-contract.md#decision-authority`).
 - Validation: text review; `test_3_*` exercises the conflict path.
 
 ### F-08 Coordinator ledger is local only. Medium

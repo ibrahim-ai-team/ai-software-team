@@ -1,6 +1,7 @@
 ---
 name: docker-cicd
 description: Builds repeatable, least-privilege container and CI workflows with pinned dependencies. Use when changing containers, CI pipelines, builds or delivery workflows.
+disable-model-invocation: true
 ---
 
 # Build repeatable container and CI workflows

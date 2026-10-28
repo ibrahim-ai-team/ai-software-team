@@ -1,6 +1,7 @@
 ---
 name: debugging-root-cause-analysis
 description: Finds root causes from reproduction and evidence before fixing. Use when diagnosing a reproducible defect, a failing build or an unstable test.
+disable-model-invocation: true
 ---
 
 # Find root causes with evidence

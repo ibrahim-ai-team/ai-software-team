@@ -1,6 +1,7 @@
 ---
 name: accessibility-review
 description: Reviews user interfaces for keyboard operation, focus management, semantics, contrast and assistive-technology support. Use when designing or reviewing UI accessibility.
+disable-model-invocation: true
 ---
 
 # Review user-interface accessibility

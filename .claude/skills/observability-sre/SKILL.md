@@ -1,6 +1,7 @@
 ---
 name: observability-sre
 description: Designs observable, reliable services with SLOs, telemetry, actionable alerts and runbooks. Use when defining reliability objectives, alerting, incident response or production-readiness checks.
+disable-model-invocation: true
 ---
 
 # Design observable and reliable services

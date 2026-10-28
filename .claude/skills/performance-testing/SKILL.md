@@ -1,6 +1,7 @@
 ---
 name: performance-testing
 description: Measures system performance reproducibly against explicit thresholds. Use when designing load, stress, spike, endurance, scalability or performance regression tests.
+disable-model-invocation: true
 ---
 
 # Measure system performance reproducibly

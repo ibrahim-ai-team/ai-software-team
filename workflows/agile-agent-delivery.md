@@ -2,6 +2,8 @@
 
 Coordination, phases, session start/end, authority and sponsor boundaries are defined once in `workflows/orchestration-contract.md`; this workflow adds the delivery-specific rules.
 
+Contents: before coding → [gates](#mechanical-validation-gates-mandatory), [task claiming](#task-claiming-and-local-execution), [backlog readiness](#backlog-quality-and-qa-planning-mandatory); before a PR → [readiness checklist](#pull-request-readiness-checklist), [review protocol](#coordinator-review-protocol); sprint end → [closure and ROI](#sprint-closure-and-roi-reporting), [cadence](#sprint-cadence); reference → [accountability](#operating-model-and-accountability), [workflow from an idea](#end-to-end-workflow-from-an-idea), [user involvement](#user-involvement), [issue lifecycle](#issue-lifecycle), [daily loop](#project-manager-daily-operating-loop), [traceability](#delegation-and-traceability-rules), [improvement proposals](#framework-and-architecture-improvement-proposals), [automation boundaries](#automation-boundaries).
+
 ## Operating model and accountability
 
 - The Product Owner owns discovery, requirements, stories, acceptance criteria and backlog priority. The user who provides the idea is the sponsor/supervisor, not the day-to-day Product Owner.

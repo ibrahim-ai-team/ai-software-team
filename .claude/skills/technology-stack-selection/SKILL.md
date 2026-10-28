@@ -1,6 +1,7 @@
 ---
 name: technology-stack-selection
 description: Chooses technologies only after requirements, favoring free and open-source options with documented trade-offs. Use when selecting frameworks, platforms or infrastructure.
+disable-model-invocation: true
 ---
 
 # Choose technologies only after requirements

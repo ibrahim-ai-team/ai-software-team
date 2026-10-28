@@ -1,6 +1,7 @@
 ---
 name: ui-ux-design-system
 description: Designs implementation-ready user flows, screens, interactions, responsive layouts and design-system patterns. Use before building a new journey or a material UI change.
+disable-model-invocation: true
 ---
 
 # Design implementation-ready user experiences
