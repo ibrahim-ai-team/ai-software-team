@@ -56,6 +56,14 @@ ALLOWED_SCRIPTS = (
 )
 # Worktree creation only; cleanup deletes work and stays a human-run command.
 WORKTREE_CREATE = re.compile(rf"\./scripts/new_worktree\.sh {_ID} {_ID}")
+# ci-verifier's closed command allowlist (.claude/agents/ci-verifier.md), for that role only. Running a test
+# suite executes repository code by design; arguments stay plain words with no shell-expansion characters.
+CI_VERIFIER_CHECKS = re.compile(
+    rf"python3? -m (?:pytest|unittest)(?: [A-Za-z0-9_./:-]+)*"
+    rf"|ruff format --check(?: {_PATH})*"
+    r"|npm (?:test|run lint|run build)"
+    r"|make (?:test|lint)"
+)
 
 
 def _in_repository_root(cwd: object) -> bool:
@@ -171,6 +179,8 @@ def _bash_decision(command: object, agent: str, cwd: object = None) -> tuple[boo
     if not args:
         return False, "empty Bash command", ""
     if _is_allowed_script(command, cwd, agent):
+        return True, "", ""
+    if agent == "ci-verifier" and CI_VERIFIER_CHECKS.fullmatch(command):
         return True, "", ""
     # A bare command name only: a path such as `./git` or `/tmp/x/ls` could run any binary.
     if "/" in args[0]:

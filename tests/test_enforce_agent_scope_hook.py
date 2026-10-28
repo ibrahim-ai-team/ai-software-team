@@ -155,6 +155,27 @@ class ScopeHookTests(unittest.TestCase):
                 with self.subTest(agent=agent, command=command):
                     self.assertEqual(self.bash_decision(command, agent=agent), "allow")
 
+    def test_ci_verifier_can_run_only_its_contract_checks(self):
+        for command in (
+            "python -m unittest discover -s tests",
+            "python3 -m pytest -q tests",
+            "ruff format --check scripts",
+            "npm test",
+            "make lint",
+        ):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command, agent="ci-verifier"), "allow")
+                self.assertEqual(self.bash_decision(command, agent="backend-developer"), "deny")
+        for command in (
+            "python -m unittest $(id)",
+            "python -m pip install x",
+            "python -m http.server",
+            "npm install",
+            "make deploy",
+        ):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command, agent="ci-verifier"), "deny")
+
     def test_governance_scripts_are_limited_to_their_roles(self):
         self.assertEqual(
             self.bash_decision("python scripts/check_gates.py --story US-12 --gate G2", agent="backend-developer"), "deny"
