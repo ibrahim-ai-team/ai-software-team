@@ -27,6 +27,7 @@ class CheckGatesTests(unittest.TestCase):
             "reviewer": "code-review-security",
             "date": "2026-10-24T12:30:00Z",
             "checks": {"lint": "pass", "tests": "pass", "secrets": "pass"},
+            "commit": "c" * 40,
         }
         self.write(self.g1_path, self.g1)
         self.write(self.g2_path, self.g2)
@@ -35,9 +36,29 @@ class CheckGatesTests(unittest.TestCase):
     def write(path, record):
         path.write_text(json.dumps(record), encoding="utf-8")
 
-    def run_checker(self, *argv):
-        with patch.object(check_gates, "GATES_DIR", self.gates_dir):
+    def run_checker(self, *argv, head="c" * 40):
+        # Pin HEAD so the tests do not depend on the repository's real commit.
+        with (
+            patch.object(check_gates, "GATES_DIR", self.gates_dir),
+            patch.object(check_gates, "current_commit", return_value=head),
+        ):
             return check_gates.main(list(argv))
+
+    def test_g2_is_bound_to_the_verified_commit(self):
+        args = ("--story", "SHOP-12", "--gate", "G2")
+        self.assertEqual(self.run_checker(*args, head="d" * 40), 1)  # code changed after verification
+        self.assertEqual(self.run_checker(*args, head=None), 1)  # HEAD unknown: fail closed
+        self.assertEqual(self.run_checker(*args, "--commit", "c" * 40, head="d" * 40), 0)
+        self.assertEqual(self.run_checker(*args, "--commit", "d" * 40), 1)
+        self.assertEqual(self.run_checker(*args, "--commit", "abc123"), 2)
+        for bad in (None, "c" * 12, "z" * 40):
+            with self.subTest(commit=bad):
+                self.g2["commit"] = bad
+                self.write(self.g2_path, self.g2)
+                self.assertEqual(self.run_checker(*args), 1)
+
+    def test_g1_does_not_need_a_commit(self):
+        self.assertEqual(self.run_checker("--story", "SHOP-12", "--gate", "G1", head=None), 0)
 
     def test_valid_g1_returns_zero(self):
         self.assertEqual(self.run_checker("--story", "SHOP-12", "--gate", "G1"), 0)
