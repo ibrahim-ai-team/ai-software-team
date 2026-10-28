@@ -6,13 +6,15 @@ This is a same-machine coordination aid, not a distributed lock service.
 from __future__ import annotations
 
 import argparse
+import fcntl
 import getpass
 import json
 import os
 import socket
 import sys
 import uuid
-from contextlib import suppress
+from collections.abc import Iterator
+from contextlib import contextmanager, suppress
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -87,11 +89,24 @@ def create_lock(path: Path, ttl_seconds: int) -> dict[str, Any]:
     return lock
 
 
+@contextmanager
+def _guard(path: Path) -> Iterator[None]:
+    """Serialize acquire and release: without it, two takeovers of an expired lock could both succeed."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path.with_name(f"{path.name}.guard"), "a", encoding="utf-8") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        yield
+
+
 def acquire(path: Path, ttl_seconds: int) -> int:
     if ttl_seconds <= 0:
         print("ERROR: --ttl must be a positive number of seconds.", file=sys.stderr)
         return 2
-    path.parent.mkdir(parents=True, exist_ok=True)
+    with _guard(path):
+        return _acquire(path, ttl_seconds)
+
+
+def _acquire(path: Path, ttl_seconds: int) -> int:
     try:
         create_lock(path, ttl_seconds)
         print(f"Lock acquired: {path}")
@@ -184,13 +199,23 @@ def acquire(path: Path, ttl_seconds: int) -> int:
 
 
 def release(path: Path) -> int:
-    try:
-        path.unlink()
-    except FileNotFoundError:
-        pass
-    except OSError as exc:
-        print(f"ERROR: could not release lock {path}: {exc}", file=sys.stderr)
-        return 1
+    with _guard(path):
+        lock = read_lock(path)
+        # Acquire and release run as separate processes, so ownership is the host and OS user, not the PID.
+        foreign = lock is not None and (lock["hostname"] != socket.gethostname() or lock["holder"] != getpass.getuser())
+        if foreign and not is_expired(lock, utc_now()):
+            print(
+                f"ERROR: lock is held by {lock['holder']} on {lock['hostname']} and has not expired; not releasing it.",
+                file=sys.stderr,
+            )
+            return 1
+        try:
+            path.unlink()
+        except FileNotFoundError:
+            pass
+        except OSError as exc:
+            print(f"ERROR: could not release lock {path}: {exc}", file=sys.stderr)
+            return 1
     print("Lock released.")
     return 0
 
@@ -221,11 +246,15 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    if args.command == "acquire":
-        return acquire(args.lock_path, args.ttl)
-    if args.command == "release":
-        return release(args.lock_path)
-    return show_status(args.lock_path)
+    try:
+        if args.command == "acquire":
+            return acquire(args.lock_path, args.ttl)
+        if args.command == "release":
+            return release(args.lock_path)
+        return show_status(args.lock_path)
+    except ValueError as exc:  # malformed lock file: fail closed without a traceback
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

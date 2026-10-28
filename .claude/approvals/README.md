@@ -1,6 +1,6 @@
 # Human Approval Records
 
-The orchestrator records each human decision in a separate JSON file:
+Each human decision is a separate JSON file that **the human creates** (in an editor or terminal). Claude cannot write these files: `.claude/settings.json` denies edits to `.claude/approvals/*.json` and `.claude/human-approvers.json`, no agent scope covers `.claude/`, and the scope hook blocks shell writes. The orchestrator only asks for the approval and verifies it.
 
 `.claude/approvals/CP<N>-<story>.json`
 
@@ -36,5 +36,19 @@ echo $?
 ```
 
 Exit code `0` means the approval record is structurally valid for the requested story/checkpoint. Exit code `1` means it is absent or invalid. Exit code `2` means required arguments or argument values are invalid. The checker is read-only.
+
+## Approver list
+
+Create `.claude/human-approvers.json` to bind approvals to people:
+
+```json
+{ "approvers": ["your-github-username"] }
+```
+
+When it exists, `approved_by` in approval records, `human_decision.decided_by` in disagreement records and `approved_by` in provisioning records must exactly match a listed username (case-insensitive). A malformed or empty list fails closed: no approval is accepted. Without the file, disagreement records accept only `human sponsor`, `sponsor` or `human`.
+
+## Provisioning approval
+
+Before `python3 scripts/provision_project.py apply <plan>` creates anything, the sponsor creates `.claude/approvals/PROVISION-<project-id>.json` with `approved_by` and `plan_digest` set to the full digest printed by `provision_project.py plan`. The plan file's own approval block is not enough, because whoever writes the plan can fill it in.
 
 **Security boundary:** this JSON is an auditable record, not proof of identity. The checker validates the digest's SHA-256 format but cannot recompute it against the artifact because no artifact path is supplied. Human approval authority must be enforced through repository permissions and review controls.

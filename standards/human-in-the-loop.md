@@ -6,6 +6,8 @@ Human-in-the-loop (HITL) checkpoints are mandatory sponsor decisions at lifecycl
 
 Every approval is recorded as `.claude/approvals/CP<N>-<story>.json`. The orchestrator must run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>` before crossing the corresponding boundary. Exit code 0 permits that transition; exit code 1 means approval is absent or invalid and the orchestrator must stop; exit code 2 means the checker was invoked with missing or invalid arguments and must be corrected. The checker is read-only.
 
+Only the human creates approval records: `.claude/settings.json` denies Claude edits to `.claude/approvals/*.json` and `.claude/human-approvers.json`, and no agent scope covers `.claude/`. When `.claude/human-approvers.json` exists, `approved_by` must exactly match a listed username; a malformed or empty list fails closed (`.claude/approvals/README.md`).
+
 `approved_by` records the human approver's GitHub username. The approval JSON is an auditable record, not cryptographic identity proof: repository permissions and review history remain the source of authority. `artifact_hash` must be the SHA-256 hex digest of the exact artifact reviewed for that checkpoint. The checker validates its SHA-256 representation; since the CLI receives no artifact path, it cannot independently recompute the digest from the source artifact.
 
 ## Mandatory checkpoints

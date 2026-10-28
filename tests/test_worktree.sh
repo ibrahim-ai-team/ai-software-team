@@ -49,4 +49,10 @@ pass "confirmed cleanup removes the worktree"
 if ./scripts/cleanup_worktree.sh main STORY-1 >/dev/null 2>&1; then fail "cleanup must refuse main"; fi
 pass "cleanup refuses main"
 
+./scripts/new_worktree.sh backend STORY-3 >/dev/null || fail "creation should succeed"
+git -C ../worktrees/wt-backend-STORY-3 switch -q -c someone-elses-branch
+if printf 'yes\n' | ./scripts/cleanup_worktree.sh backend STORY-3 >/dev/null 2>&1; then fail "cleanup removed a worktree on another branch"; fi
+[[ -d ../worktrees/wt-backend-STORY-3 ]] || fail "branch-mismatch cleanup removed the worktree"
+pass "cleanup refuses a worktree on an unexpected branch"
+
 echo "All worktree tests passed."

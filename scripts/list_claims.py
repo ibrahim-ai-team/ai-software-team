@@ -5,6 +5,7 @@ import argparse
 import json
 import subprocess
 import sys
+import uuid
 
 
 def git(*args, check=True):
@@ -35,11 +36,14 @@ def main():
         print("No active claims.")
         return 0
     for ref, _sha in sorted(entries):
-        fetched = git("fetch", "--no-tags", args.remote, ref, check=False)
+        # A private temporary ref, not the shared FETCH_HEAD that concurrent runs overwrite.
+        temp_ref = f"refs/ai-team-tmp/{uuid.uuid4()}"
+        fetched = git("fetch", "--no-tags", args.remote, f"+{ref}:{temp_ref}", check=False)
         if fetched.returncode:
             print(f"Could not read {ref}: {fetched.stderr.strip()}", file=sys.stderr)
             return 3
-        shown = git("show", "FETCH_HEAD:claim.json", check=False)
+        shown = git("show", f"{temp_ref}:claim.json", check=False)
+        git("update-ref", "-d", temp_ref, check=False)
         if shown.returncode:
             print(f"Could not parse {ref}: claim.json is missing.", file=sys.stderr)
             return 1

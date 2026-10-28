@@ -9,7 +9,9 @@
       "src/frontend/**",
       "*.md",
       ".claude/**",
-      ".github/**"
+      ".github/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "frontend-developer": {
@@ -21,7 +23,9 @@
       "src/backend/**",
       "src/api/**",
       ".claude/**",
-      ".github/**"
+      ".github/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "database-engineer": {
@@ -33,7 +37,9 @@
     "forbidden_paths": [
       "src/frontend/**",
       "src/backend/**",
-      ".claude/**"
+      ".claude/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "devops-platform": {
@@ -45,7 +51,9 @@
     ],
     "forbidden_paths": [
       "src/**",
-      ".claude/agents/**"
+      ".claude/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "ui-ux-designer": {
@@ -56,19 +64,24 @@
     ],
     "forbidden_paths": [
       "src/backend/**",
-      ".claude/**"
+      ".claude/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "documentation-manager": {
     "allowed_paths": [
       "docs/**",
-      "*.md",
-      "README.md"
+      "README.md",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md"
     ],
     "forbidden_paths": [
       "src/**",
-      ".claude/agents/**",
-      "scripts/**"
+      ".claude/**",
+      "scripts/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "business-analyst": {
@@ -79,7 +92,9 @@
     ],
     "forbidden_paths": [
       "src/**",
-      ".claude/agents/**"
+      ".claude/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "product-owner": {
@@ -89,7 +104,9 @@
     ],
     "forbidden_paths": [
       "src/**",
-      ".claude/agents/**"
+      ".claude/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "qa-automation": {
@@ -99,7 +116,9 @@
     ],
     "forbidden_paths": [
       "src/**",
-      ".claude/agents/**"
+      ".claude/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "tech-lead": {
@@ -115,7 +134,9 @@
     ],
     "forbidden_paths": [
       "src/**",
-      ".claude/agents/**"
+      ".claude/**",
+      "workflows/**",
+      "standards/**"
     ]
   },
   "code-review-security": {

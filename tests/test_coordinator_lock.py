@@ -78,6 +78,35 @@ class CoordinatorLockTests(unittest.TestCase):
             self.assertIn("WARNING", result.stderr)
             self.assertEqual(json.loads(lock_path.read_text(encoding="utf-8"))["ttl_seconds"], 90)
 
+    def write_foreign_lock(self, lock_path, age_seconds, ttl_seconds):
+        started = (datetime.now(timezone.utc) - timedelta(seconds=age_seconds)).isoformat().replace("+00:00", "Z")
+        record = {"pid": 424242, "hostname": "other-host", "started_at": started, "ttl_seconds": ttl_seconds, "holder": "other"}
+        lock_path.write_text(json.dumps(record), encoding="utf-8")
+
+    def test_release_refuses_another_holders_live_lock(self):
+        with tempfile.TemporaryDirectory() as directory:
+            lock_path = Path(directory) / "coordinator.lock"
+            self.write_foreign_lock(lock_path, age_seconds=10, ttl_seconds=3600)
+            result = self.run_cli(lock_path, "release")
+            self.assertEqual(result.returncode, 1)
+            self.assertTrue(lock_path.exists())
+
+    def test_release_clears_another_holders_expired_lock(self):
+        with tempfile.TemporaryDirectory() as directory:
+            lock_path = Path(directory) / "coordinator.lock"
+            self.write_foreign_lock(lock_path, age_seconds=120, ttl_seconds=60)
+            result = self.run_cli(lock_path, "release")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse(lock_path.exists())
+
+    def test_malformed_lock_fails_closed_without_traceback(self):
+        with tempfile.TemporaryDirectory() as directory:
+            lock_path = Path(directory) / "coordinator.lock"
+            lock_path.write_text("{", encoding="utf-8")
+            result = self.run_cli(lock_path, "release")
+            self.assertEqual(result.returncode, 2)
+            self.assertNotIn("Traceback", result.stderr)
+
     def test_status_without_lock_prints_no_lock(self):
         with tempfile.TemporaryDirectory() as directory:
             lock_path = Path(directory) / "missing.lock"

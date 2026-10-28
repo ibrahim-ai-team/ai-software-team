@@ -11,6 +11,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
+from unittest import mock
 
 from scripts import provision_project as pp
 
@@ -552,22 +553,56 @@ class ApprovalGateTests(unittest.TestCase):
 
     def main(self, *args, client):
         out = io.StringIO()
-        with redirect_stdout(out):
+        # Isolated from the repository's real .claude/human-approvers.json.
+        with redirect_stdout(out), mock.patch.object(pp, "APPROVERS_PATH", Path(tempfile.gettempdir()) / "no-approvers.json"):
             code = pp.main(list(args), client=client)
         return code, out.getvalue()
+
+    def human_record(self, folder, digest, approved_by="IbrhimGhorafi"):
+        project_id = pp.validate_plan(plan())["project"]["id"]
+        record = {"approved_by": approved_by, "plan_digest": digest}
+        (Path(folder) / f"PROVISION-{project_id}.json").write_text(json.dumps(record), encoding="utf-8")
 
     def test_apply_requires_matching_approval(self):
         with tempfile.TemporaryDirectory() as folder:
             fake = FakeGitHub()
-            code, out = self.main("apply", self.write_plan(plan(), folder), "--state-dir", folder, client=fake)
+            flags = ("--state-dir", folder, "--approvals-dir", folder)
+            code, out = self.main("apply", self.write_plan(plan(), folder), *flags, client=fake)
             self.assertEqual(code, 4)
             self.assertIn("Refusing to provision", out)
             self.assertEqual(fake.writes, [])
             digest = pp.plan_digest(pp.validate_plan(plan()))
             approved = plan(approval={"approved_by": "IbrhimGhorafi", "approved_at": "2026-10-20", "plan_digest": digest})
-            code, out = self.main("apply", self.write_plan(approved, folder), "--state-dir", folder, client=fake)
+            self.human_record(folder, digest)
+            code, out = self.main("apply", self.write_plan(approved, folder), *flags, client=fake)
             self.assertEqual(code, 0, out)
             self.assertEqual(len(fake.repos), 3)
+
+    def test_plan_file_approval_alone_is_not_enough(self):
+        # Whoever writes the plan can fill its approval block; the human record must also exist.
+        digest = pp.plan_digest(pp.validate_plan(plan()))
+        approved = plan(approval={"approved_by": "agent", "plan_digest": digest})
+        with tempfile.TemporaryDirectory() as folder:
+            fake = FakeGitHub()
+            flags = ("--state-dir", folder, "--approvals-dir", folder)
+            code, out = self.main("apply", self.write_plan(approved, folder), *flags, client=fake)
+            self.assertEqual(code, 4)
+            self.assertIn("PROVISION-", out)
+            self.human_record(folder, "0" * 64)
+            code, out = self.main("apply", self.write_plan(approved, folder), *flags, client=fake)
+            self.assertEqual(code, 4)
+            self.assertIn("does not approve this plan", out)
+            self.assertEqual(fake.writes, [])
+
+    def test_human_record_must_name_a_configured_approver(self):
+        digest = pp.plan_digest(pp.validate_plan(plan()))
+        with tempfile.TemporaryDirectory() as folder:
+            self.human_record(folder, digest, approved_by="someone-else")
+            approvers = Path(folder) / "approvers.json"
+            approvers.write_text('{"approvers": ["IbrhimGhorafi"]}', encoding="utf-8")
+            with mock.patch.object(pp, "APPROVERS_PATH", approvers):
+                problem = pp.human_approval_problem(Path(folder), pp.validate_plan(plan())["project"]["id"], digest)
+            self.assertIn("is not listed", problem)
 
     def test_changed_plan_invalidates_approval(self):
         digest = pp.plan_digest(pp.validate_plan(plan()))

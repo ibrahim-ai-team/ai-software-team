@@ -1,13 +1,17 @@
 """Tests for the Claude Code write-scope hook."""
 
 import json
+import os
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HOOK = ROOT / "scripts" / "enforce_agent_scope_hook.py"
+# Denials append telemetry; keep test events out of the team's real log.
+TELEMETRY = Path(tempfile.mkdtemp()) / "activity.jsonl"
 
 
 def invoke(payload):
@@ -18,6 +22,7 @@ def invoke(payload):
         capture_output=True,
         text=True,
         check=False,
+        env={**os.environ, "AI_TEAM_TELEMETRY_LOG": str(TELEMETRY)},
     )
 
 
@@ -38,7 +43,9 @@ class ScopeHookTests(unittest.TestCase):
         self.assertEqual(result.stdout, "")
 
     def test_out_of_scope_write_is_blocked_and_telemetry_recorded(self):
-        telemetry = ROOT / ".claude/telemetry/activity.jsonl"
+        telemetry = TELEMETRY
+        real_log = ROOT / ".claude/telemetry/activity.jsonl"
+        real_before = real_log.read_text(encoding="utf-8") if real_log.exists() else ""
         before = telemetry.read_text(encoding="utf-8") if telemetry.exists() else ""
         result = invoke(
             {
@@ -59,6 +66,7 @@ class ScopeHookTests(unittest.TestCase):
         event = json.loads(after.splitlines()[-1])
         self.assertEqual(event["details"]["refused_path"], "src/frontend/blocked.tsx")
         self.assertNotIn("secret-not-logged", after)
+        self.assertEqual(real_log.read_text(encoding="utf-8") if real_log.exists() else "", real_before)
 
     def test_unknown_subagent_fails_closed(self):
         result = invoke(
@@ -84,8 +92,10 @@ class ScopeHookTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, "")
 
-    def bash_decision(self, command, cwd=str(ROOT)):
-        payload = {"tool_name": "Bash", "agent_type": "agile-orchestrator", "cwd": cwd, "tool_input": {"command": command}}
+    def bash_decision(self, command, cwd=str(ROOT), agent="agile-orchestrator"):
+        payload = {"tool_name": "Bash", "cwd": cwd, "tool_input": {"command": command}}
+        if agent:
+            payload["agent_type"] = agent
         result = invoke(payload)
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"] if result.stdout else "allow"
@@ -122,6 +132,64 @@ class ScopeHookTests(unittest.TestCase):
         ):
             with self.subTest(command=command):
                 self.assertEqual(self.bash_decision(command), "deny")
+
+    def test_coordinator_can_run_the_governance_scripts(self):
+        commands = (
+            "python scripts/detect_conflict.py --story US-12 --agents software-architect,tech-lead",
+            "python scripts/check_approvals.py --story US-12 --checkpoint CP2",
+            "python3 scripts/check_gates.py --story US-12 --gate G2",
+            "python scripts/check_claims.py docs/project-state.md",
+            "python scripts/enforce_agent_scope.py --agent backend-developer --path src/backend/app.py",
+            "python scripts/coordinator_lock.py acquire --ttl 7200",
+            "python scripts/coordinator_lock.py release",
+            "python scripts/check_governance.py docs/sprints/*.md",
+            "python scripts/check_governance.py --state docs/project-state.md --repo . --release",
+            "python scripts/status_report.py --health-json --strict",
+            "python scripts/add_lesson.py --title 'Pin actions' --context 'G2 lint' --error 'unpinned' --rule 'Pin SHAs' --story US-12",
+            "./scripts/new_worktree.sh backend-developer US-12",
+            "python3 scripts/provision_project.py plan .provisioning/shop-plan.json --check-github",
+            "python3 scripts/provision_project.py apply .provisioning/shop-plan.json --dry-run",
+        )
+        for agent in ("agile-orchestrator", None):  # None: the main session started without --agent
+            for command in commands:
+                with self.subTest(agent=agent, command=command):
+                    self.assertEqual(self.bash_decision(command, agent=agent), "allow")
+
+    def test_governance_scripts_are_limited_to_their_roles(self):
+        self.assertEqual(
+            self.bash_decision("python scripts/check_gates.py --story US-12 --gate G2", agent="backend-developer"), "deny"
+        )
+        self.assertEqual(
+            self.bash_decision(
+                "python scripts/add_lesson.py --title 'a' --context 'b' --error 'c' --rule 'd' --story US-1",
+                agent="qa-automation",
+            ),
+            "deny",
+        )
+        self.assertEqual(self.bash_decision("./scripts/new_worktree.sh a US-1", agent="devops-platform"), "deny")
+        self.assertEqual(
+            self.bash_decision("python scripts/check_governance.py docs/sprints/S1.md", agent="project-manager"), "allow"
+        )
+        self.assertEqual(
+            self.bash_decision("python scripts/check_governance.py docs/sprints/S1.md", agent="backend-developer"), "deny"
+        )
+
+    def test_governance_script_arguments_are_exact(self):
+        for command in (
+            "./scripts/cleanup_worktree.sh backend-developer US-12",
+            "python scripts/coordinator_lock.py --lock-path /tmp/x status",
+            "python scripts/check_gates.py --story US-12 --gate G3",
+            "python scripts/check_claims.py ../outside.md",
+            "python scripts/check_claims.py /etc/passwd",
+            "python scripts/check_governance.py docs/*/*.md",
+            "python scripts/add_lesson.py --title \"$HOME\" --context 'b' --error 'c' --rule 'd' --story US-1",
+            "python scripts/add_lesson.py --title 'a' 'x' --context 'b' --error 'c' --rule 'd' --story US-1",
+            "python scripts/detect_conflict.py --story US-12 --agents {a,b}",
+        ):
+            with self.subTest(command=command):
+                self.assertEqual(self.bash_decision(command), "deny")
+        relative = "python scripts/check_gates.py --story US-12 --gate G1"
+        self.assertEqual(self.bash_decision(relative, cwd="/tmp"), "deny")
 
     def test_read_only_commands_stay_allowed(self):
         for command in (

@@ -12,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 APPROVALS_DIR = ROOT / ".claude" / "approvals"
+APPROVERS_PATH = ROOT / ".claude" / "human-approvers.json"
 CHECKPOINTS = ("CP1", "CP2", "CP3", "CP4")
 STORY_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SHA256_PATTERN = re.compile(r"^[a-fA-F0-9]{64}$")
@@ -33,6 +34,20 @@ def is_iso8601(value: object) -> bool:
     except ValueError:
         return False
     return parsed.tzinfo is not None and parsed.utcoffset() is not None
+
+
+def configured_approvers() -> set[str] | None:
+    """GitHub usernames from .claude/human-approvers.json, or None when the sponsor has not created it."""
+    try:
+        data = json.loads(APPROVERS_PATH.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return set()  # unreadable or malformed: fail closed, nobody is an approver
+    names = data.get("approvers") if isinstance(data, dict) else None
+    if not isinstance(names, list):
+        return set()
+    return {name.strip().casefold() for name in names if isinstance(name, str) and name.strip()}
 
 
 def validate_record(story: str, checkpoint: str, path: Path) -> tuple[bool, str]:
@@ -60,6 +75,9 @@ def validate_record(story: str, checkpoint: str, path: Path) -> tuple[bool, str]
         return False, "story does not match requested story"
     if not isinstance(record.get("approved_by"), str) or not record["approved_by"].strip():
         return False, "approved_by must be a non-empty username"
+    approvers = configured_approvers()
+    if approvers is not None and record["approved_by"].strip().casefold() not in approvers:
+        return False, "approved_by is not listed in .claude/human-approvers.json"
     if not is_iso8601(record.get("date")):
         return False, "date must be an ISO 8601 datetime with timezone"
     if not isinstance(record.get("artifact_hash"), str) or not SHA256_PATTERN.fullmatch(record["artifact_hash"]):

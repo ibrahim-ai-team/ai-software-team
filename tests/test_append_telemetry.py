@@ -52,6 +52,27 @@ class AppendTelemetryTests(unittest.TestCase):
     def read_events(self):
         return [json.loads(line) for line in self.log_path.read_text(encoding="utf-8").splitlines()]
 
+    def test_credential_values_and_keys_are_rejected(self):
+        # Built at runtime so secret scanners do not flag this test file.
+        token = "gh" + "p_" + "A" * 36
+        for details in (
+            json.dumps({"note": token}),
+            json.dumps({"nested": [{"x": "Bear" + "er abcdefghijklmnop"}]}),
+            json.dumps({"authorization": "x"}),
+            json.dumps({"credential": "x"}),
+        ):
+            with self.subTest(details=details[:20]):
+                self.assertEqual(self.run_append(details=details), 1)
+        with (
+            patch.object(
+                sys, "argv", ["a", "--agent", "agile-orchestrator", "--action", "delegate", "--story", token, "--details", "{}"]
+            ),
+            patch.object(append_telemetry, "LOG_PATH", self.log_path),
+            patch.object(append_telemetry, "AGENTS_PATH", self.agents_path),
+        ):
+            self.assertEqual(append_telemetry.main(), 1)
+        self.assertFalse(self.log_path.exists())
+
     def test_appends_iso_timestamp_and_uuid4(self):
         self.assertEqual(self.run_append(), 0)
         event = self.read_events()[0]

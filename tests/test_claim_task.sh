@@ -17,6 +17,7 @@ export GIT_AUTHOR_EMAIL="claim-test@example.invalid"
 export GIT_COMMITTER_NAME="Claim Test"
 export GIT_COMMITTER_EMAIL="claim-test@example.invalid"
 export PYTHONDONTWRITEBYTECODE=1
+unset RUN_ID
 CLAIM=(python3 "$ROOT/scripts/claim_task.py" --remote "$BARE")
 RELEASE=(python3 "$ROOT/scripts/release_claim.py" --remote "$BARE")
 
@@ -35,8 +36,22 @@ if ! { [[ "$A" -eq 0 && "$B" -eq 1 ]] || [[ "$A" -eq 1 && "$B" -eq 0 ]]; }; then
   exit 1
 fi
 
-# Release then re-claim.
-(cd "$WORK" && "${RELEASE[@]}" --task-id T-RACE)
+# Only the run that holds a claim may release it.
+WINNER=run-A
+LOSER=run-B
+if [[ "$B" -eq 0 ]]; then WINNER=run-B; LOSER=run-A; fi
+if (cd "$WORK" && "${RELEASE[@]}" --task-id T-RACE --run-id "$LOSER") 2>/dev/null; then
+  echo "A non-holder released another run's claim" >&2
+  exit 1
+fi
+git --git-dir="$BARE" show-ref --verify --quiet refs/claims/T-RACE
+if (cd "$WORK" && "${RELEASE[@]}" --task-id T-RACE) 2>/dev/null; then
+  echo "Release without --run-id unexpectedly succeeded" >&2
+  exit 1
+fi
+
+# Release by the holder, then re-claim.
+(cd "$WORK" && "${RELEASE[@]}" --task-id T-RACE --run-id "$WINNER")
 (cd "$WORK" && "${CLAIM[@]}" --task-id T-RACE --run-id run-after-release)
 
 # Listing must include the active claim.

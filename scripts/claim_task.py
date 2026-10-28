@@ -50,17 +50,21 @@ def remote_sha(remote, ref):
 
 
 def read_claim(remote, ref):
-    # Fetch the advertised claim ref so its JSON can be inspected without GitHub APIs.
-    result = git("fetch", "--no-tags", remote, ref, check=False)
-    if result.returncode:
-        raise RuntimeError(result.stderr.strip() or "git fetch failed")
-    result = git("show", "FETCH_HEAD:claim.json", check=False)
-    if result.returncode:
-        raise RuntimeError("Claim ref does not contain a readable claim.json")
+    # Fetch the advertised claim ref into a private temporary ref (not the shared FETCH_HEAD,
+    # which concurrent runs overwrite) so its JSON can be inspected without GitHub APIs.
+    temp_ref = f"refs/ai-team-tmp/{uuid.uuid4()}"
     try:
+        result = git("fetch", "--no-tags", remote, f"+{ref}:{temp_ref}", check=False)
+        if result.returncode:
+            raise RuntimeError(result.stderr.strip() or "git fetch failed")
+        result = git("show", f"{temp_ref}:claim.json", check=False)
+        if result.returncode:
+            raise RuntimeError("Claim ref does not contain a readable claim.json")
         return json.loads(result.stdout)
     except json.JSONDecodeError as exc:
         raise RuntimeError("Claim ref contains invalid JSON") from exc
+    finally:
+        git("update-ref", "-d", temp_ref, check=False)
 
 
 def create_orphan_commit(payload):
