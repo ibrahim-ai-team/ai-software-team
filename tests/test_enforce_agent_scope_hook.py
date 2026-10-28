@@ -149,6 +149,11 @@ class ScopeHookTests(unittest.TestCase):
             "./scripts/new_worktree.sh backend-developer US-12",
             "python3 scripts/provision_project.py plan .provisioning/shop-plan.json --check-github",
             "python3 scripts/provision_project.py apply .provisioning/shop-plan.json --dry-run",
+            "python scripts/route_model.py --agent backend-developer --skill backend-engineering-standards --size M --risk",
+            "python scripts/detect_checks.py",
+            "python scripts/detect_checks.py --repo ../worktrees/wt-backend-developer-US-12",
+            "python scripts/check_diff_scope.py --agent backend-developer",
+            "python scripts/check_diff_scope.py --agent backend-developer --base main --repo ../worktrees/wt-backend-developer-US-12",
         )
         for agent in ("agile-orchestrator", None):  # None: the main session started without --agent
             for command in commands:
