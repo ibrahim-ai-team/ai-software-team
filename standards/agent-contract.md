@@ -62,7 +62,7 @@ The orchestrator remains the only delegation coordinator. It delegates GitHub ex
 
 ## Scope enforcement
 
-Before any agent write, run `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`. The central `.claude/agent-scopes.json` is authoritative. Unknown agents, malformed configuration, forbidden paths, and paths outside the allowlist are denied. This preflight is not a sandbox; runtime/tool-level controls must also constrain writes. Scope denials must be reported and logged as telemetry with `action=error` and `details.refused_path`.
+The central `.claude/agent-scopes.json` is authoritative. Before delegating a write, the orchestrator runs `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`; at runtime, the PreToolUse hook (`scripts/enforce_agent_scope_hook.py`) applies the same check to every subagent write. Unknown agents, malformed configuration, forbidden paths, and paths outside the allowlist are denied. Neither is a sandbox. Scope denials are reported and logged as telemetry with `action=error` and `details.refused_path`.
 
 ## Product Owner vs Business Analyst: responsibility boundary
 
@@ -103,4 +103,4 @@ Any PO/BA disagreement is escalated to the orchestrator; neither agent may assum
 
 ## Conflict resolution authority
 
-For disagreements, follow [`standards/conflict-resolution.md`](conflict-resolution.md). The authority order is: **human sponsor > CP1–CP4 human checkpoint decisions > `software-architect` for architecture > `tech-lead` for code decisions > all other agents**. Security and repository protections remain hard constraints. Specialists must return conflicting evidence rather than override one another; after two unsuccessful rounds on the same story/topic, the orchestrator escalates to the human sponsor and blocks the dependent transition until a human decision is recorded. No agent may ignore an escalated disagreement.
+Follow [`standards/conflict-resolution.md`](conflict-resolution.md) for the authority order, the two-strike escalation and the stop rule. Specialists return conflicting evidence instead of overriding one another, and no agent may ignore an escalated disagreement.

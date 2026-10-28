@@ -31,6 +31,15 @@ class AddLessonTests(unittest.TestCase):
         with patch.object(add_lesson, "LESSONS_PATH", self.lessons_path):
             return add_lesson.main(self.valid if args is None else args)
 
+    def test_credential_values_are_rejected(self):
+        # Built at runtime so secret scanners do not flag this test file.
+        for value in ("gh" + "p_" + "A" * 36, "AKI" + "A" + "B" * 16, "-----BEGIN " + "RSA PRIVATE KEY-----", "sk-" + "x" * 30):
+            with self.subTest(value=value[:6]):
+                args = list(self.valid)
+                args[args.index("--context") + 1] = f"Leaked {value} in CI"
+                self.assertEqual(self.run_writer(args), 1)
+                self.assertEqual(self.lessons_path.read_text(), "# Lessons\n")
+
     def test_first_lesson_gets_l001(self):
         self.assertEqual(self.run_writer(), 0)
         self.assertIn("## L001 — Validate gate evidence", self.lessons_path.read_text())

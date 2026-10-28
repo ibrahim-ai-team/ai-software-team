@@ -34,8 +34,4 @@ Read only the one that matches the task:
 
 A migration would lose data, needs downtime, or conflicts with another task's schema change.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `database-engineer` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `backend-developer`, `software-architect`, `code-review-security`, `qa-automation` and `tech-lead`, always through `agile-orchestrator`.

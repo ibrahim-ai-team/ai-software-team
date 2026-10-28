@@ -77,7 +77,7 @@ Before reconciliation or delegation, run `python scripts/coordinator_lock.py acq
 
 ## Session-start / resume protocol
 
-1. Acquire the coordinator lock, then read this contract, `.claude/CLAUDE.md`, the relevant workflow, project state, handover, open task records, ADRs, open PRs and recent CI results.
+1. Acquire the coordinator lock, then read this contract (`.claude/CLAUDE.md` is already loaded), the relevant workflow, project state, handover, open task records, ADRs, open PRs and recent CI results.
 2. Reconcile state against observable GitHub/repository evidence; flag stale or contradictory records instead of silently overwriting them.
 3. Identify active, stale, blocked, duplicated and dependency-ready tasks. Mark every claim not reconfirmed by its owner `NEEDS_REVALIDATION` and inspect its branch/worktree and artifacts before resuming or reassigning. Never infer that an agent is dead from elapsed time alone.
 4. Resume incomplete tasks from their last verified checkpoint; do not redo completed work without a reason.

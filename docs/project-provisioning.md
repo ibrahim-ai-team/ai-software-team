@@ -52,7 +52,7 @@ Branch protection is applied only when the approved plan sets `options.branch_pr
 
 ## Approval
 
-`apply` refuses to run unless `approval.plan_digest` equals the digest printed by `plan`. The digest covers the whole normalized plan except the approval block. Changing anything (a repository, visibility, the backlog) requires a new approval. `--dry-run` needs no approval and writes nothing.
+`apply` refuses to run unless `approval.plan_digest` equals the digest printed by `plan` (a full 64-character SHA-256) **and** the sponsor has created `.claude/approvals/PROVISION-<project-id>.json` with `approved_by` and the same `plan_digest`. Claude cannot write that record (see `.claude/approvals/README.md`), so an agent that edits the plan cannot approve it. The digest covers the whole normalized plan except the approval block. Changing anything (a repository, visibility, the backlog) requires a new approval. `--dry-run` needs no approval and writes nothing.
 
 `.claude/settings.json` also asks a human before any command containing `provision_project.py apply` runs (verified at runtime: PV-05).
 

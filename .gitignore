@@ -28,3 +28,4 @@ Thumbs.db
 
 # Runtime-only local coordinator lock
 /state/coordinator.lock
+/state/coordinator.lock.guard

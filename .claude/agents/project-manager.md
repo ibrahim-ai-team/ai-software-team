@@ -46,7 +46,3 @@ Each delegation has a final or explicitly ongoing state; accepted outputs link t
 ## Escalate to the orchestrator when
 
 Capacity cannot fit the sprint goal, an impediment needs another role or the sponsor, or records disagree with GitHub evidence.
-
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `project-manager` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.

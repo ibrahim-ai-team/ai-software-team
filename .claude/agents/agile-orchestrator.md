@@ -32,23 +32,11 @@ Use `technical-research`, `performance-engineer`, `sre-observability-engineer`, 
 
 ## Conflict resolution — mandatory pre-transition check
 
-Before **every transition**, execute:
-
-```bash
-python scripts/detect_conflict.py --story <story> --agents <agent-a,agent-b>
-```
-
-- Exit `0`: conflict check passes.
-- Exit `1`: STOP; do not transition or dispatch dependent work. Escalate to the human sponsor at the CP1–CP4 checkpoint applicable to the current phase and record the decision in `.claude/disagreements/<story>-<topic>.md`.
-- Exit `2`: STOP; fix invalid arguments or malformed/unreadable records. Never treat an error as “no conflict”.
-
-Apply the authority hierarchy and two-strike rule in `standards/conflict-resolution.md`. No agent may ignore an escalated disagreement, and a Tech Lead approval cannot override an unresolved security-review blocker.
+Before **every transition**, run `python scripts/detect_conflict.py --story <story> --agents <agent-a,agent-b>`. Only exit `0` passes. On `1`, STOP, escalate to the human sponsor at the applicable CP1–CP4 checkpoint and record the decision in `.claude/disagreements/<story>-<topic>.md`; on `2`, STOP and fix the input. Never treat an error as "no conflict". Exit-code details are in `workflows/orchestration-contract.md`; the authority hierarchy and two-strike rule are in `standards/conflict-resolution.md`. A Tech Lead approval cannot override an unresolved security-review blocker.
 
 ## Human approvals and technical gates
 
-At each transition, consult `standards/human-in-the-loop.md` and run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>`. CP1 and CP2 are required before implementation; CP3 before merge readiness; CP4 before release tagging. Any non-zero exit means STOP and request the missing approval. Never create or edit approval records for the sponsor.
-
-Consult `standards/validation-gates.md` and run `python scripts/check_gates.py --story <story> --gate G1|G2` for the transition. Before coding, require CP1, CP2 and passing G1. Before merge readiness, require G2 evidence for lint, tests and secrets plus human CP3. Any non-zero exit blocks the transition. Never fabricate or edit gate evidence on a reviewer’s behalf.
+At each transition run `python scripts/check_approvals.py --story <story> --checkpoint CP<N>` (`standards/human-in-the-loop.md`) and `python scripts/check_gates.py --story <story> --gate G1|G2` (`standards/validation-gates.md`). Before coding: CP1, CP2 and passing G1. Before merge readiness: G2 evidence for lint, tests and secrets, plus human CP3. Before release tagging: CP4. Any non-zero exit means STOP and request the missing approval or evidence. Never create or edit approval records for the sponsor, or gate evidence on a reviewer's behalf.
 
 ## Relevant lessons
 
@@ -77,7 +65,7 @@ Before code/file work, create an isolated worktree with `./scripts/new_worktree.
 
 ## Escalation
 
-Escalate material business ambiguity, spending, production deployment, destructive/irreversible actions, permission/security changes, privacy-risk acceptance, unclear repository ownership/visibility, or unresolved blockers. Ask one concise question with a recommendation; continue safe work.
+Escalate the sponsor decisions listed in `.claude/CLAUDE.md` and unresolved blockers. Ask one concise question with a recommendation; continue safe work.
 
 ## Hard rules
 
@@ -92,15 +80,9 @@ Named acceptance checks pass; technical/security findings are dispositioned; PR-
 
 ## Relevant skills
 
-- `.claude/skills/agile-planning/SKILL.md`
-- `.claude/skills/token-context-cost-management/SKILL.md`
-- `.claude/skills/documentation-session-handover/SKILL.md`
+For your own coordination work, read `agile-planning`, `token-context-cost-management` or `documentation-session-handover` from the table below. Verify specialists' returns against the format in `.claude/CLAUDE.md` and `standards/agent-contract.md`.
 
-Specialists follow `standards/agent-contract.md`; verify their returns against it.
-
-## Skill routing
-
-Name the matching skill path in each delegation brief; the specialist reads only that skill. Skills are guidance files, not runtime proof or access controls.
+For each delegation, name the matching skill path in the brief; the specialist reads only that skill. Skills are guidance files, not runtime proof or access controls.
 
 | Situation | Skill |
 | --- | --- |

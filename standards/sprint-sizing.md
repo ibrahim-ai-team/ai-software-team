@@ -75,7 +75,7 @@ From Anthropic's [cost guidance](https://code.claude.com/docs/en/costs), applied
 - **Inspect before working.** Resume from `docs/project-state.md`, the handover and the open Issues and PRs. Do not repeat planning, research or reviews that already have a recorded result and no new information.
 - **One task per session thread.** Use `/clear` between unrelated tasks, and `/compact` with a focus instruction when a long task must continue.
 - **Small, specific prompts.** Give each delegation exact files, paths and acceptance checks; do not ask it to "look at the whole repository".
-- **Cheaper models where they fit.** Most work runs on the default model. Keep the strongest model for hard architecture or debugging decisions (`docs/model-routing-decision.md`).
+- **Right-size the model.** Each role has a default model tier, and each delegation is routed by the complexity of its primary skill, size and risk (`docs/model-routing-decision.md`).
 - **Short always-loaded context.** Keep `.claude/CLAUDE.md` under about 200 lines and put procedures in on-demand skills.
 - **Few tools.** Prefer the `gh` CLI or the project-status workflow over extra MCP servers, and turn off MCP servers a session does not need.
 - **Push verbose output away from the main thread.** Let the implementing agent run tests and read logs, and return a summary with the exact commands and results.

@@ -20,6 +20,13 @@ def git(*args, input_text=None, check=True):
     )
 
 
+def remote_arg(value):
+    """argparse type: a remote name, path or URL, never a git option such as --upload-pack=..."""
+    if not value or value.startswith("-"):
+        raise argparse.ArgumentTypeError("must be a remote name, path or URL, not an option")
+    return value
+
+
 def task_ref(task_id):
     ref = f"refs/claims/{task_id}"
     try:
@@ -43,17 +50,21 @@ def remote_sha(remote, ref):
 
 
 def read_claim(remote, ref):
-    # Fetch the advertised claim ref so its JSON can be inspected without GitHub APIs.
-    result = git("fetch", "--no-tags", remote, ref, check=False)
-    if result.returncode:
-        raise RuntimeError(result.stderr.strip() or "git fetch failed")
-    result = git("show", "FETCH_HEAD:claim.json", check=False)
-    if result.returncode:
-        raise RuntimeError("Claim ref does not contain a readable claim.json")
+    # Fetch the advertised claim ref into a private temporary ref (not the shared FETCH_HEAD,
+    # which concurrent runs overwrite) so its JSON can be inspected without GitHub APIs.
+    temp_ref = f"refs/ai-team-tmp/{uuid.uuid4()}"
     try:
+        result = git("fetch", "--no-tags", remote, f"+{ref}:{temp_ref}", check=False)
+        if result.returncode:
+            raise RuntimeError(result.stderr.strip() or "git fetch failed")
+        result = git("show", f"{temp_ref}:claim.json", check=False)
+        if result.returncode:
+            raise RuntimeError("Claim ref does not contain a readable claim.json")
         return json.loads(result.stdout)
     except json.JSONDecodeError as exc:
         raise RuntimeError("Claim ref contains invalid JSON") from exc
+    finally:
+        git("update-ref", "-d", temp_ref, check=False)
 
 
 def create_orphan_commit(payload):
@@ -66,7 +77,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--task-id", required=True)
     parser.add_argument("--run-id")
-    parser.add_argument("--remote", default="origin")
+    parser.add_argument("--remote", default="origin", type=remote_arg)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 

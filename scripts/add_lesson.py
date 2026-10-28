@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import fcntl
 import re
 import sys
 from datetime import date
@@ -12,7 +13,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LESSONS_PATH = ROOT / ".claude" / "lessons" / "lessons.md"
 LESSON_ID_PATTERN = re.compile(r"(?m)^## L(\d{3,})\s+—")
-SUSPICIOUS_TERMS = ("token", "password", "secret")
+SUSPICIOUS_TERMS = ("token", "password", "secret", "bearer", "private key")
+# Secret values that contain none of the words above: GitHub, AWS, Slack and API keys, PEM blocks.
+SECRET_VALUE_RE = re.compile(
+    r"gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|xox[abprs]-[A-Za-z0-9-]{10,}"
+    r"|sk-[A-Za-z0-9_-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----"
+)
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -31,6 +37,8 @@ def validate_fields(values: dict[str, str]) -> tuple[bool, str]:
             return False, f"{name} must not be empty"
         if any(term in value.casefold() for term in SUSPICIOUS_TERMS):
             return False, f"{name} contains a prohibited sensitive-term marker"
+        if SECRET_VALUE_RE.search(value):
+            return False, f"{name} contains what looks like a credential value"
         if "\x00" in value:
             return False, f"{name} contains an invalid control character"
     return True, ""
@@ -72,11 +80,13 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     try:
-        existing = LESSONS_PATH.read_text(encoding="utf-8") if LESSONS_PATH.exists() else ""
-        lesson_id = next_lesson_id(existing)
-        rendered = render_lesson(lesson_id, **values)
         LESSONS_PATH.parent.mkdir(parents=True, exist_ok=True)
         with LESSONS_PATH.open("a", encoding="utf-8", newline="\n") as handle:
+            # Hold the lock across read and append so concurrent writers cannot reuse a lesson ID.
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            existing = LESSONS_PATH.read_text(encoding="utf-8")
+            lesson_id = next_lesson_id(existing)
+            rendered = render_lesson(lesson_id, **values)
             if existing and not existing.endswith("\n"):
                 handle.write("\n")
             handle.write(rendered)

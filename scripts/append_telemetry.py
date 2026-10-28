@@ -1,9 +1,11 @@
 """Append a validated, secret-safe event to the local JSONL telemetry log."""
 
 import argparse
+import fcntl
 import hashlib
 import json
 import os
+import re
 import sys
 import uuid
 from datetime import datetime, timezone
@@ -11,10 +13,27 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-LOG_PATH = ROOT / ".claude" / "telemetry" / "activity.jsonl"
+# Tests point AI_TEAM_TELEMETRY_LOG at a temporary file so they do not pollute the real log.
+LOG_PATH = Path(os.environ.get("AI_TEAM_TELEMETRY_LOG") or ROOT / ".claude" / "telemetry" / "activity.jsonl")
 AGENTS_PATH = ROOT / "state" / "agents.json"
 ALLOWED_ACTIONS = {"delegate", "gate", "approve", "tool_call", "error"}
-FORBIDDEN_KEY_PARTS = ("token", "password", "api_key", "secret")
+FORBIDDEN_KEY_PARTS = ("token", "password", "api_key", "secret", "authorization", "credential", "cookie", "private_key")
+# Secret values whose key name looks harmless: GitHub, AWS, Slack and API keys, bearer headers, PEM blocks.
+SECRET_VALUE_RE = re.compile(
+    r"gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|xox[abprs]-[A-Za-z0-9-]{10,}"
+    r"|sk-[A-Za-z0-9_-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|\bBearer\s+[A-Za-z0-9._~+/-]{10,}"
+)
+
+
+def contains_secret_value(value: Any) -> bool:
+    """Return whether any string inside the value looks like a credential."""
+    if isinstance(value, str):
+        return SECRET_VALUE_RE.search(value) is not None
+    if isinstance(value, dict):
+        return any(contains_secret_value(key) or contains_secret_value(child) for key, child in value.items())
+    if isinstance(value, list):
+        return any(contains_secret_value(child) for child in value)
+    return False
 
 
 def contains_forbidden_key(value: Any) -> str | None:
@@ -123,6 +142,9 @@ def main() -> int:
     if forbidden:
         print("ERROR: sensitive field name rejected; telemetry event was not written.", file=sys.stderr)
         return 1
+    if contains_secret_value([details, args.story, args.agent or ""]):
+        print("ERROR: credential-like value rejected; telemetry event was not written.", file=sys.stderr)
+        return 1
 
     agent_id = args.agent_id or args.agent
     try:
@@ -148,10 +170,13 @@ def main() -> int:
     }
     try:
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        event["prev_hash"] = previous_event_hash()
-        event_payload = {key: value for key, value in event.items() if key not in {"prev_hash", "event_hash"}}
-        event["event_hash"] = hashlib.sha256((event["prev_hash"] + canonical_json(event_payload)).encode("utf-8")).hexdigest()
         with LOG_PATH.open("a", encoding="utf-8", newline="\n") as handle:
+            # Hold the lock across reading prev_hash and appending, or concurrent writers fork the chain.
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            event["prev_hash"] = previous_event_hash()
+            event_payload = {key: value for key, value in event.items() if key not in {"prev_hash", "event_hash"}}
+            digest_input = (event["prev_hash"] + canonical_json(event_payload)).encode("utf-8")
+            event["event_hash"] = hashlib.sha256(digest_input).hexdigest()
             handle.write(json.dumps(event, ensure_ascii=False, separators=(",", ":")) + "\n")
     except (OSError, ValueError) as exc:
         print(f"ERROR: unable to append telemetry ({exc}).", file=sys.stderr)

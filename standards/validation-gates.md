@@ -4,8 +4,6 @@
 
 **Gate = agent; Checkpoint = human.** G1/G2 are produced by agents using evidence and the schemas in this standard. CP1–CP4 are explicit human decisions recorded under `.claude/approvals/` and checked by `scripts/check_approvals.py` as defined in `standards/human-in-the-loop.md`. A passing Gate never replaces a human Checkpoint, and a Checkpoint never replaces technical verification.
 
-**G1/G2 produits par agents, CP1-CP4 par humains.**
-
 ## Gate 1 (G1) — Pre-execution plan review
 
 Before any coding agent starts implementation, `code-review-security` reviews the proposed plan for a clear scope, exact expected files/paths, tests and verification commands, and material risks/mitigations. The plan artifact must contain all four areas. The reviewer records the SHA-256 digest of the exact plan reviewed.

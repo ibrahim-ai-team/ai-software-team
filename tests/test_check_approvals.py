@@ -27,9 +27,23 @@ class CheckApprovalsTests(unittest.TestCase):
     def write_record(self):
         self.approval_path.write_text(json.dumps(self.record), encoding="utf-8")
 
-    def run_checker(self, *argv):
-        with patch.object(check_approvals, "APPROVALS_DIR", self.approvals_dir):
+    def run_checker(self, *argv, approvers=None):
+        # Isolated from the repository's real .claude/human-approvers.json.
+        approvers_path = self.approvals_dir / "approvers.json"
+        if approvers is not None:
+            approvers_path.write_text(approvers, encoding="utf-8")
+        with (
+            patch.object(check_approvals, "APPROVALS_DIR", self.approvals_dir),
+            patch.object(check_approvals, "APPROVERS_PATH", approvers_path),
+        ):
             return check_approvals.main(list(argv))
+
+    def test_configured_approvers_must_list_the_approver(self):
+        args = ("--story", "SHOP-12", "--checkpoint", "CP1")
+        self.assertEqual(self.run_checker(*args, approvers='{"approvers": ["Human-Reviewer"]}'), 0)
+        self.assertEqual(self.run_checker(*args, approvers='{"approvers": ["someone-else"]}'), 1)
+        self.assertEqual(self.run_checker(*args, approvers='{"approvers": []}'), 1)
+        self.assertEqual(self.run_checker(*args, approvers="not json"), 1)
 
     def test_valid_approval_returns_zero(self):
         self.assertEqual(self.run_checker("--story", "SHOP-12", "--checkpoint", "CP1"), 0)

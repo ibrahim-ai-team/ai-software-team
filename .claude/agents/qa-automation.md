@@ -34,8 +34,4 @@ Read only the one that matches the task:
 
 Acceptance criteria are not testable, the environment or test data is missing, or a defect blocks the sprint goal.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `qa-automation` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with the developers, `product-owner`, `software-architect`, `performance-engineer`, `sre-observability-engineer`, `project-manager` and `tech-lead`, always through `agile-orchestrator`.

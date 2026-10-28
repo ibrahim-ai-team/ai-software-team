@@ -137,10 +137,45 @@ def default_roles(architecture: dict) -> list[str]:
     return []
 
 
+APPROVALS_DIR = Path(__file__).resolve().parents[1] / ".claude" / "approvals"
+APPROVERS_PATH = APPROVALS_DIR.parent / "human-approvers.json"
+
+
+def human_approval_problem(approvals_dir: Path, project_id: str, digest: str) -> str | None:
+    """Why the human approval record for this plan is missing or invalid, or None when it is valid.
+
+    The plan file's own approval block can be edited by whoever writes the plan; this record lives
+    where agents cannot write (`.claude/approvals/`, denied in settings and agent scopes).
+    """
+    path = approvals_dir / f"PROVISION-{project_id}.json"
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return f"the sponsor must create {path} with approved_by and plan_digest = {digest}"
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return f"{path} is unreadable or not valid JSON"
+    if not isinstance(record, dict) or record.get("plan_digest") != digest:
+        return f"{path} does not approve this plan (plan_digest must be {digest})"
+    approved_by = record.get("approved_by")
+    if not isinstance(approved_by, str) or not approved_by.strip():
+        return f"{path} needs a non-empty approved_by"
+    try:
+        approvers = json.loads(APPROVERS_PATH.read_text(encoding="utf-8")).get("approvers")
+    except FileNotFoundError:
+        return None  # no approver list configured yet
+    except (OSError, UnicodeError, json.JSONDecodeError, AttributeError):
+        return f"{APPROVERS_PATH} is unreadable or malformed"
+    names = {n.strip().casefold() for n in approvers if isinstance(n, str)} if isinstance(approvers, list) else set()
+    if approved_by.strip().casefold() not in names:
+        return f"{approved_by} is not listed in {APPROVERS_PATH}"
+    return None
+
+
 def plan_digest(plan: dict) -> str:
     """Digest of the normalized plan without its approval block; the sponsor approves this value."""
     body = {k: v for k, v in plan.items() if k not in ("approval", "repos", "home_role")}
-    return hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()[:16]
+    # Full SHA-256: a truncated digest would let a second plan be found with the same value.
+    return hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()
 
 
 def validate_plan(raw: dict, existing_repos: list | None = None) -> dict:
@@ -218,6 +253,9 @@ def validate_plan(raw: dict, existing_repos: list | None = None) -> dict:
     sprint = plan.setdefault("sprint", {})
     sprint.setdefault("length_days", 14)
     sprint.setdefault("count", 1)
+    length = sprint["length_days"]
+    if not (isinstance(length, int) and not isinstance(length, bool) and 1 <= length <= 28):
+        errors.append("sprint.length_days must be an integer from 1 to 28")
     try:
         dt.date.fromisoformat(str(sprint.get("start", "")))
     except ValueError:
@@ -392,14 +430,19 @@ def scaffold_files(plan: dict, repo: dict) -> dict[str, str]:
     return files
 
 
+def _strip_keys(text: str) -> str:
+    """Remove ai-team-key markers from free text so one backlog item cannot claim another's issue."""
+    return re.sub(r"<!--\s*ai-team-key:.*?-->", "", text, flags=re.DOTALL)
+
+
 def issue_body(plan: dict, item: dict, resolved: dict[str, str]) -> str:
     deps = [f"- Depends on: {resolved.get(d, d + ' (link pending)')}" for d in item["depends_on"]] or ["- None"]
-    criteria = [f"- [ ] {c}" for c in item.get("acceptance_criteria", [])] or ["- Not applicable"]
+    criteria = [f"- [ ] {_strip_keys(str(c))}" for c in item.get("acceptance_criteria", [])] or ["- Not applicable"]
     sprint = f" · Sprint: {item['sprint']}" if "sprint" in item else ""
     return (
         "\n".join(
             [
-                item.get("description", "").strip(),
+                _strip_keys(item.get("description", "")).strip(),
                 "",
                 "## Acceptance criteria",
                 *criteria,
@@ -831,7 +874,8 @@ class GhClient:
                     (self.GRAPHQL_STATUS[e["type"]] for e in errors if e.get("type") in self.GRAPHQL_STATUS), 422
                 )
                 message = "; ".join(e.get("message", "") for e in errors)
-            raise classify(status, message[:300])
+            # Redact before truncating so a token cut at the limit cannot escape the pattern.
+            raise classify(status, redact(message)[:300])
         return proc.stdout
 
     def _api(self, method: str, path: str, body=None):
@@ -1021,6 +1065,7 @@ def main(argv: list[str] | None = None, client=None) -> int:
     p_apply.add_argument("plan")
     p_apply.add_argument("--dry-run", action="store_true", help="read GitHub, write nothing")
     p_apply.add_argument("--state-dir", default=".provisioning")
+    p_apply.add_argument("--approvals-dir", default=str(APPROVALS_DIR), help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
 
     raw = json.loads(Path(args.plan).read_text(encoding="utf-8"))
@@ -1049,6 +1094,9 @@ def main(argv: list[str] | None = None, client=None) -> int:
             f"Refusing to provision: the plan needs sponsor approval with approval.plan_digest = {digest} "
             "(the digest changes whenever the plan changes)."
         )
+        return 4
+    if not args.dry_run and (problem := human_approval_problem(Path(args.approvals_dir), plan["project"]["id"], digest)):
+        print(f"Refusing to provision: {problem}")
         return 4
     state_path = Path(args.state_dir) / f"{plan['project']['id']}.json"
     state = Provisioner(DryRunClient(gh) if args.dry_run else gh, plan, state_path, dry_run=args.dry_run).run()

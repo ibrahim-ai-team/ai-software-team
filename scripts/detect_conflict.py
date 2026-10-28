@@ -8,6 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DISAGREEMENTS_DIR = ROOT / ".claude" / "disagreements"
+APPROVERS_PATH = ROOT / ".claude" / "human-approvers.json"
+# Accepted decided_by values until the sponsor lists approvers by username.
+GENERIC_DECIDERS = {"human sponsor", "sponsor", "human"}
 STORY_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 AGENT_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 
@@ -23,6 +26,20 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _configured_approvers() -> set[str] | None:
+    """GitHub usernames from .claude/human-approvers.json, or None when the sponsor has not created it."""
+    try:
+        data = json.loads(APPROVERS_PATH.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return set()  # unreadable or malformed: fail closed, nobody is an approver
+    names = data.get("approvers") if isinstance(data, dict) else None
+    if not isinstance(names, list):
+        return set()
+    return {name.strip().casefold() for name in names if isinstance(name, str) and name.strip()}
+
+
 def _has_human_decision(record: object) -> bool:
     if not isinstance(record, dict):
         return False
@@ -33,7 +50,9 @@ def _has_human_decision(record: object) -> bool:
     decision_text = decision.get("decision")
     if not isinstance(decided_by, str) or not decided_by.strip():
         return False
-    if not re.search(r"\b(human|sponsor)\b", decided_by, re.IGNORECASE):
+    # Exact match only: a substring test accepted values such as "not human".
+    approvers = _configured_approvers()
+    if decided_by.strip().casefold() not in (GENERIC_DECIDERS if approvers is None else approvers):
         return False
     return isinstance(decision_text, str) and bool(decision_text.strip())
 

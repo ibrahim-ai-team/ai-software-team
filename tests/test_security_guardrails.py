@@ -164,6 +164,22 @@ class SimulatedRuleMatching(unittest.TestCase):
             ],
         )
 
+    def test_governance_records_are_protected(self):
+        # Approvals and the approver list are human-only; gate, conflict and lesson records need a human prompt.
+        self.assert_decisions("Edit", "deny", ["./.claude/approvals/CP3-US-1.json", "./.claude/human-approvers.json"])
+        self.assert_decisions("Edit", "allow", ["./.claude/approvals/README.md"])
+        self.assert_decisions(
+            "Edit",
+            "ask",
+            [
+                "./.claude/gates/G2-US-1.json",
+                "./.claude/disagreements/US-1-topic.md",
+                "./.claude/lessons/lessons.md",
+                "./.claude/agent-scopes.json",
+                "./scripts/enforce_agent_scope_hook.py",
+            ],
+        )
+
     def test_provisioning_plan_does_not_ask(self):
         self.assertEqual(decide("Bash", "python3 scripts/provision_project.py plan plan.json"), "allow")
 

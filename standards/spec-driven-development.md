@@ -6,7 +6,7 @@ Every new story must have a completed, reviewed specification based on [`templat
 
 ## Ownership and validation
 
-- **Authors:** `product-owner` and `business-analyst` collaborate to produce the EARS specification, including functional requirements, non-functional constraints, Gherkin acceptance criteria, assumptions, and out-of-scope boundaries.
+- **Author:** `business-analyst` is the sole author of the EARS specification (functional requirements, non-functional constraints, Gherkin acceptance criteria, assumptions, out-of-scope boundaries), built from the `product-owner`'s business-value brief. The PO validates it without rewriting it (`standards/agent-contract.md`).
 - **Human checkpoint:** the human sponsor reviews and approves the product plan/specification at CP1 according to [the human-in-the-loop standard](human-in-the-loop.md).
 - **Architecture validation:** the `software-architect` reviews the spec for feasibility, system boundaries, interfaces, security/privacy, and material technical constraints before G1.
 - **G1 precondition:** the Gate reviewer verifies that the story links to the reviewed EARS spec and that its requirements are testable and consistent with acceptance criteria. If either the spec or required approval/review evidence is missing, G1 fails closed.

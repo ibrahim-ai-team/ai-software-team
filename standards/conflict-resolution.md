@@ -57,7 +57,7 @@ Required shape:
 }
 ```
 
-Until `human_decision.decided_by` identifies the human sponsor (or another explicitly authorized human) and `human_decision.decision` is non-empty, the record is unresolved. Do not invent a decision, date, or approver. Record the actual decision and date after the human responds.
+Until `human_decision.decided_by` identifies the human sponsor (or another explicitly authorized human) and `human_decision.decision` is non-empty, the record is unresolved. The detector matches `decided_by` exactly: a username listed in `.claude/human-approvers.json` when that file exists, otherwise only `human sponsor`, `sponsor` or `human`. Writing a disagreement record prompts the human (`ask` rule in `.claude/settings.json`). Do not invent a decision, date, or approver. Record the actual decision and date after the human responds.
 
 ## Mandatory stop rule
 

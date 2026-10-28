@@ -42,8 +42,4 @@ Requirements are understandable, testable, prioritized and traceable; assumption
 
 Scope, priority or a business commitment needs the sponsor's decision.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `product-owner` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `business-analyst`, `project-manager`, `software-architect`, `qa-automation` and the sponsor, always through `agile-orchestrator`.

@@ -51,7 +51,13 @@
       "Edit(./**/*.key)",
       "Edit(./secrets/**)",
       "mcp__github__merge_pull_request",
-      "mcp__github__enable_pr_auto_merge"
+      "mcp__github__enable_pr_auto_merge",
+      "Edit(./.claude/approvals/*.json)",
+      "Edit(./.claude/human-approvers.json)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.config/gh/**)"
     ],
     "ask": [
       "Bash(git push*)",
@@ -66,7 +72,13 @@
       "Edit(./.github/dependabot.yml)",
       "Edit(./.claude/CLAUDE.md)",
       "Edit(./.claude/manifest.json)",
-      "Bash(*provision_project.py apply*)"
+      "Bash(*provision_project.py apply*)",
+      "Edit(./.claude/gates/**)",
+      "Edit(./.claude/disagreements/**)",
+      "Edit(./.claude/lessons/**)",
+      "Edit(./.claude/agent-scopes.json)",
+      "Edit(./scripts/enforce_agent_scope_hook.py)",
+      "Edit(./scripts/enforce_agent_scope.py)"
     ]
   },
   "hooks": {

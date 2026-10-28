@@ -40,8 +40,4 @@ Read only the one that matches the task:
 
 A change touches production, incurs cloud cost or needs on-call commitments.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `sre-observability-engineer` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `devops-platform`, `software-architect`, `backend-developer`, `database-engineer`, `qa-automation` and `release-manager`, always through `agile-orchestrator`.

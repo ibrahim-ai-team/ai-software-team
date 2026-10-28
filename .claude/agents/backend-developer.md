@@ -35,8 +35,4 @@ Read only the one that matches the task:
 
 The task needs files outside allowed paths, an API contract or ADR is unclear or wrong, or tests cannot run in the environment.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `backend-developer` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `software-architect`, `database-engineer`, `qa-automation`, `tech-lead` and `code-review-security`, always through `agile-orchestrator`.

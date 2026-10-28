@@ -42,6 +42,13 @@ if [[ "$worktree_root" == "$repo_root" || "$worktree_branch" == "main" ]]; then
   echo "Error: refusing to remove main or the primary repository checkout." >&2
   exit 1
 fi
+# Different agent/story pairs can share a path (a-b + c and a + b-c both give wt-a-b-c);
+# the branch name new_worktree.sh created tells them apart.
+expected_branch="feat/$story-$agent"
+if [[ "$worktree_branch" != "$expected_branch" ]]; then
+  echo "Error: $worktree is on branch $worktree_branch, not $expected_branch; it belongs to another agent or story." >&2
+  exit 1
+fi
 
 printf 'Remove worktree %s (branch %s)? This does not delete the branch. Type yes to confirm: ' "$worktree" "$worktree_branch"
 IFS= read -r confirmation

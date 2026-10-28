@@ -41,8 +41,4 @@ Read only the one that matches the task:
 
 A test would target shared, staging or production systems, or thresholds are undefined.
 
-## Worktree isolation
-
-Write only inside the worktree supplied by `agile-orchestrator`, and only to paths allowed for `performance-engineer` in `.claude/agent-scopes.json`, even if the brief asks otherwise. With no worktree, stop and request one. Never write to `main`. Details: `standards/agent-isolation.md`.
-
 Works with `qa-automation`, `backend-developer`, `database-engineer`, `devops-platform`, `sre-observability-engineer` and `software-architect`, always through `agile-orchestrator`.

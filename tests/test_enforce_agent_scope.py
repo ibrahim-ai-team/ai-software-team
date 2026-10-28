@@ -1,14 +1,18 @@
 """Regression tests for fail-closed agent scope checks."""
 
 import json
+import os
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "enforce_agent_scope.py"
 HOOK = ROOT / "scripts" / "enforce_agent_scope_hook.py"
+# Denials append telemetry; keep test events out of the team's real log.
+HOOK_ENV = {**os.environ, "AI_TEAM_TELEMETRY_LOG": str(Path(tempfile.mkdtemp()) / "activity.jsonl")}
 
 
 def check(agent, path):
@@ -63,6 +67,27 @@ class EnforceAgentScopeTests(unittest.TestCase):
         }
         self.assertEqual(before, after)
 
+    def test_governance_files_are_not_writable_by_writing_agents(self):
+        # fnmatch's `*` crosses `/`, so a broad `*.md` once reached lessons, disagreements and skills.
+        for agent in ("documentation-manager", "business-analyst", "qa-automation", "devops-platform"):
+            for path in (
+                ".claude/lessons/lessons.md",
+                ".claude/disagreements/US-1-topic.md",
+                ".claude/gates/G2-US-1.json",
+                ".claude/approvals/CP3-US-1.json",
+                ".claude/skills/agile-planning/SKILL.md",
+                "workflows/orchestration-contract.md",
+                "standards/security-principles.md",
+            ):
+                with self.subTest(agent=agent, path=path):
+                    self.assertEqual(check(agent, path).returncode, 1)
+
+    def test_documentation_manager_keeps_its_documentation_scope(self):
+        for path in ("docs/setup.md", "docs/adr/0001.md", "README.md", "CHANGELOG.md"):
+            with self.subTest(path=path):
+                self.assertEqual(check("documentation-manager", path).returncode, 0)
+        self.assertEqual(check("devops-platform", "scripts/deploy/release.sh").returncode, 0)
+
     def hook(self, command, agent="backend-developer"):
         payload = json.dumps(
             {
@@ -78,6 +103,7 @@ class EnforceAgentScopeTests(unittest.TestCase):
             capture_output=True,
             text=True,
             check=False,
+            env=HOOK_ENV,
         )
 
     def test_bash_write_redirect_is_blocked(self):

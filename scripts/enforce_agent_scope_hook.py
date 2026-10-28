@@ -20,26 +20,76 @@ SAFE_SIMPLE_COMMANDS = {"pytest", "ls", "cat", "grep", "find", "wc", "head", "ta
 SHELL_META = re.compile(r"[<>|;&`]|\$\(|\n|\r")
 REDIRECTION_TARGET = re.compile(r"(?:>>?|[0-9]+>>?)\s*([^\s;&|<>]+)")
 WRITE_COMMANDS = {"tee", "cp", "mv", "rm", "dd"}
-# The orchestrator must run this read-only lessons lookup before every delegation.
-LESSONS_SCRIPT = ROOT / "scripts" / "relevant_lessons.py"
-# Matched against the raw command string, not shlex tokens: bash applies brace, glob, `$` and `~`
-# expansion to what it runs, so the pattern admits none of those characters.
-LESSONS_ARGS = r" --story [A-Za-z0-9][A-Za-z0-9._-]{0,63}(?: --max [0-9]{1,4})?"
-LESSONS_RELATIVE = re.compile(r"python3? scripts/relevant_lessons\.py" + LESSONS_ARGS)
-LESSONS_ABSOLUTE = re.compile(r"python3? " + re.escape(LESSONS_SCRIPT.as_posix()) + LESSONS_ARGS)
+# Options that make an otherwise read-only allowed command write files or run other commands.
+UNSAFE_OPTIONS = {
+    "git": ("--output", "--ext-diff", "--textconv"),
+    "ruff": ("--fix", "--fix-only", "--unsafe-fixes", "--add-noqa", "--output-file", "-o", "--watch", "-w"),
+    "gitleaks": ("--report-path", "-r"),
+    "find": ("-exec", "-execdir", "-delete", "-ok", "-okdir", "-fprint", "-fprint0", "-fprintf", "-fls"),
+}
+# Governance scripts the orchestration contract requires. Patterns are matched against the raw command
+# string, not shlex tokens: bash applies brace, glob, `$` and `~` expansion to what it runs, so they admit
+# none of those characters (except the fixed `docs/sprints/*.md` glob).
+COORDINATORS = frozenset({"agile-orchestrator", "unknown-agent"})  # unknown-agent: the main session without --agent
+_ID = r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}"
+_PATH = r"(?:[A-Za-z0-9_][A-Za-z0-9._-]*/)*[A-Za-z0-9_][A-Za-z0-9._-]*"
+_TEXT = r"'[^']{1,500}'"  # single-quoted, so bash performs no expansion inside
+_GOVERNANCE_ROLES = COORDINATORS | {"project-manager", "release-manager"}
+_STATUS_FLAGS = r"(?: --json| --health-json| --strict| --filter (?:agent|task)=[A-Za-z0-9._-]+)*"
+# (agents allowed to run it, or None for any agent; script name and arguments after `scripts/`)
+ALLOWED_SCRIPTS = (
+    (None, rf"relevant_lessons\.py --story {_ID}(?: --max [0-9]{{1,4}})?"),
+    (COORDINATORS, rf"detect_conflict\.py --story {_ID} --agents [a-z0-9-]+(?:,[a-z0-9-]+)*"),
+    (COORDINATORS, rf"check_approvals\.py --story {_ID} --checkpoint CP[1-4]"),
+    (COORDINATORS, rf"check_gates\.py --story {_ID} --gate G[12]"),
+    (COORDINATORS, rf"check_claims\.py {_PATH}"),
+    (COORDINATORS, rf"enforce_agent_scope\.py --agent [a-z0-9-]+ --path {_PATH}"),
+    (COORDINATORS, r"coordinator_lock\.py (?:acquire(?: --ttl [0-9]{1,6})?|status|release)"),
+    (COORDINATORS, rf"add_lesson\.py --title {_TEXT} --context {_TEXT} --error {_TEXT} --rule {_TEXT} --story {_ID}"),
+    (COORDINATORS | {"project-manager"}, rf"status_report\.py{_STATUS_FLAGS}"),
+    (_GOVERNANCE_ROLES, rf"check_governance\.py(?: (?:{_PATH}|docs/sprints/\*\.md))+"),
+    (_GOVERNANCE_ROLES, rf"check_governance\.py --frontend-readiness --design-handoff {_PATH}"),
+    (_GOVERNANCE_ROLES, rf"check_governance\.py --state {_PATH} --repo \. --release"),
+    # A real apply also needs the settings `ask` prompt and the human PROVISION-<id> approval record.
+    (COORDINATORS, rf"provision_project\.py plan (?:\.provisioning/)?{_PATH}(?: --check-github)?"),
+    (COORDINATORS, rf"provision_project\.py apply (?:\.provisioning/)?{_PATH}(?: --dry-run)?"),
+)
+# Worktree creation only; cleanup deletes work and stays a human-run command.
+WORKTREE_CREATE = re.compile(rf"\./scripts/new_worktree\.sh {_ID} {_ID}")
+# ci-verifier's closed command allowlist (.claude/agents/ci-verifier.md), for that role only. Running a test
+# suite executes repository code by design; arguments stay plain words with no shell-expansion characters.
+CI_VERIFIER_CHECKS = re.compile(
+    rf"python3? -m (?:pytest|unittest)(?: [A-Za-z0-9_./:-]+)*"
+    rf"|ruff format --check(?: {_PATH})*"
+    r"|npm (?:test|run lint|run build)"
+    r"|make (?:test|lint)"
+)
 
 
-def _is_lessons_lookup(command: str, cwd: object) -> bool:
-    """Allow only `python[3] scripts/relevant_lessons.py --story ID [--max N]`."""
-    if LESSONS_ABSOLUTE.fullmatch(command):
-        return True
-    # Bash resolves a relative path against its own working directory, so require it to be ROOT.
-    if not LESSONS_RELATIVE.fullmatch(command) or not isinstance(cwd, str):
+def _in_repository_root(cwd: object) -> bool:
+    # Bash resolves a relative path against its own working directory, so relative forms require ROOT.
+    if not isinstance(cwd, str):
         return False
     try:
         return Path(cwd).resolve() == ROOT.resolve()
     except OSError:
         return False
+
+
+def _is_allowed_script(command: str, cwd: object, agent: str) -> bool:
+    """Allow only the exact governance-script invocations in ALLOWED_SCRIPTS, for the listed agents."""
+    in_root = _in_repository_root(cwd)
+    if agent in COORDINATORS and in_root and WORKTREE_CREATE.fullmatch(command):
+        return True
+    scripts_dir = re.escape((ROOT / "scripts").as_posix())
+    for agents, body in ALLOWED_SCRIPTS:
+        if agents is not None and agent not in agents:
+            continue
+        if re.fullmatch(rf"python3? {scripts_dir}/{body}", command):
+            return True
+        if in_root and re.fullmatch(rf"python3? scripts/{body}", command):
+            return True
+    return False
 
 
 def deny(reason: str, agent: str, path: str = "") -> int:
@@ -97,6 +147,17 @@ def _scope_check_target(agent: str, target: str) -> tuple[bool, str]:
     return result.returncode == 0, relative
 
 
+def _has_unsafe_option(executable: str, args: list[str]) -> bool:
+    for option in UNSAFE_OPTIONS.get(executable, ()):
+        for arg in args[1:]:
+            if arg == option or arg.startswith(option + "="):
+                return True
+            # Short options can carry their value attached, as in `-ofile`.
+            if len(option) == 2 and option[1] != "-" and arg.startswith(option):
+                return True
+    return False
+
+
 def _bash_decision(command: object, agent: str, cwd: object = None) -> tuple[bool, str, str]:
     if not isinstance(command, str) or not command.strip():
         return False, "missing or invalid Bash command", ""
@@ -117,18 +178,23 @@ def _bash_decision(command: object, agent: str, cwd: object = None) -> tuple[boo
         return False, "malformed shell quoting", ""
     if not args:
         return False, "empty Bash command", ""
-    executable = Path(args[0]).name
+    if _is_allowed_script(command, cwd, agent):
+        return True, "", ""
+    if agent == "ci-verifier" and CI_VERIFIER_CHECKS.fullmatch(command):
+        return True, "", ""
+    # A bare command name only: a path such as `./git` or `/tmp/x/ls` could run any binary.
+    if "/" in args[0]:
+        return False, "commands must be invoked by bare name", ""
+    executable = args[0]
+    if _has_unsafe_option(executable, args):
+        return False, f"unsafe {executable} option", ""
     if executable == "git" and len(args) >= 2 and args[1] in {"status", "diff", "log"}:
         return True, "", ""
     if executable == "ruff" and len(args) >= 2 and args[1] == "check":
         return True, "", ""
     if executable == "gitleaks" and len(args) >= 2 and args[1] == "detect":
         return True, "", ""
-    if _is_lessons_lookup(command, cwd):
-        return True, "", ""
     if executable in SAFE_SIMPLE_COMMANDS:
-        if executable == "find" and any(arg in {"-exec", "-execdir", "-delete"} for arg in args):
-            return False, "unsafe find option", ""
         return True, "", ""
     if executable == "sed" and any(arg == "-i" or arg.startswith("-i") for arg in args[1:]):
         return False, "in-place sed edits are not allowed", args[-1] if len(args) > 1 else ""
