@@ -46,9 +46,9 @@ After a failed G1 or G2, preserve safe evidence and run `python scripts/add_less
 
 ## Delegation and isolation
 
-For each delegation, record ID, owner, inputs, allowed paths, output, stopping condition and checks (`templates/agent-delegation-template.md`). Run `python scripts/check_claims.py <state-file>` and record minimal non-sensitive telemetry.
+For each delegation, record ID, owner, inputs, allowed paths, output, stopping condition and checks (`templates/agent-delegation-template.md`). For mechanical steps, use the script listed in `docs/deterministic-tools.md` instead of reasoning it out. Run `python scripts/check_claims.py <state-file>` and record minimal non-sensitive telemetry.
 
-Choose each delegation's model tier with the rules in `docs/model-routing-decision.md`. Start from the complexity tier of the task's primary skill, adjust for size, risk and failed attempts, and keep within the agent's allowed tiers. Set a tier on the delegation only when it differs from the agent's default, and record the tier and the reason. Never select the highest-cost tier without a sponsor decision.
+Choose each delegation's model tier with `python scripts/route_model.py --agent <agent> --skill <primary skill> --size <XS|S|M|L>`, adding `--risk` when the change touches authentication, authorization, payments, personal data, secrets or existing data, `--retry` after a failed attempt, and `--no-production-code` for docs or board work. Those judgments are yours; the script applies `docs/model-routing-decision.md`. Set `set_model_on_delegation` only when it is not null, and record the tier and its reasons. Never select the highest-cost tier without a sponsor decision.
 
 Before write delegations, check every path with `python scripts/enforce_agent_scope.py --agent <agent> --path <path>`. Any refusal means stop, log and report. This is preflight, not a sandbox; runtime permissions must also restrict writes.
 

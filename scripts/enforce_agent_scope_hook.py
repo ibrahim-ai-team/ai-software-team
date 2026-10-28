@@ -44,9 +44,20 @@ ALLOWED_SCRIPTS = (
     (COORDINATORS, rf"check_gates\.py --story {_ID} --gate G[12](?: --commit [0-9a-fA-F]{{40}})?"),
     (COORDINATORS, rf"check_claims\.py {_PATH}"),
     (COORDINATORS, rf"enforce_agent_scope\.py --agent [a-z0-9-]+ --path {_PATH}"),
+    (
+        COORDINATORS,
+        rf"check_diff_scope\.py --agent [a-z0-9-]+(?: --base [A-Za-z0-9][A-Za-z0-9._/-]{{0,199}})?"
+        rf"(?: --repo (?:\.\./worktrees/{_ID}|{_PATH}))?",
+    ),
     (COORDINATORS, r"coordinator_lock\.py (?:acquire(?: --ttl [0-9]{1,6})?|status|release)"),
     (COORDINATORS, rf"add_lesson\.py --title {_TEXT} --context {_TEXT} --error {_TEXT} --rule {_TEXT} --story {_ID}"),
     (COORDINATORS | {"project-manager"}, rf"status_report\.py{_STATUS_FLAGS}"),
+    (COORDINATORS | {"ci-verifier"}, rf"detect_checks\.py(?: --repo (?:\.\./worktrees/{_ID}|{_PATH}))?"),
+    (
+        COORDINATORS,
+        r"route_model\.py --agent [a-z0-9-]+ --skill [a-z0-9-]+ --size (?:XS|S|M|L|XL)"
+        r"(?: --risk)?(?: --retry)?(?: --no-production-code)?",
+    ),
     (_GOVERNANCE_ROLES, rf"check_governance\.py(?: (?:{_PATH}|docs/sprints/\*\.md))+"),
     (_GOVERNANCE_ROLES, rf"check_governance\.py --frontend-readiness --design-handoff {_PATH}"),
     (_GOVERNANCE_ROLES, rf"check_governance\.py --state {_PATH} --repo \. --release"),

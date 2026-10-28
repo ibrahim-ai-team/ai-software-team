@@ -23,3 +23,11 @@ Use `python scripts/add_lesson.py --title "..." --context "..." --error "..." --
 - **Rule to apply:** Write file references as repository-root paths such as workflows/orchestration-contract.md#section, never bare file names
 - **Date:** 2026-10-28
 - **Source story:** PROGRESSIVE-DISCLOSURE
+
+## L003 — Keep agent allowlists and examples consistent with new tools
+
+- **Context:** Adding deterministic tools for ci-verifier and documenting them
+- **Observed error:** An example file anchor in backticks was parsed as a real reference, and a new command was referenced in an agent contract without being added to its closed allowlist
+- **Rule to apply:** Write example references as plain text, and add every command an agent is told to run to that agent closed allowlist in the same change
+- **Date:** 2026-10-28
+- **Source story:** DETERMINISTIC-TOOLS

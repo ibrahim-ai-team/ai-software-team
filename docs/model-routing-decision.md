@@ -86,6 +86,8 @@ Skills are routed by complexity **per delegation**, not by a `model` field in `S
 
 ### Resolving a delegation's tier
 
+`scripts/route_model.py` implements these steps; `tests/test_route_model.py` fails if its data drifts from the tables in this section. The orchestrator supplies the judgment inputs (primary skill, size, security sensitivity, failed attempt) and the script applies the rules:
+
 1. **Base:** the tier of the task's primary skill, meaning the first skill named in the brief.
 2. **Raise one tier** (at most premium, once per delegation) if any of these applies: size L (5 points); the change touches authentication, authorization, payments, personal data, secrets, or migrates existing data; or the previous attempt at the same task failed or hit its turn cap.
 3. **Lower one tier** (at least light) only if the size is XS (1 point), the base is standard, no raise applies, and the task changes no production code or tests (docs, configuration copy, board or issue updates, report formatting).
