@@ -1,6 +1,7 @@
 ---
 name: test-strategy-automation
 description: Designs a risk-based test approach across test levels, automation and quality gates. Use when planning or writing tests or defining quality gates.
+disable-model-invocation: true
 ---
 
 # Design a risk-based testing approach

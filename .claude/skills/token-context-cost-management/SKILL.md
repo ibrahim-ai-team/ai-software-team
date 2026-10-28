@@ -1,6 +1,7 @@
 ---
 name: token-context-cost-management
 description: Keeps delegations bounded and context small to save subscription usage. Use when planning delegations, managing context pressure or controlling execution cost.
+disable-model-invocation: true
 ---
 
 # Manage context and usage efficiently

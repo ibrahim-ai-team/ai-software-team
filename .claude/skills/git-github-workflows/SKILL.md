@@ -1,6 +1,7 @@
 ---
 name: git-github-workflows
 description: Makes safe, reviewable Git changes on feature branches and pull requests, never on the default branch. Use when branching, committing, opening PRs or managing GitHub changes.
+disable-model-invocation: true
 ---
 
 # Make safe and reviewable Git changes

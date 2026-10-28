@@ -1,6 +1,7 @@
 ---
 name: api-design-documentation
 description: Designs consistent, secure API contracts with schemas, error models and compatibility rules. Use when defining or changing an API contract or its documentation.
+disable-model-invocation: true
 ---
 
 # Design consistent and secure APIs

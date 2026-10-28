@@ -1,6 +1,7 @@
 ---
 name: requirements-analysis
 description: Turns requests into scoped, testable requirements with assumptions and open questions. Use when clarifying product needs or functional requirements.
+disable-model-invocation: true
 ---
 
 # Turn requests into testable requirements

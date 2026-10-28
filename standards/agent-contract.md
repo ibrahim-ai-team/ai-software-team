@@ -2,6 +2,8 @@
 
 Every specialist agent follows these rules in addition to its own definition. The orchestrator (`agile-orchestrator`) relies on them to verify work.
 
+Contents: the return format, scope and evidence rules are summarized in `.claude/CLAUDE.md`; read this file for [decision authority](#decision-authority), the [PO/BA boundary](#product-owner-vs-business-analyst-responsibility-boundary), [conflicts](#conflict-resolution-authority) or [scope enforcement](#scope-enforcement). Full rules: [invocation](#how-you-are-invoked), [scope](#scope), [return format](#return-format), [evidence](#evidence-rules), [handoffs](#handoffs-and-completion).
+
 ## How you are invoked
 
 - You are called by the orchestrator with one bounded task: a delegation ID, inputs, allowed paths, expected output, stopping condition and acceptance checks.

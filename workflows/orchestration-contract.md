@@ -4,6 +4,10 @@
 
 This contract defines the repeatable control loop for a Claude Code session. It is a protocol, not a background service, distributed lock manager, or proof that Claude Code can discover or delegate to every profile. The coordinator of record is `agile-orchestrator`, started as the main session with `claude --agent agile-orchestrator`; a session started without it follows the same contract. Delegation is hub-and-spoke: only the orchestrator has the `Agent` tool, and specialists return results to it and never call each other. Work stops when the session stops unless an independently configured scheduler invokes it.
 
+This file holds every rule; step-by-step procedures (lock, claims, telemetry, threat model, lessons, board status, end-of-session checklist) are in [`orchestration-procedures.md`](orchestration-procedures.md). Each rule below links to its procedure: read it only when you perform that step.
+
+Contents: every session → [session start](#session-start--resume-protocol), [usage defaults](#session-and-usage-defaults), [daily report](#daily-report-evidence-rules); every transition → [conflicts](#conflict-resolution), [HITL](#hitl-enforcement), [state machine](#state-machine); delegating → [task ownership](#task-ownership-and-concurrency), [GitHub](#github-execution-delegation), [quality and merge](#quality-and-merge-gate); exceptions → [authority](#authority-and-precedence), [retry](#retry-failure-and-recovery), [sponsor decisions](#sponsor-decision-boundaries), [high-risk commands](#high-risk-command-gate).
+
 ## Canonical state
 
 Keep a durable project state file in the project repository (recommended: `docs/project-state.md`) and task records in GitHub Issues when available. Keep sensitive values out of state files. Facts about code and checks come from the repository, commits, PR state and CI results; chat history and agent claims are context only, never proof. Task state comes from the canonical issue/Project status, then delegation records.
@@ -51,7 +55,7 @@ Exit `0` is required to proceed. Exit `1` (record absent or invalid): stop and a
 
 ## Threat-model checkpoint
 
-During `ARCHITECTURE`, before implementation, require a documented threat model whenever the system handles authentication/authorization, personal or sensitive data, external integrations/webhooks, file uploads, payments, secrets or privileged operations. Use `.claude/skills/security-threat-modelling/SKILL.md` and record assets, trust boundaries, abuse cases, mitigations, residual risks and verification tasks. With no meaningful security-sensitive flow, record `NOT APPLICABLE` with a short rationale.
+During `ARCHITECTURE`, a scope with authentication, sensitive data, integrations, uploads, payments, secrets or privileged operations needs a documented threat model before implementation; otherwise record `NOT APPLICABLE` with a rationale ([procedure](orchestration-procedures.md#threat-model-checkpoint)).
 
 ## State machine
 
@@ -73,11 +77,11 @@ Record each transition with timestamp, previous phase, new phase, reason and evi
 
 ## Local single-coordinator lock
 
-Before reconciliation or delegation, run `python scripts/coordinator_lock.py acquire`. If it exits `2`, stop and inspect `python scripts/coordinator_lock.py status`; never coordinate concurrently while a non-expired lock is held. The default TTL is 3,600 seconds (raise with `--ttl` for longer sessions; an expired lock can be taken over with a warning). After the handover and Project Manager report, run `python scripts/coordinator_lock.py release`. The lock at `state/coordinator.lock` is a **same-machine local lock only**, not a distributed lock service.
+Acquire the coordinator lock before reconciling or delegating, never coordinate while another live lock is held, and release it after the handover. It is a same-machine lock only ([procedure](orchestration-procedures.md#local-single-coordinator-lock)).
 
 ## Session-start / resume protocol
 
-1. Acquire the coordinator lock, then read this contract (`.claude/CLAUDE.md` is already loaded), the relevant workflow, project state, handover, open task records, ADRs, open PRs and recent CI results.
+1. Acquire the coordinator lock ([procedure](orchestration-procedures.md#local-single-coordinator-lock)), then read this contract (`.claude/CLAUDE.md` is already loaded), the relevant workflow, project state, handover, open task records, ADRs, open PRs and recent CI results.
 2. Reconcile state against observable GitHub/repository evidence; flag stale or contradictory records instead of silently overwriting them.
 3. Identify active, stale, blocked, duplicated and dependency-ready tasks. Mark every claim not reconfirmed by its owner `NEEDS_REVALIDATION` and inspect its branch/worktree and artifacts before resuming or reassigning. Never infer that an agent is dead from elapsed time alone.
 4. Resume incomplete tasks from their last verified checkpoint; do not redo completed work without a reason.
@@ -86,19 +90,15 @@ Before reconciliation or delegation, run `python scripts/coordinator_lock.py acq
 
 ## Execution identity and telemetry correlation
 
-Each telemetry event keeps the existing fields and adds `agent_id`, `session_id`, `run_id` and a unique UUID4 `event_id`. Resolve `agent_id` from `--agent-id`/`AGENT_ID` (or the backward-compatible `--agent`) and validate it against `state/agents.json`. Set `SESSION_ID` and `RUN_ID`, or pass `--session-id` and `--run-id`, when events share a session or run; otherwise the writer generates a fresh UUID4 per invocation. Never rename or remove `agent` or `trace_id`. Record `run_id` and `session_id` in every Active delegations row. Historical events without these fields remain readable and count as legacy in `scripts/analyze_telemetry.py`.
+Telemetry events carry a validated `agent_id` plus `session_id`, `run_id` and a unique `event_id`, and every Active delegations row records `run_id` and `session_id` ([procedure](orchestration-procedures.md#execution-identity-and-telemetry-correlation)).
 
 ## Task ownership and concurrency
 
 - Give each task a stable ID and each delegation a unique ID, e.g. `STORY-12-D02`. A task record states one accountable owner, dependencies, allowed paths, input commit, outputs, acceptance checks and status.
 - Canonical task statuses: `BACKLOG`, `READY`, `CLAIMED`, `IN_PROGRESS`, `BLOCKED`, `IN_REVIEW`, `CHANGES_REQUESTED`, `APPROVED_AWAITING_HUMAN_MERGE`, `DONE`, `CANCELLED`. `UNKNOWN` is a reconciliation observation and `NEEDS_REVALIDATION` a claim flag, not statuses. Project labels such as `Ready to Claim` map to `READY`.
 - A claim is not a real lock unless backed by a mechanism with atomic exclusivity. Labels, comments and markdown records are coordination conventions. Without a lock service, use a single-writer policy: one coordinator assigns one coding task per shared working tree and never dispatches overlapping file ownership. Parallel work requires separate branches/worktrees and non-overlapping ownership. If an ownership conflict appears, pause the later task, keep both results separately and reconcile.
-- Claims record `claimed-at`, last observed checkpoint, owner, branch/worktree and allowed paths. Do not promise heartbeat or timeout behavior unless a real mechanism exists, and never auto-steal a claim because time elapsed.
-- **Claim protocol (single coordinator, no lock service):**
-  1. *Claim:* add a row to the project state's Active delegations table (delegation ID, task ID, owner, branch/worktree, allowed paths, status `CLAIMED`), run `python scripts/check_claims.py <state file>`, and dispatch only if it passes; then set `IN_PROGRESS`.
-  2. *Release:* when the agent returns, verify the branch/PR evidence, then set `IN_REVIEW`, `BLOCKED`, `DONE` or `CANCELLED`. Only `CLAIMED`/`IN_PROGRESS` rows hold paths.
-  3. *Recover:* at the next session, mark unconfirmed active rows `NEEDS_REVALIDATION`, inspect their branch/worktree, then resume, release to `BLOCKED` with partial work preserved, or reassign after release. Never reassign a row that is still active.
-  4. *Conflict:* if two writers touched the same branch or paths, stop both, keep each result on its own branch, and reconcile in one follow-up task.
+- Name the matching skill path in every brief, from the skill routing table in `.claude/agents/agile-orchestrator.md`.
+- Dispatch, release and recover every delegation with the [claim protocol](orchestration-procedures.md#claim-protocol): dispatch only after `python scripts/check_claims.py` passes, never reassign a row that is still active, and never auto-steal a claim because time elapsed.
 - Agents return the format in `.claude/CLAUDE.md` (Specialist essentials) plus evidence links. The coordinator verifies repository state before marking work complete.
 
 ## Session and usage defaults
@@ -115,7 +115,7 @@ The team runs on the sponsor's Claude Pro subscription through Claude Code: no C
 
 ## Continuous learning after failed Gates
 
-At every failed Gate (G1 or G2), preserve the failing check and safe evidence, then **call `scripts/add_lesson.py` before retrying** with the sanitized context, observed error, rule to apply and originating story ID. Never copy logs or payloads that may contain credentials, tokens, passwords or secrets into a lesson; the writer rejects suspicious terms, but the caller remains responsible for redaction. Then reread `.claude/lessons/lessons.md`, include relevant lessons in the retry brief, and change the remediation strategy. If a lesson cannot be safely recorded, stop and report the blocker.
+At every failed Gate (G1 or G2), **call `scripts/add_lesson.py` before retrying** with sanitized text only (never logs or secrets), include the lesson in the retry brief and change the strategy; if it cannot be recorded safely, stop and report ([procedure](orchestration-procedures.md#continuous-learning-after-failed-gates)).
 
 ## Retry, failure and recovery
 
@@ -132,7 +132,7 @@ The orchestrator delegates but is not the GitHub operator. Every create/update o
 
 ## Backlog and project status integrity
 
-Follow `workflows/sprint-governance.md` for sprint planning, scope changes, closure and release criteria, and the issue creation gate in `workflows/backlog-quality-gates.md` before creating any issue or calling a task Ready. QA maps acceptance criteria to verification methods and identifies distinct linked QA issues before sprint commitment. Follow `workflows/project-status-transitions.md` for the Project Status field and allowed transitions. A title prefix, body text, label or agent assertion does not prove a board status changed: verify the actual Project V2 field after each update, report failures without claiming success, and keep the last verified state. Never set Done without a verified human-merged PR and completion evidence.
+Before creating an issue, calling a task Ready or changing board status, follow the [status integrity procedure](orchestration-procedures.md#backlog-and-project-status-integrity). Verify the real board field after each update, and never set Done without a verified human-merged PR.
 
 ## Quality and merge gate
 
@@ -171,12 +171,4 @@ Before any command that can mutate external state, credentials, infrastructure, 
 
 ## Acceptance checklist for a usable orchestration run
 
-- [ ] State reconciled against current repository, issues, PRs and CI.
-- [ ] Phase and next task are explicit.
-- [ ] Every active task has unique ID, owner, dependencies, allowed paths and acceptance checks.
-- [ ] No overlapping writer in a shared working tree.
-- [ ] Delegation outcomes are independently reconciled.
-- [ ] Actual checks and evidence are linked.
-- [ ] PRs await human merge.
-- [ ] Daily report distinguishes implementation, testing, merge and deployment.
-- [ ] Handover persists next action and blockers.
+Before ending a session, run the [acceptance checklist](orchestration-procedures.md#acceptance-checklist-for-a-usable-orchestration-run).

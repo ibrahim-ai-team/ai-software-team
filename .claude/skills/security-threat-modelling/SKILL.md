@@ -1,6 +1,7 @@
 ---
 name: security-threat-modelling
 description: Identifies trust boundaries, threats and abuse cases and ranks mitigations by risk. Use when designing or reviewing authentication, authorization, sensitive data flows, secrets or other security-relevant changes.
+disable-model-invocation: true
 ---
 
 # Identify threats and prioritize mitigations

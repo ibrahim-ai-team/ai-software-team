@@ -12,5 +12,7 @@ Claude Code is the current supported execution environment. This folder document
 - `.claude/skills/*/SKILL.md` and `.claude/commands/*.md` use Claude Code discovery conventions.
 - Agent frontmatter fields such as `tools`, `model`, and `skills` may be interpreted by Claude Code rather than a generic Markdown parser.
 - Orchestration/delegation uses Claude Code's Agent tool and named tools; the validator enforces an allowlist of those names.
+- Skills set `disable-model-invocation: true`. Claude Code then keeps their descriptions out of every turn's context; agents still read a skill by its path when the orchestrator's routing table (`.claude/agents/agile-orchestrator.md`) names it in the brief, and a human can still run `/<skill-name>`. Another runtime can ignore the field.
+- The PreToolUse scope hook (`scripts/enforce_agent_scope_hook.py`) is registered for `Read`, `Grep`, `Glob`, `Bash` and the write tools in `.claude/settings.json`.
 
 See [the portability audit](../../docs/portability-audit.md). No DeepSeek, LangGraph, or CrewAI adapter is implemented by this PR.

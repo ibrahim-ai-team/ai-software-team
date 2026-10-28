@@ -1,6 +1,7 @@
 ---
 name: backend-engineering-standards
 description: Implements testable server-side logic with trust-boundary validation, server-side authorization and safe errors. Use when implementing business logic, APIs, integrations or authorization-sensitive code.
+disable-model-invocation: true
 ---
 
 # Implement maintainable and secure backend behavior

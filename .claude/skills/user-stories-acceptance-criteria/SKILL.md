@@ -1,6 +1,7 @@
 ---
 name: user-stories-acceptance-criteria
 description: Writes small, independent user stories with testable acceptance criteria. Use when creating or refining backlog stories.
+disable-model-invocation: true
 ---
 
 # Write small, testable user stories

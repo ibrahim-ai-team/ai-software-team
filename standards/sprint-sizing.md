@@ -2,6 +2,8 @@
 
 Version 2, 2026-10-20. Replaces the dollar budgets of version 1. Turn-cap enforcement comes from BUD-01 in `docs/verification-report.md`. Caps and capacity are v2 defaults. Recalibrate them after the first pilot sprint (#45), using that sprint's observed delegations and sessions.
 
+Contents: planning a sprint → [points](#story-points-and-size), [turn caps](#usage-per-delegation), [capacity](#sprint-capacity); running a session → [stop rules](#stop-and-checkpoint-rules), [token-saving practices](#token-saving-practices); background → [operating model](#operating-model-claude-pro-subscription-only), [enforcement](#what-is-enforced-and-what-is-policy), [free infrastructure](#free-infrastructure-first), [tracking](#tracking).
+
 ## Operating model: Claude Pro subscription only
 
 | Setting | Value |

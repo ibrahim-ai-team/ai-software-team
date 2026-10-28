@@ -1,6 +1,7 @@
 ---
 name: technical-research-source-verification
 description: Researches technical claims against current primary sources and cites them. Use when verifying versions, vendor capabilities or any technical claim.
+disable-model-invocation: true
 ---
 
 # Research technical claims responsibly

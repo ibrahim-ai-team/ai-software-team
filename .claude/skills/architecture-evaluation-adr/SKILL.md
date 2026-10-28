@@ -1,6 +1,7 @@
 ---
 name: architecture-evaluation-adr
 description: Compares architecture options against quality attributes and records the decision as an ADR. Use when choosing system boundaries or making a consequential, hard-to-reverse technical decision.
+disable-model-invocation: true
 ---
 
 # Evaluate architecture choices and record decisions
